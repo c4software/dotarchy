@@ -25,5 +25,11 @@ gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
 gsettings set org.gnome.desktop.interface icon-theme "Yaru-blue"
 
 # Apply the osaka-jade theme by default
-rm -rf ~/.config/theme
-omarchy-theme-set "osaka-jade"
+# Si .config/theme is already a symlink skip this step
+if [ ! -L ~/.config/theme ]; then
+    if [ -d ~/.config/theme ]; then
+        rm -rf ~/.config/theme
+    fi
+    
+    omarchy-theme-set "osaka-jade"
+fi
