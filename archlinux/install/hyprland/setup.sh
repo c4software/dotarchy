@@ -13,6 +13,7 @@ rm -rf ~/.config/hypr
 cp -r "$SCRIPT_DIR/config/"* ~/.config/
 
 echo -e "Moving extra bin scripts"
+mkdir -p ~/.local/bin # Ensure the directory exists
 cp -r "$SCRIPT_DIR/bin/"* ~/.local/bin/
 
 # Set the dark theme for GTK apps
