@@ -6,6 +6,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ "$1" != "--skip-packages" ]; then
     # Install with yay the packages.aur.txt
     yay -S --noconfirm --needed - <"$SCRIPT_DIR/packages.aur.txt"
+
+    source "$SCRIPT_DIR/greetd.sh"
 fi
 
 echo -e "Moving configuration files (replace if exists)"
