@@ -40,6 +40,8 @@ To update only the configuration files without installing packages, you can run 
 ./install/hyprland/setup.sh --skip-packages
 ```
 
+[Keybindings reference](./install/hyprland/README.md)
+
 -----
 
 ## Installed Software
