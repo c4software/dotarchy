@@ -1,4 +1,9 @@
-<!doctype html><html lang=en-us dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
   Hyprland Configuration
   
   #
@@ -39,43 +44,461 @@ windows.conf: General window management rules.
   #
   
 
-The look and feel of Hyprland, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in archlinux/install/hyprland/config/themes. Each theme has its own directory containing specific configuration files."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://c4software.github.io/dotarchy/docs/hyprland/"><meta property="og:site_name" content="Dotarchy"><meta property="og:title" content="Hyprland"><meta property="og:description" content="Hyprland Configuration # Hyprland is a dynamic tiling Wayland compositor based on wlroots that doesn’t sacrifice on its looks. The configuration for Hyprland is located in archlinux/install/hyprland/config/hypr.
+The look and feel of Hyprland, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in archlinux/install/hyprland/config/themes. Each theme has its own directory containing specific configuration files.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://c4software.github.io/dotarchy/docs/hyprland/">
+  <meta property="og:site_name" content="Dotarchy">
+  <meta property="og:title" content="Hyprland">
+  <meta property="og:description" content="Hyprland Configuration # Hyprland is a dynamic tiling Wayland compositor based on wlroots that doesn’t sacrifice on its looks. The configuration for Hyprland is located in archlinux/install/hyprland/config/hypr.
 Structure # The configuration is split into multiple files for better organization:
-hyprland.conf: The main configuration file that sources all other configuration files. autostart.conf: Manages applications and scripts that are launched at startup. bindings.conf: Defines all keybindings and mouse bindings for window management, application launching, and system controls. envs.conf: Sets environment variables used by Hyprland and other applications. input.conf: Configures input devices such as keyboards, mice, and touchpads. monitors.conf: Defines monitor layouts, resolutions, and refresh rates. base/: This directory contains the core configuration files for different aspects of the compositor: apps.conf: Window rules for specific applications. autostart.conf: Core startup applications. bindings.conf: Base keybindings. envs.conf: Essential environment variables. hyprlock.conf: Configuration for the screen locker. input.conf: General input settings. looknfeel.conf: Visual settings like gaps, borders, and animations. sidepad.conf: Configuration for side panels or special devices. windows.conf: General window management rules. Themes # The look and feel of Hyprland, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in archlinux/install/hyprland/config/themes. Each theme has its own directory containing specific configuration files."><meta property="og:locale" content="en_us"><meta property="og:type" content="article"><meta property="article:section" content="docs"><title>Hyprland | Dotarchy</title><link rel=icon href=/dotarchy/favicon.png><link rel=manifest href=/dotarchy/manifest.json><link rel=canonical href=https://c4software.github.io/dotarchy/docs/hyprland/><link rel=stylesheet href=/dotarchy/book.min.8cccde2f1e7e4a5ea6c3869ce8a1df6c4204e7f83a0a84f40fdcf0f11db2c78c.css integrity="sha256-jMzeLx5+Sl6mw4ac6KHfbEIE5/g6CoT0D9zw8R2yx4w=" crossorigin=anonymous><script defer src=/dotarchy/fuse.min.js></script><script defer src=/dotarchy/en.search.min.2c137483ccfc739c49cf08f815b324b0a5b0e048dc4ad0011998826722ab9f44.js integrity="sha256-LBN0g8z8c5xJzwj4FbMksKWw4EjcStABGZiCZyKrn0Q=" crossorigin=anonymous></script></head><body dir=ltr class="book-kind-page book-type-docs book-layout-"><input type=checkbox class="hidden toggle" id=menu-control>
-<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/dotarchy/><span>Dotarchy</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=/dotarchy/docs/introduction/>Introduction</a></li><li><a href=/dotarchy/docs/system/>The System</a></li><li><a href=/dotarchy/docs/user/>The User</a></li><li><a href=/dotarchy/docs/look/>The Look</a></li><li><a href=/dotarchy/docs/apps/>The Apps</a></li><li><a href=/dotarchy/docs/hyprland/ class=active>Hyprland</a></li><li><a href=/dotarchy/docs/keybindings/>Keybindings</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/dotarchy/svg/menu.svg class=book-icon alt=Menu></label><h3>Hyprland</h3><label for=toc-control><img src=/dotarchy/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#hyprland-configuration>Hyprland Configuration</a><ul><li><a href=#structure>Structure</a></li><li><a href=#themes>Themes</a></li><li><a href=#scripts>Scripts</a></li><li><a href=#keybindings>Keybindings</a></li><li><a href=#autostart>Autostart</a></li><li><a href=#environment-variables>Environment Variables</a></li><li><a href=#input-devices>Input Devices</a></li><li><a href=#monitors>Monitors</a></li></ul></li></ul></nav></aside></header><article class="markdown book-article"><h2 id=hyprland-configuration>Hyprland Configuration
-<a class=anchor href=#hyprland-configuration>#</a></h2><p>Hyprland is a dynamic tiling Wayland compositor based on wlroots that doesn&rsquo;t sacrifice on its looks. The configuration for Hyprland is located in <code>archlinux/install/hyprland/config/hypr</code>.</p><h3 id=structure>Structure
-<a class=anchor href=#structure>#</a></h3><p>The configuration is split into multiple files for better organization:</p><ul><li><strong><code>hyprland.conf</code></strong>: The main configuration file that sources all other configuration files.</li><li><strong><code>autostart.conf</code></strong>: Manages applications and scripts that are launched at startup.</li><li><strong><code>bindings.conf</code></strong>: Defines all keybindings and mouse bindings for window management, application launching, and system controls.</li><li><strong><code>envs.conf</code></strong>: Sets environment variables used by Hyprland and other applications.</li><li><strong><code>input.conf</code></strong>: Configures input devices such as keyboards, mice, and touchpads.</li><li><strong><code>monitors.conf</code></strong>: Defines monitor layouts, resolutions, and refresh rates.</li><li><strong><code>base/</code></strong>: This directory contains the core configuration files for different aspects of the compositor:<ul><li><code>apps.conf</code>: Window rules for specific applications.</li><li><code>autostart.conf</code>: Core startup applications.</li><li><code>bindings.conf</code>: Base keybindings.</li><li><code>envs.conf</code>: Essential environment variables.</li><li><code>hyprlock.conf</code>: Configuration for the screen locker.</li><li><code>input.conf</code>: General input settings.</li><li><code>looknfeel.conf</code>: Visual settings like gaps, borders, and animations.</li><li><code>sidepad.conf</code>: Configuration for side panels or special devices.</li><li><code>windows.conf</code>: General window management rules.</li></ul></li></ul><h3 id=themes>Themes
-<a class=anchor href=#themes>#</a></h3><p>The look and feel of Hyprland, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in <code>archlinux/install/hyprland/config/themes</code>. Each theme has its own directory containing specific configuration files.</p><h3 id=scripts>Scripts
-<a class=anchor href=#scripts>#</a></h3><p>A collection of useful scripts is available in <code>archlinux/install/hyprland/bin</code>. These scripts handle tasks like taking screenshots, managing power profiles, launching menus, and controlling system settings.</p><h3 id=keybindings>Keybindings
-<a class=anchor href=#keybindings>#</a></h3><p>Keybindings are defined in the <code>bindings.conf</code> file. This file includes shortcuts for launching applications, managing windows, and controlling system functions. The configuration uses a combination of modifier keys (like <code>SUPER</code>, <code>ALT</code>, and <code>CTRL</code>) and other keys to create a comprehensive set of shortcuts.</p><p>For a complete list of keybindings and their functions, refer to the <a href=https://wiki.hyprland.org/Configuring/Keybindings/>official Hyprland documentation on keybindings</a>.</p><p>There is some example content in the <code>bindings.conf</code> file:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#75715e># Launch terminal</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>bind</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>SUPER,RETURN,exec,uwsm app -- alacritty</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Close focused window</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>bind</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>SUPER,Q,close</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Switch to workspace 1</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>bind</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>SUPER,1,workspace,1</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Move focused window to workspace 2</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>bind</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>SUPER,SHIFT,2,movetoworkspace,2</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Toggle floating mode for focused window</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>bind</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>SUPER,F,modetoggle,floating</span>
-</span></span></code></pre></div><h3 id=autostart>Autostart
-<a class=anchor href=#autostart>#</a></h3><p>The <code>autostart.conf</code> file is used to launch applications and scripts automatically when Hyprland starts. This is useful for starting essential services like the notification daemon, the status bar, or the wallpaper manager.</p><p>For more details, you can refer to the <a href=https://wiki.hyprland.org/Configuring/Executing/>official documentation on executing applications</a>.</p><p>Here is an example from the configuration:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#75715e># Start the notification daemon</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>exec-once</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>uwsm app -- mako</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Start the status bar</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>exec-once</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>uwsm app -- waybar</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Set a random background</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>exec-once</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>uwsm app -- random-bg</span>
-</span></span></code></pre></div><h3 id=environment-variables>Environment Variables
-<a class=anchor href=#environment-variables>#</a></h3><p>The <code>envs.conf</code> file allows you to set environment variables that will be available within the Hyprland session. This is useful for configuring applications that rely on environment variables for their behavior.</p><p>For more information, see the <a href=https://wiki.hyprland.org/Configuring/Variables/#environment-variables>official documentation on environment variables</a>.</p><p>Example:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#75715e># Set the default browser</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>env</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>BROWSER,google-chrome-stable</span>
-</span></span></code></pre></div><h3 id=input-devices>Input Devices
-<a class=anchor href=#input-devices>#</a></h3><p>The <code>input.conf</code> file is where you configure your input devices, such as keyboards, mice, and touchpads. You can set options like keyboard layout, mouse sensitivity, and touchpad gestures.</p><p>Consult the <a href=https://wiki.hyprland.org/Configuring/Variables/#input>official documentation on input configuration</a> for a complete list of options.</p><h3 id=monitors>Monitors
-<a class=anchor href=#monitors>#</a></h3><p>The <code>monitors.conf</code> file is used to define the layout, resolution, and refresh rate of your monitors. This is essential for multi-monitor setups.</p><p>For detailed configuration options, visit the <a href=https://wiki.hyprland.org/Configuring/Monitors/>official documentation on configuring monitors</a>.</p></article><footer class=book-footer><div class="flex flex-wrap justify-between"></div><div class="flex flex-wrap justify-between"><span><a href=/dotarchy/docs/apps/ class="flex align-center"><img src=/dotarchy/svg/backward.svg class=book-icon alt=Previous title="The Apps">
-<span>The Apps</span>
-</a></span><span><a href=/dotarchy/docs/keybindings/ class="flex align-center"><span>Keybindings</span>
-<img src=/dotarchy/svg/forward.svg class=book-icon alt=Next title=Keybindings></a></span></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#hyprland-configuration>Hyprland Configuration</a><ul><li><a href=#structure>Structure</a></li><li><a href=#themes>Themes</a></li><li><a href=#scripts>Scripts</a></li><li><a href=#keybindings>Keybindings</a></li><li><a href=#autostart>Autostart</a></li><li><a href=#environment-variables>Environment Variables</a></li><li><a href=#input-devices>Input Devices</a></li><li><a href=#monitors>Monitors</a></li></ul></li></ul></nav></div></aside></main></body></html>
+hyprland.conf: The main configuration file that sources all other configuration files. autostart.conf: Manages applications and scripts that are launched at startup. bindings.conf: Defines all keybindings and mouse bindings for window management, application launching, and system controls. envs.conf: Sets environment variables used by Hyprland and other applications. input.conf: Configures input devices such as keyboards, mice, and touchpads. monitors.conf: Defines monitor layouts, resolutions, and refresh rates. base/: This directory contains the core configuration files for different aspects of the compositor: apps.conf: Window rules for specific applications. autostart.conf: Core startup applications. bindings.conf: Base keybindings. envs.conf: Essential environment variables. hyprlock.conf: Configuration for the screen locker. input.conf: General input settings. looknfeel.conf: Visual settings like gaps, borders, and animations. sidepad.conf: Configuration for side panels or special devices. windows.conf: General window management rules. Themes # The look and feel of Hyprland, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in archlinux/install/hyprland/config/themes. Each theme has its own directory containing specific configuration files.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+<title>Hyprland | Dotarchy</title>
+<link rel="icon" href="/dotarchy/favicon.png" >
+<link rel="manifest" href="/dotarchy/manifest.json">
+<link rel="canonical" href="https://c4software.github.io/dotarchy/docs/hyprland/">
+<link rel="stylesheet" href="/dotarchy/book.min.8cccde2f1e7e4a5ea6c3869ce8a1df6c4204e7f83a0a84f40fdcf0f11db2c78c.css" integrity="sha256-jMzeLx5&#43;Sl6mw4ac6KHfbEIE5/g6CoT0D9zw8R2yx4w=" crossorigin="anonymous">
+  <script defer src="/dotarchy/fuse.min.js"></script>
+  <script defer src="/dotarchy/en.search.min.b204e75eee87c82137fa1890260592b41a46879a40fa4c7220ae4521d65320ab.js" integrity="sha256-sgTnXu6HyCE3&#43;hiQJgWStBpGh5pA&#43;kxyIK5FIdZTIKs=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs book-layout-">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/dotarchy/"><span>Dotarchy</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/introduction/" class="">Introduction</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/system/" class="">The System</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/user/" class="">The User</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/look/" class="">The Look</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/apps/" class="">The Apps</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/hyprland/" class="active">Hyprland</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/keybindings/" class="">Keybindings</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/dotarchy/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Hyprland</h3>
+
+  <label for="toc-control">
+    
+    <img src="/dotarchy/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#hyprland-configuration">Hyprland Configuration</a>
+      <ul>
+        <li><a href="#structure">Structure</a></li>
+        <li><a href="#themes">Themes</a></li>
+        <li><a href="#scripts">Scripts</a></li>
+        <li><a href="#keybindings">Keybindings</a></li>
+        <li><a href="#autostart">Autostart</a></li>
+        <li><a href="#environment-variables">Environment Variables</a></li>
+        <li><a href="#input-devices">Input Devices</a></li>
+        <li><a href="#monitors">Monitors</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h2 id="hyprland-configuration">
+  Hyprland Configuration
+  
+  <a class="anchor" href="#hyprland-configuration">#</a>
+  
+</h2>
+<p>Hyprland is a dynamic tiling Wayland compositor based on wlroots that doesn&rsquo;t sacrifice on its looks. The configuration for Hyprland is located in <code>archlinux/install/hyprland/config/hypr</code>.</p>
+<h3 id="structure">
+  Structure
+  
+  <a class="anchor" href="#structure">#</a>
+  
+</h3>
+<p>The configuration is split into multiple files for better organization:</p>
+<ul>
+<li><strong><code>hyprland.conf</code></strong>: The main configuration file that sources all other configuration files.</li>
+<li><strong><code>autostart.conf</code></strong>: Manages applications and scripts that are launched at startup.</li>
+<li><strong><code>bindings.conf</code></strong>: Defines all keybindings and mouse bindings for window management, application launching, and system controls.</li>
+<li><strong><code>envs.conf</code></strong>: Sets environment variables used by Hyprland and other applications.</li>
+<li><strong><code>input.conf</code></strong>: Configures input devices such as keyboards, mice, and touchpads.</li>
+<li><strong><code>monitors.conf</code></strong>: Defines monitor layouts, resolutions, and refresh rates.</li>
+<li><strong><code>base/</code></strong>: This directory contains the core configuration files for different aspects of the compositor:
+<ul>
+<li><code>apps.conf</code>: Window rules for specific applications.</li>
+<li><code>autostart.conf</code>: Core startup applications.</li>
+<li><code>bindings.conf</code>: Base keybindings.</li>
+<li><code>envs.conf</code>: Essential environment variables.</li>
+<li><code>hyprlock.conf</code>: Configuration for the screen locker.</li>
+<li><code>input.conf</code>: General input settings.</li>
+<li><code>looknfeel.conf</code>: Visual settings like gaps, borders, and animations.</li>
+<li><code>sidepad.conf</code>: Configuration for side panels or special devices.</li>
+<li><code>windows.conf</code>: General window management rules.</li>
+</ul>
+</li>
+</ul>
+<h3 id="themes">
+  Themes
+  
+  <a class="anchor" href="#themes">#</a>
+  
+</h3>
+<p>The look and feel of Hyprland, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in <code>archlinux/install/hyprland/config/themes</code>. Each theme has its own directory containing specific configuration files.</p>
+<h3 id="scripts">
+  Scripts
+  
+  <a class="anchor" href="#scripts">#</a>
+  
+</h3>
+<p>A collection of useful scripts is available in <code>archlinux/install/hyprland/bin</code>. These scripts handle tasks like taking screenshots, managing power profiles, launching menus, and controlling system settings.</p>
+<h3 id="keybindings">
+  Keybindings
+  
+  <a class="anchor" href="#keybindings">#</a>
+  
+</h3>
+<p>Keybindings are defined in the <code>bindings.conf</code> file. This file includes shortcuts for launching applications, managing windows, and controlling system functions. The configuration uses a combination of modifier keys (like <code>SUPER</code>, <code>ALT</code>, and <code>CTRL</code>) and other keys to create a comprehensive set of shortcuts.</p>
+<p>For a complete list of keybindings and their functions, refer to the <a href="https://wiki.hyprland.org/Configuring/Keybindings/">official Hyprland documentation on keybindings</a>.</p>
+<p>There is some example content in the <code>bindings.conf</code> file:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#75715e"># Launch terminal</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">bind</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">SUPER,RETURN,exec,uwsm app -- alacritty</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Close focused window</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">bind</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">SUPER,Q,close</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Switch to workspace 1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">bind</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">SUPER,1,workspace,1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Move focused window to workspace 2</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">bind</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">SUPER,SHIFT,2,movetoworkspace,2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Toggle floating mode for focused window</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">bind</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">SUPER,F,modetoggle,floating</span>
+</span></span></code></pre></div><h3 id="autostart">
+  Autostart
+  
+  <a class="anchor" href="#autostart">#</a>
+  
+</h3>
+<p>The <code>autostart.conf</code> file is used to launch applications and scripts automatically when Hyprland starts. This is useful for starting essential services like the notification daemon, the status bar, or the wallpaper manager.</p>
+<p>For more details, you can refer to the <a href="https://wiki.hyprland.org/Configuring/Executing/">official documentation on executing applications</a>.</p>
+<p>Here is an example from the configuration:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#75715e"># Start the notification daemon</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">exec-once</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">uwsm app -- mako</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Start the status bar</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">exec-once</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">uwsm app -- waybar</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Set a random background</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">exec-once</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">uwsm app -- random-bg</span>
+</span></span></code></pre></div><h3 id="environment-variables">
+  Environment Variables
+  
+  <a class="anchor" href="#environment-variables">#</a>
+  
+</h3>
+<p>The <code>envs.conf</code> file allows you to set environment variables that will be available within the Hyprland session. This is useful for configuring applications that rely on environment variables for their behavior.</p>
+<p>For more information, see the <a href="https://wiki.hyprland.org/Configuring/Variables/#environment-variables">official documentation on environment variables</a>.</p>
+<p>Example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#75715e"># Set the default browser</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">env</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">BROWSER,google-chrome-stable</span>
+</span></span></code></pre></div><h3 id="input-devices">
+  Input Devices
+  
+  <a class="anchor" href="#input-devices">#</a>
+  
+</h3>
+<p>The <code>input.conf</code> file is where you configure your input devices, such as keyboards, mice, and touchpads. You can set options like keyboard layout, mouse sensitivity, and touchpad gestures.</p>
+<p>Consult the <a href="https://wiki.hyprland.org/Configuring/Variables/#input">official documentation on input configuration</a> for a complete list of options.</p>
+<h3 id="monitors">
+  Monitors
+  
+  <a class="anchor" href="#monitors">#</a>
+  
+</h3>
+<p>The <code>monitors.conf</code> file is used to define the layout, resolution, and refresh rate of your monitors. This is essential for multi-monitor setups.</p>
+<p>For detailed configuration options, visit the <a href="https://wiki.hyprland.org/Configuring/Monitors/">official documentation on configuring monitors</a>.</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/dotarchy/docs/apps/" class="flex align-center">
+        <img src="/dotarchy/svg/backward.svg" class="book-icon" alt="Previous" title="The Apps" />
+        <span>The Apps</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/dotarchy/docs/keybindings/" class="flex align-center">
+        <span>Keybindings</span>
+        <img src="/dotarchy/svg/forward.svg" class="book-icon" alt="Next" title="Keybindings" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+
+<aside class="book-toc">
+  <div class="book-toc-content">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#hyprland-configuration">Hyprland Configuration</a>
+      <ul>
+        <li><a href="#structure">Structure</a></li>
+        <li><a href="#themes">Themes</a></li>
+        <li><a href="#scripts">Scripts</a></li>
+        <li><a href="#keybindings">Keybindings</a></li>
+        <li><a href="#autostart">Autostart</a></li>
+        <li><a href="#environment-variables">Environment Variables</a></li>
+        <li><a href="#input-devices">Input Devices</a></li>
+        <li><a href="#monitors">Monitors</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </div>
+</aside>
+
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
