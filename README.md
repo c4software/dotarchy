@@ -3,6 +3,7 @@
 This folder contains installation and configuration scripts for multiple Linux distributions (currently: Arch Linux, Fedora and macOS). The goal is to automate the setup of applications, fonts, development tools, and user configurations.
 
 ⚠️ The Hyprland setup is extracted (with some cleanup and adjustments) from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
+[Hyprland Keybindings reference](./archlinux/install/hyprland/README.md)
 
 ## Prerequisites
 

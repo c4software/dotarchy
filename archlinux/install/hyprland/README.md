@@ -1,87 +1,88 @@
-# Hyprland - Raccourcis clavier
+# Hyprland - Keyboard Shortcuts
 
-### Gestion des fenêtres
+### Window Management
 
-| Raccourci | Description |
+| Shortcut | Description |
 | :--- | :--- |
-| `SUPER + W` | Fermer la fenêtre active |
-| `SUPER + J` | Basculer le "split" (division) |
-| `SUPER + P` | Fenêtre "pseudo" |
-| `SUPER + V` | Basculer en mode flottant |
-| `SHIFT + F11` | Forcer le plein écran |
-| `SUPER + ↑/↓` | Basculer en mode monocle (plein écran avec gestion des fenêtres en arrière-plan) |
-| `SUPER + ←/→/↑/↓` | Déplacer le focus |
-| `SUPER + [0-9]` | Changer d'espace de travail |
-| `SUPER + SHIFT + [0-9]` | Déplacer la fenêtre vers un espace de travail |
-| `SUPER + TAB` | Espace de travail suivant |
-| `SUPER + SHIFT + TAB` | Espace de travail précédent |
-| `SUPER + SHIFT + ←/→/↑/↓` | Échanger la fenêtre active avec la voisine |
-| `ALT + Tab` | Fenêtre suivante dans l'espace de travail |
-| `ALT + SHIFT + Tab` | Fenêtre précédente dans l'espace de travail |
-| `SUPER + -/=` | Redimensionner la fenêtre horizontalement |
-| `SUPER + SHIFT + -/=` | Redimensionner la fenêtre verticalement |
-| `ALT + ←/→/↑/↓` | Redimensionner la fenêtre horizontalement/verticalement |
-| `SUPER + Molette souris` | Faire défiler les espaces de travail |
-| `SUPER + Clic gauche` | Déplacer la fenêtre |
-| `SUPER + Clic droit` | Redimensionner la fenêtre |
+| `SUPER + W` | Close the active window |
+| `SUPER + J` | Toggle "split" (division) |
+| `SUPER + P` | "Pseudo" window |
+| `SUPER + V` | Toggle floating mode |
+| `SHIFT + F11` | Force fullscreen |
+| `SUPER + ↑/↓` | Toggle monocle mode (fullscreen with background window management) |
+| `SUPER + ←/→/↑/↓` | Move focus |
+| `SUPER + [0-9]` | Switch to workspace |
+| `SUPER + SHIFT + [0-9]` | Move window to workspace |
+| `SUPER + TAB` | Next workspace |
+| `SUPER + SHIFT + TAB` | Previous workspace |
+| `SUPER + SHIFT + ←/→/↑/↓` | Swap active window with neighbor |
+| `ALT + Tab` | Next window in workspace |
+| `ALT + SHIFT + Tab` | Previous window in workspace |
+| `SUPER + -/=` | Resize window horizontally |
+| `SUPER + SHIFT + -/=` | Resize window vertically |
+| `ALT + ←/→/↑/↓` | Resize window horizontally/vertically |
+| `SUPER + Mouse wheel` | Scroll through workspaces |
+| `SUPER + Left click` | Move window |
+| `SUPER + Right click` | Resize window |
 
 ---
 
 ### Applications
 
-| Raccourci | Description |
+| Shortcut | Description |
 | :--- | :--- |
-| `SUPER + Enter` | Lancer le terminal |
-| `SUPER + F` | Lancer le gestionnaire de fichiers |
-| `SUPER + B` | Lancer le navigateur |
-| `SUPER + N` | Lancer Neovim |
-| `SUPER + T` | Lancer `btop` (moniteur d'activité) |
-| `SUPER + D` | Lancer `lazydocker` |
-| `SUPER + C` | Lancer le menu IA |
-| `SUPER + SHIFT + G` | Lancer WhatsApp |
-| `SUPER + ALT + G` | Lancer Google Messages |
+| `SUPER + Enter` | Launch terminal |
+| `SUPER + F` | Launch file manager |
+| `SUPER + B` | Launch browser |
+| `SUPER + N` | Launch Neovim |
+| `SUPER + T` | Launch `btop` (activity monitor) |
+| `SUPER + D` | Launch `lazydocker` |
+| `SUPER + C` | Launch AI menu |
+| `SUPER + SHIFT + G` | Launch WhatsApp |
+| `SUPER + ALT + G` | Launch Google Messages |
 
 ---
 
-### Utilitaires
+### Utilities
 
-| Raccourci | Description |
+| Shortcut | Description |
 | :--- | :--- |
-| `SUPER + Espace` | Lancer le menu d'applications (`walker`) |
-| `SUPER + CTRL + E` | Afficher le presse-papiers (`walker` Emojis) |
-| `SUPER + ALT + Espace` | Menu Omarchy |
-| `SUPER + ESC` ou `XF86PowerOff` | Menu d'alimentation |
-| `SUPER + K` | Afficher les raccourcis clavier |
-| `SUPER + SHIFT + Espace` | Afficher/cacher la barre supérieure (`waybar`) |
-| `SUPER + CTRL + Espace` | Fond d'écran suivant du thème |
-| `SUPER + SHIFT + CTRL + Espace` | Choisir un nouveau thème |
-| `SUPER + ,` | Rejeter la dernière notification |
-| `SUPER + SHIFT + ,` | Rejeter toutes les notifications |
-| `SUPER + CTRL + ,` | Activer/désactiver le mode silencieux pour les notifications |
-| `SUPER + CTRL + I` | Activer/désactiver le verrouillage en cas d'inactivité |
-| `Impr. écran` | Capture d'écran d'une région |
-| `SHIFT + Impr. écran` | Capture d'écran d'une fenêtre |
-| `CTRL + Impr. écran` | Capture d'écran de l'affichage |
-| `ALT + Impr. écran` | Enregistrement vidéo d'une région |
-| `CTRL + ALT + Impr. écran` | Enregistrement vidéo de l'affichage |
-| `SUPER + Impr. écran` | Sélecteur de couleur (`hyprpicker`) |
+| `SUPER + Space` | Launch application menu (`walker`) |
+| `SUPER + CTRL + E` | Show clipboard (`walker` Emojis) |
+| `SUPER + ALT + Space` | Omarchy menu |
+| `SUPER + ESC` or `XF86PowerOff` | Power menu |
+| `SUPER + K` | Show keyboard shortcuts |
+| `SUPER + SHIFT + Space` | Show/hide top bar (`waybar`) |
+| `SUPER + CTRL + Space` | Next wallpaper in theme |
+| `SUPER + SHIFT + CTRL + Space` | Choose a new theme |
+| `SUPER + ,` | Dismiss last notification |
+| `SUPER + SHIFT + ,` | Dismiss all notifications |
+| `SUPER + CTRL + ,` | Toggle silent mode for notifications |
+| `SUPER + CTRL + I` | Toggle lock on inactivity |
+| `Print Screen` | Screenshot of a region |
+| `SHIFT + Print Screen` | Screenshot of a window |
+| `CTRL + Print Screen` | Screenshot of the display |
+| `ALT + Print Screen` | Video recording of a region |
+| `CTRL + ALT + Print Screen` | Video recording of the display |
+| `SUPER + Print Screen` | Color picker (`hyprpicker`) |
 
 ---
 
-### Média
+### Media
 
-| Raccourci | Description |
+| Shortcut | Description |
 | :--- | :--- |
-| `XF86AudioRaiseVolume` | Augmenter le volume |
-| `XF86AudioLowerVolume` | Baisser le volume |
-| `XF86AudioMute` | Couper/rétablir le son |
-| `XF86AudioMicMute` | Couper/rétablir le micro |
-| `XF86MonBrightnessUp` | Augmenter la luminosité |
-| `XF86MonBrightnessDown` | Baisser la luminosité |
-| `ALT + XF86AudioRaiseVolume` | Augmenter le volume (précis) |
-| `ALT + XF86AudioLowerVolume` | Baisser le volume (précis) |
-| `ALT + XF86MonBrightnessUp` | Augmenter la luminosité (précis) |
-| `ALT + XF86MonBrightnessDown` | Baisser la luminosité (précis) |
-| `XF86AudioNext` | Piste suivante |
-| `XF86AudioPause` / `XF86AudioPlay` | Lecture/pause |
-| `XF86AudioPrev` | Piste précédente |
+| `XF86AudioRaiseVolume` | Increase volume |
+| `XF86AudioLowerVolume` | Decrease volume |
+| `XF86AudioMute` | Mute/unmute sound |
+| `XF86AudioMicMute` | Mute/unmute microphone |
+| `XF86MonBrightnessUp` | Increase brightness |
+| `XF86MonBrightnessDown` | Decrease brightness |
+| `ALT + XF86AudioRaiseVolume` | Increase volume (precise) |
+| `ALT + XF86AudioLowerVolume` | Decrease volume (precise) |
+| `ALT + XF86MonBrightnessUp` | Increase brightness (precise) |
+| `ALT + XF86MonBrightnessDown` | Decrease brightness (precise) |
+| `XF86AudioNext` | Next track |
+| `XF86AudioPause` / `XF86AudioPlay` | Play/pause |
+| `XF86AudioPrev` | Previous track |
+
