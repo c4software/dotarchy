@@ -5,6 +5,8 @@ type: "landing"
 
 Welcome to the Dotarchy manual. This documentation provides a guide to understanding, installing, and using the Dotarchy dotfiles.
 
+![Screenshot](./screenshot.jpg)
+
 - [Source code](https://github.com/c4software/dotarchy)
 
 ## Installation

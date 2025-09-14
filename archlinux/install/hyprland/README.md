@@ -1,5 +1,8 @@
 # Hyprland - Keyboard Shortcuts
 
+![Screenshot](../../../docs/static/screenshot.jpg)
+
+
 ### Window Management
 
 | Shortcut | Description |
