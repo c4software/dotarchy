@@ -1,4 +1,9 @@
-<!doctype html><html lang=en-us dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="This section details the applications installed and their configurations.
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="This section details the applications installed and their configurations.
 
 Development tools (Neovim, Git, Docker)
 Terminal emulators
@@ -25,7 +30,7 @@ mise: A tool for managing development environments.
 visual-studio-code-bin, jetbrains-toolbox: Alternative IDEs.
 
 
-  Terminal & Shell
+  Terminal &amp; Shell
   
   #
   
@@ -47,14 +52,385 @@ google-chrome: Web browser.
 spotify: Music streaming.
 signal-desktop: Secure messaging.
 proton-vpn-gtk-app: VPN client.
-"><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://c4software.github.io/dotarchy/docs/apps/"><meta property="og:site_name" content="Dotarchy"><meta property="og:title" content="The Apps"><meta property="og:description" content="This section details the applications installed and their configurations.
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://c4software.github.io/dotarchy/docs/apps/">
+  <meta property="og:site_name" content="Dotarchy">
+  <meta property="og:title" content="The Apps">
+  <meta property="og:description" content="This section details the applications installed and their configurations.
 Development tools (Neovim, Git, Docker) Terminal emulators Web browsers Core Applications # A set of applications is installed by default to provide a complete development and desktop environment. The package lists are located in archlinux/install/apps/packages.txt, archlinux/install/desktop/packages.txt, and archlinux/install/desktop/packages.aur.txt.
-Development # neovim: The primary text editor. git, lazygit: Version control. docker, docker-compose, lazydocker: Containerization. mise: A tool for managing development environments. visual-studio-code-bin, jetbrains-toolbox: Alternative IDEs. Terminal & Shell # alacritty, ghostty: Terminal emulators. zellij: A terminal multiplexer. starship: A customizable shell prompt. fzf, ripgrep, bat: Powerful command-line utilities. Desktop # google-chrome: Web browser. spotify: Music streaming. signal-desktop: Secure messaging. proton-vpn-gtk-app: VPN client."><meta property="og:locale" content="en_us"><meta property="og:type" content="article"><meta property="article:section" content="docs"><title>The Apps | Dotarchy</title><link rel=icon href=/dotarchy/favicon.png><link rel=manifest href=/dotarchy/manifest.json><link rel=canonical href=https://c4software.github.io/dotarchy/docs/apps/><link rel=stylesheet href=/dotarchy/book.min.8cccde2f1e7e4a5ea6c3869ce8a1df6c4204e7f83a0a84f40fdcf0f11db2c78c.css integrity="sha256-jMzeLx5+Sl6mw4ac6KHfbEIE5/g6CoT0D9zw8R2yx4w=" crossorigin=anonymous><script defer src=/dotarchy/fuse.min.js></script><script defer src=/dotarchy/en.search.min.ef6a08b5bc9f65fb4cd984c6e1cbe6ce7e5466ef1521660d35309746f231651b.js integrity="sha256-72oItbyfZftM2YTG4cvmzn5UZu8VIWYNNTCXRvIxZRs=" crossorigin=anonymous></script></head><body dir=ltr class="book-kind-page book-type-docs book-layout-"><input type=checkbox class="hidden toggle" id=menu-control>
-<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/dotarchy/><span>Dotarchy</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=/dotarchy/docs/introduction/>Introduction</a></li><li><a href=/dotarchy/docs/system/>The System</a></li><li><a href=/dotarchy/docs/user/>The User</a></li><li><a href=/dotarchy/docs/look/>The Look</a></li><li><a href=/dotarchy/docs/apps/ class=active>The Apps</a></li><li><a href=/dotarchy/docs/hyprland/>Hyprland</a></li><li><a href=/dotarchy/docs/keybindings/>Keybindings</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/dotarchy/svg/menu.svg class=book-icon alt=Menu></label><h3>The Apps</h3><label for=toc-control><img src=/dotarchy/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#core-applications>Core Applications</a><ul><li><a href=#development>Development</a></li><li><a href=#terminal--shell>Terminal & Shell</a></li><li><a href=#desktop>Desktop</a></li></ul></li></ul></nav></aside></header><article class="markdown book-article"><p>This section details the applications installed and their configurations.</p><ul><li>Development tools (Neovim, Git, Docker)</li><li>Terminal emulators</li><li>Web browsers</li></ul><h2 id=core-applications>Core Applications
-<a class=anchor href=#core-applications>#</a></h2><p>A set of applications is installed by default to provide a complete development and desktop environment. The package lists are located in <code>archlinux/install/apps/packages.txt</code>, <code>archlinux/install/desktop/packages.txt</code>, and <code>archlinux/install/desktop/packages.aur.txt</code>.</p><h3 id=development>Development
-<a class=anchor href=#development>#</a></h3><ul><li><strong><code>neovim</code></strong>: The primary text editor.</li><li><strong><code>git</code></strong>, <strong><code>lazygit</code></strong>: Version control.</li><li><strong><code>docker</code></strong>, <strong><code>docker-compose</code></strong>, <strong><code>lazydocker</code></strong>: Containerization.</li><li><strong><code>mise</code></strong>: A tool for managing development environments.</li><li><strong><code>visual-studio-code-bin</code></strong>, <strong><code>jetbrains-toolbox</code></strong>: Alternative IDEs.</li></ul><h3 id=terminal--shell>Terminal & Shell
-<a class=anchor href=#terminal--shell>#</a></h3><ul><li><strong><code>alacritty</code></strong>, <strong><code>ghostty</code></strong>: Terminal emulators.</li><li><strong><code>zellij</code></strong>: A terminal multiplexer.</li><li><strong><code>starship</code></strong>: A customizable shell prompt.</li><li><strong><code>fzf</code></strong>, <strong><code>ripgrep</code></strong>, <strong><code>bat</code></strong>: Powerful command-line utilities.</li></ul><h3 id=desktop>Desktop
-<a class=anchor href=#desktop>#</a></h3><ul><li><strong><code>google-chrome</code></strong>: Web browser.</li><li><strong><code>spotify</code></strong>: Music streaming.</li><li><strong><code>signal-desktop</code></strong>: Secure messaging.</li><li><strong><code>proton-vpn-gtk-app</code></strong>: VPN client.</li></ul></article><footer class=book-footer><div class="flex flex-wrap justify-between"></div><div class="flex flex-wrap justify-between"><span><a href=/dotarchy/docs/look/ class="flex align-center"><img src=/dotarchy/svg/backward.svg class=book-icon alt=Previous title="The Look">
-<span>The Look</span>
-</a></span><span><a href=/dotarchy/docs/hyprland/ class="flex align-center"><span>Hyprland</span>
-<img src=/dotarchy/svg/forward.svg class=book-icon alt=Next title=Hyprland></a></span></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#core-applications>Core Applications</a><ul><li><a href=#development>Development</a></li><li><a href=#terminal--shell>Terminal & Shell</a></li><li><a href=#desktop>Desktop</a></li></ul></li></ul></nav></div></aside></main></body></html>
+Development # neovim: The primary text editor. git, lazygit: Version control. docker, docker-compose, lazydocker: Containerization. mise: A tool for managing development environments. visual-studio-code-bin, jetbrains-toolbox: Alternative IDEs. Terminal &amp; Shell # alacritty, ghostty: Terminal emulators. zellij: A terminal multiplexer. starship: A customizable shell prompt. fzf, ripgrep, bat: Powerful command-line utilities. Desktop # google-chrome: Web browser. spotify: Music streaming. signal-desktop: Secure messaging. proton-vpn-gtk-app: VPN client.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+<title>The Apps | Dotarchy</title>
+<link rel="icon" href="/dotarchy/favicon.png" >
+<link rel="manifest" href="/dotarchy/manifest.json">
+<link rel="canonical" href="https://c4software.github.io/dotarchy/docs/apps/">
+<link rel="stylesheet" href="/dotarchy/book.min.8cccde2f1e7e4a5ea6c3869ce8a1df6c4204e7f83a0a84f40fdcf0f11db2c78c.css" integrity="sha256-jMzeLx5&#43;Sl6mw4ac6KHfbEIE5/g6CoT0D9zw8R2yx4w=" crossorigin="anonymous">
+  <script defer src="/dotarchy/fuse.min.js"></script>
+  <script defer src="/dotarchy/en.search.min.ef6a08b5bc9f65fb4cd984c6e1cbe6ce7e5466ef1521660d35309746f231651b.js" integrity="sha256-72oItbyfZftM2YTG4cvmzn5UZu8VIWYNNTCXRvIxZRs=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs book-layout-">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/dotarchy/"><span>Dotarchy</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/introduction/" class="">Introduction</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/system/" class="">The System</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/user/" class="">The User</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/look/" class="">The Look</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/apps/" class="active">The Apps</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/hyprland/" class="">Hyprland</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/keybindings/" class="">Keybindings</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/dotarchy/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>The Apps</h3>
+
+  <label for="toc-control">
+    
+    <img src="/dotarchy/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#core-applications">Core Applications</a>
+      <ul>
+        <li><a href="#development">Development</a></li>
+        <li><a href="#terminal--shell">Terminal &amp; Shell</a></li>
+        <li><a href="#desktop">Desktop</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><p>This section details the applications installed and their configurations.</p>
+<ul>
+<li>Development tools (Neovim, Git, Docker)</li>
+<li>Terminal emulators</li>
+<li>Web browsers</li>
+</ul>
+<h2 id="core-applications">
+  Core Applications
+  
+  <a class="anchor" href="#core-applications">#</a>
+  
+</h2>
+<p>A set of applications is installed by default to provide a complete development and desktop environment. The package lists are located in <code>archlinux/install/apps/packages.txt</code>, <code>archlinux/install/desktop/packages.txt</code>, and <code>archlinux/install/desktop/packages.aur.txt</code>.</p>
+<h3 id="development">
+  Development
+  
+  <a class="anchor" href="#development">#</a>
+  
+</h3>
+<ul>
+<li><strong><code>neovim</code></strong>: The primary text editor.</li>
+<li><strong><code>git</code></strong>, <strong><code>lazygit</code></strong>: Version control.</li>
+<li><strong><code>docker</code></strong>, <strong><code>docker-compose</code></strong>, <strong><code>lazydocker</code></strong>: Containerization.</li>
+<li><strong><code>mise</code></strong>: A tool for managing development environments.</li>
+<li><strong><code>visual-studio-code-bin</code></strong>, <strong><code>jetbrains-toolbox</code></strong>: Alternative IDEs.</li>
+</ul>
+<h3 id="terminal--shell">
+  Terminal &amp; Shell
+  
+  <a class="anchor" href="#terminal--shell">#</a>
+  
+</h3>
+<ul>
+<li><strong><code>alacritty</code></strong>, <strong><code>ghostty</code></strong>: Terminal emulators.</li>
+<li><strong><code>zellij</code></strong>: A terminal multiplexer.</li>
+<li><strong><code>starship</code></strong>: A customizable shell prompt.</li>
+<li><strong><code>fzf</code></strong>, <strong><code>ripgrep</code></strong>, <strong><code>bat</code></strong>: Powerful command-line utilities.</li>
+</ul>
+<h3 id="desktop">
+  Desktop
+  
+  <a class="anchor" href="#desktop">#</a>
+  
+</h3>
+<ul>
+<li><strong><code>google-chrome</code></strong>: Web browser.</li>
+<li><strong><code>spotify</code></strong>: Music streaming.</li>
+<li><strong><code>signal-desktop</code></strong>: Secure messaging.</li>
+<li><strong><code>proton-vpn-gtk-app</code></strong>: VPN client.</li>
+</ul>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/dotarchy/docs/look/" class="flex align-center">
+        <img src="/dotarchy/svg/backward.svg" class="book-icon" alt="Previous" title="The Look" />
+        <span>The Look</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/dotarchy/docs/hyprland/" class="flex align-center">
+        <span>Hyprland</span>
+        <img src="/dotarchy/svg/forward.svg" class="book-icon" alt="Next" title="Hyprland" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+
+<aside class="book-toc">
+  <div class="book-toc-content">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#core-applications">Core Applications</a>
+      <ul>
+        <li><a href="#development">Development</a></li>
+        <li><a href="#terminal--shell">Terminal &amp; Shell</a></li>
+        <li><a href="#desktop">Desktop</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </div>
+</aside>
+
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
