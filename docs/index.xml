@@ -1,474 +1,60 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docs on Dotarchy</title><link>https://c4software.github.io/dotarchy/docs/</link><description>Recent content in Docs on Dotarchy</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://c4software.github.io/dotarchy/docs/index.xml" rel="self" type="application/rss+xml"/><item><title>Introduction</title><link>https://c4software.github.io/dotarchy/docs/introduction/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://c4software.github.io/dotarchy/docs/introduction/</guid><description>&lt;h2 id="what-is-dotarchy"&gt;
- What is Dotarchy?
- 
- &lt;a class="anchor" href="#what-is-dotarchy"&gt;#&lt;/a&gt;
- 
-&lt;/h2&gt;
-&lt;p&gt;Dotarchy is a set of dotfiles and configurations to create a consistent and powerful development environment across different operating systems like Arch Linux, Fedora, and macOS.&lt;/p&gt;
-&lt;p&gt;The main goal is to have a modular and easy-to-maintain system that can be quickly set up on a new machine.&lt;/p&gt;</description></item><item><title>The System</title><link>https://c4software.github.io/dotarchy/docs/system/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://c4software.github.io/dotarchy/docs/system/</guid><description>&lt;p&gt;This section describes the system-level configurations and installations.&lt;/p&gt;
-&lt;p&gt;It includes:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Base system setup&lt;/li&gt;
-&lt;li&gt;Package management&lt;/li&gt;
-&lt;li&gt;System services&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="packages"&gt;
- Packages
- 
- &lt;a class="anchor" href="#packages"&gt;#&lt;/a&gt;
- 
-&lt;/h2&gt;
-&lt;p&gt;The system installs a set of essential packages for a functional environment. These are defined in &lt;code&gt;archlinux/install/system/packages.txt&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Key packages include:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;fuse&lt;/code&gt;&lt;/strong&gt;: For AppImage support.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;bluez&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;bluez-utils&lt;/code&gt;&lt;/strong&gt;: Bluetooth support.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;fwupd&lt;/code&gt;&lt;/strong&gt;: For firmware updates.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;power-profiles-daemon&lt;/code&gt;&lt;/strong&gt;: For managing power profiles.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;cups&lt;/code&gt;&lt;/strong&gt;: For printing support.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;ufw&lt;/code&gt;&lt;/strong&gt;: A simple firewall.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;bolt&lt;/code&gt;&lt;/strong&gt;: For Thunderbolt device management.&lt;/li&gt;
-&lt;/ul&gt;</description></item><item><title>The User</title><link>https://c4software.github.io/dotarchy/docs/user/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://c4software.github.io/dotarchy/docs/user/</guid><description>&lt;p&gt;This section covers user-specific configurations.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Shell environment (bash, zsh)&lt;/li&gt;
-&lt;li&gt;Aliases and functions&lt;/li&gt;
-&lt;li&gt;Input configuration&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="shell"&gt;
- Shell
- 
- &lt;a class="anchor" href="#shell"&gt;#&lt;/a&gt;
- 
-&lt;/h2&gt;
-&lt;p&gt;The primary shell is configured through files in &lt;code&gt;common/config/bash&lt;/code&gt;.&lt;/p&gt;
-&lt;h3 id="aliases"&gt;
- Aliases
- 
- &lt;a class="anchor" href="#aliases"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;p&gt;A number of aliases are defined in &lt;code&gt;common/config/bash/aliases&lt;/code&gt; to simplify common commands. Some examples:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;ls='eza -lh --group-directories-first --icons=auto'&lt;/code&gt;: A modern &lt;code&gt;ls&lt;/code&gt; replacement.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;ff='nvim &amp;quot;$(fzf -m --preview &amp;quot;bat --style=numbers --color=always {}&amp;quot;)&amp;quot;'&lt;/code&gt;: Find and open files in Neovim with a fuzzy finder.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;g='git'&lt;/code&gt;: Shortcut for &lt;code&gt;git&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;d='docker'&lt;/code&gt;: Shortcut for &lt;code&gt;docker&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;n&lt;/code&gt;: A function to open Neovim, opening the current directory if no file is specified.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="tui-shortcuts"&gt;
- TUI Shortcuts
- 
- &lt;a class="anchor" href="#tui-shortcuts"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;p&gt;A script &lt;code&gt;omarchy-tui-install&lt;/code&gt; located in &lt;code&gt;common/bin&lt;/code&gt; allows creating desktop shortcuts for terminal-based applications, making them launchable from the application menu.&lt;/p&gt;</description></item><item><title>The Look</title><link>https://c4software.github.io/dotarchy/docs/look/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://c4software.github.io/dotarchy/docs/look/</guid><description>&lt;p&gt;This section is about the visual appearance of the environment.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Themes for terminals and editors&lt;/li&gt;
-&lt;li&gt;Fonts&lt;/li&gt;
-&lt;li&gt;Wallpapers&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="themes"&gt;
- Themes
- 
- &lt;a class="anchor" href="#themes"&gt;#&lt;/a&gt;
- 
-&lt;/h2&gt;
-&lt;p&gt;The visual theme is a core part of the Dotarchy experience. Themes are managed in a centralized way and applied to multiple applications. The main theme configuration can be found in &lt;code&gt;common/config/theme&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;For example, &lt;code&gt;alacritty.toml&lt;/code&gt; in this directory defines the color scheme for the Alacritty terminal emulator.&lt;/p&gt;
-&lt;h2 id="fonts"&gt;
- Fonts
- 
- &lt;a class="anchor" href="#fonts"&gt;#&lt;/a&gt;
- 
-&lt;/h2&gt;
-&lt;p&gt;A selection of fonts is installed to ensure a consistent and pleasant visual experience, especially for development. These are listed in &lt;code&gt;archlinux/install/desktop/packages.aur.txt&lt;/code&gt; and include:&lt;/p&gt;</description></item><item><title>The Apps</title><link>https://c4software.github.io/dotarchy/docs/apps/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://c4software.github.io/dotarchy/docs/apps/</guid><description>&lt;p&gt;This section details the applications installed and their configurations.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Development tools (Neovim, Git, Docker)&lt;/li&gt;
-&lt;li&gt;Terminal emulators&lt;/li&gt;
-&lt;li&gt;Web browsers&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="core-applications"&gt;
- Core Applications
- 
- &lt;a class="anchor" href="#core-applications"&gt;#&lt;/a&gt;
- 
-&lt;/h2&gt;
-&lt;p&gt;A set of applications is installed by default to provide a complete development and desktop environment. The package lists are located in &lt;code&gt;archlinux/install/apps/packages.txt&lt;/code&gt;, &lt;code&gt;archlinux/install/desktop/packages.txt&lt;/code&gt;, and &lt;code&gt;archlinux/install/desktop/packages.aur.txt&lt;/code&gt;.&lt;/p&gt;
-&lt;h3 id="development"&gt;
- Development
- 
- &lt;a class="anchor" href="#development"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;neovim&lt;/code&gt;&lt;/strong&gt;: The primary text editor.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;git&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;lazygit&lt;/code&gt;&lt;/strong&gt;: Version control.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;docker&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;docker-compose&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;lazydocker&lt;/code&gt;&lt;/strong&gt;: Containerization.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;mise&lt;/code&gt;&lt;/strong&gt;: A tool for managing development environments.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;visual-studio-code-bin&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;jetbrains-toolbox&lt;/code&gt;&lt;/strong&gt;: Alternative IDEs.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="terminal--shell"&gt;
- Terminal &amp;amp; Shell
- 
- &lt;a class="anchor" href="#terminal--shell"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;alacritty&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;ghostty&lt;/code&gt;&lt;/strong&gt;: Terminal emulators.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;zellij&lt;/code&gt;&lt;/strong&gt;: A terminal multiplexer.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;starship&lt;/code&gt;&lt;/strong&gt;: A customizable shell prompt.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;fzf&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;ripgrep&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;bat&lt;/code&gt;&lt;/strong&gt;: Powerful command-line utilities.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="desktop"&gt;
- Desktop
- 
- &lt;a class="anchor" href="#desktop"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;google-chrome&lt;/code&gt;&lt;/strong&gt;: Web browser.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;spotify&lt;/code&gt;&lt;/strong&gt;: Music streaming.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;signal-desktop&lt;/code&gt;&lt;/strong&gt;: Secure messaging.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;proton-vpn-gtk-app&lt;/code&gt;&lt;/strong&gt;: VPN client.&lt;/li&gt;
-&lt;/ul&gt;</description></item><item><title>Hyprland</title><link>https://c4software.github.io/dotarchy/docs/hyprland/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://c4software.github.io/dotarchy/docs/hyprland/</guid><description>&lt;h2 id="hyprland-configuration"&gt;
- Hyprland Configuration
- 
- &lt;a class="anchor" href="#hyprland-configuration"&gt;#&lt;/a&gt;
- 
-&lt;/h2&gt;
-&lt;p&gt;Hyprland is a dynamic tiling Wayland compositor based on wlroots that doesn&amp;rsquo;t sacrifice on its looks. The configuration for Hyprland is located in &lt;code&gt;archlinux/install/hyprland/config/hypr&lt;/code&gt;.&lt;/p&gt;
-&lt;h3 id="structure"&gt;
- Structure
- 
- &lt;a class="anchor" href="#structure"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;p&gt;The configuration is split into multiple files for better organization:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;hyprland.conf&lt;/code&gt;&lt;/strong&gt;: The main configuration file that sources all other configuration files.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;autostart.conf&lt;/code&gt;&lt;/strong&gt;: Manages applications and scripts that are launched at startup.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;bindings.conf&lt;/code&gt;&lt;/strong&gt;: Defines all keybindings and mouse bindings for window management, application launching, and system controls.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;envs.conf&lt;/code&gt;&lt;/strong&gt;: Sets environment variables used by Hyprland and other applications.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;input.conf&lt;/code&gt;&lt;/strong&gt;: Configures input devices such as keyboards, mice, and touchpads.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;monitors.conf&lt;/code&gt;&lt;/strong&gt;: Defines monitor layouts, resolutions, and refresh rates.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;&lt;code&gt;base/&lt;/code&gt;&lt;/strong&gt;: This directory contains the core configuration files for different aspects of the compositor:
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;apps.conf&lt;/code&gt;: Window rules for specific applications.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;autostart.conf&lt;/code&gt;: Core startup applications.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;bindings.conf&lt;/code&gt;: Base keybindings.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;envs.conf&lt;/code&gt;: Essential environment variables.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;hyprlock.conf&lt;/code&gt;: Configuration for the screen locker.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;input.conf&lt;/code&gt;: General input settings.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;looknfeel.conf&lt;/code&gt;: Visual settings like gaps, borders, and animations.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;sidepad.conf&lt;/code&gt;: Configuration for side panels or special devices.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;windows.conf&lt;/code&gt;: General window management rules.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="themes"&gt;
- Themes
- 
- &lt;a class="anchor" href="#themes"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;p&gt;The look and feel of Hyprland, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in &lt;code&gt;archlinux/install/hyprland/config/themes&lt;/code&gt;. Each theme has its own directory containing specific configuration files.&lt;/p&gt;</description></item><item><title>Keybindings</title><link>https://c4software.github.io/dotarchy/docs/keybindings/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://c4software.github.io/dotarchy/docs/keybindings/</guid><description>&lt;h2 id="hyprland---keyboard-shortcuts"&gt;
- Hyprland - Keyboard Shortcuts
- 
- &lt;a class="anchor" href="#hyprland---keyboard-shortcuts"&gt;#&lt;/a&gt;
- 
-&lt;/h2&gt;
-&lt;h3 id="window-management"&gt;
- Window Management
- 
- &lt;a class="anchor" href="#window-management"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;table&gt;
- &lt;thead&gt;
- &lt;tr&gt;
- &lt;th style="text-align: left"&gt;Shortcut&lt;/th&gt;
- &lt;th style="text-align: left"&gt;Description&lt;/th&gt;
- &lt;/tr&gt;
- &lt;/thead&gt;
- &lt;tbody&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + W&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Close the active window&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + J&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Toggle &amp;ldquo;split&amp;rdquo; (division)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + P&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;&amp;ldquo;Pseudo&amp;rdquo; window&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + V&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Toggle floating mode&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SHIFT + F11&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Force fullscreen&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + ↑/↓&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Toggle monocle mode (fullscreen with background window management)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + ←/→/↑/↓&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Move focus&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + [0-9]&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Switch to workspace&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + SHIFT + [0-9]&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Move window to workspace&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + TAB&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Next workspace&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + SHIFT + TAB&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Previous workspace&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + SHIFT + ←/→/↑/↓&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Swap active window with neighbor&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;ALT + Tab&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Next window in workspace&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;ALT + SHIFT + Tab&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Previous window in workspace&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + -/=&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Resize window horizontally&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + SHIFT + -/=&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Resize window vertically&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;ALT + ←/→/↑/↓&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Resize window horizontally/vertically&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + Mouse wheel&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Scroll through workspaces&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + Left click&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Move window&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + Right click&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Resize window&lt;/td&gt;
- &lt;/tr&gt;
- &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h3 id="applications"&gt;
- Applications
- 
- &lt;a class="anchor" href="#applications"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;table&gt;
- &lt;thead&gt;
- &lt;tr&gt;
- &lt;th style="text-align: left"&gt;Shortcut&lt;/th&gt;
- &lt;th style="text-align: left"&gt;Description&lt;/th&gt;
- &lt;/tr&gt;
- &lt;/thead&gt;
- &lt;tbody&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + Enter&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch terminal&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + F&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch file manager&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + B&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch browser&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + N&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch Neovim&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + T&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch &lt;code&gt;btop&lt;/code&gt; (activity monitor)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + D&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch &lt;code&gt;lazydocker&lt;/code&gt;&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + C&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch AI menu&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + SHIFT + G&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch WhatsApp&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + ALT + G&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch Google Messages&lt;/td&gt;
- &lt;/tr&gt;
- &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h3 id="utilities"&gt;
- Utilities
- 
- &lt;a class="anchor" href="#utilities"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;table&gt;
- &lt;thead&gt;
- &lt;tr&gt;
- &lt;th style="text-align: left"&gt;Shortcut&lt;/th&gt;
- &lt;th style="text-align: left"&gt;Description&lt;/th&gt;
- &lt;/tr&gt;
- &lt;/thead&gt;
- &lt;tbody&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + Space&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Launch application menu (&lt;code&gt;walker&lt;/code&gt;)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + CTRL + E&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Show clipboard (&lt;code&gt;walker&lt;/code&gt; Emojis)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + ALT + Space&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Omarchy menu&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + ESC&lt;/code&gt; or &lt;code&gt;XF86PowerOff&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Power menu&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + K&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Show keyboard shortcuts&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + SHIFT + Space&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Show/hide top bar (&lt;code&gt;waybar&lt;/code&gt;)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + CTRL + Space&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Next wallpaper in theme&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + SHIFT + CTRL + Space&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Choose a new theme&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + ,&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Dismiss last notification&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + SHIFT + ,&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Dismiss all notifications&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + CTRL + ,&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Toggle silent mode for notifications&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + CTRL + I&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Toggle lock on inactivity&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;Print Screen&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Screenshot menu&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + SHIFT + 4&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Screenshot menu&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;SUPER + Print Screen&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Color picker (&lt;code&gt;hyprpicker&lt;/code&gt;)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h3 id="media"&gt;
- Media
- 
- &lt;a class="anchor" href="#media"&gt;#&lt;/a&gt;
- 
-&lt;/h3&gt;
-&lt;table&gt;
- &lt;thead&gt;
- &lt;tr&gt;
- &lt;th style="text-align: left"&gt;Shortcut&lt;/th&gt;
- &lt;th style="text-align: left"&gt;Description&lt;/th&gt;
- &lt;/tr&gt;
- &lt;/thead&gt;
- &lt;tbody&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;XF86AudioRaiseVolume&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Increase volume&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;XF86AudioLowerVolume&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Decrease volume&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;XF86AudioMute&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Mute/unmute sound&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;XF86AudioMicMute&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Mute/unmute microphone&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;XF86MonBrightnessUp&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Increase brightness&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;XF86MonBrightnessDown&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Decrease brightness&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;ALT + XF86AudioRaiseVolume&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Increase volume (precise)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;ALT + XF86AudioLowerVolume&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Decrease volume (precise)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;ALT + XF86MonBrightnessUp&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Increase brightness (precise)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;ALT + XF86MonBrightnessDown&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Decrease brightness (precise)&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;XF86AudioNext&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Next track&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;XF86AudioPause&lt;/code&gt; / &lt;code&gt;XF86AudioPlay&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Play/pause&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td style="text-align: left"&gt;&lt;code&gt;XF86AudioPrev&lt;/code&gt;&lt;/td&gt;
- &lt;td style="text-align: left"&gt;Previous track&lt;/td&gt;
- &lt;/tr&gt;
- &lt;/tbody&gt;
-&lt;/table&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Docs on Dotarchy</title>
+    <link>https://c4software.github.io/dotarchy/docs/</link>
+    <description>Recent content in Docs on Dotarchy</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <atom:link href="https://c4software.github.io/dotarchy/docs/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Introduction</title>
+      <link>https://c4software.github.io/dotarchy/docs/introduction/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://c4software.github.io/dotarchy/docs/introduction/</guid>
+      <description>&lt;h2 id=&#34;what-is-dotarchy&#34;&gt;&#xA;  What is Dotarchy?&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#what-is-dotarchy&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h2&gt;&#xA;&lt;p&gt;Dotarchy is a set of dotfiles and configurations to create a consistent and powerful development environment across different operating systems like Arch Linux, Fedora, and macOS.&lt;/p&gt;&#xA;&lt;p&gt;The main goal is to have a modular and easy-to-maintain system that can be quickly set up on a new machine.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>The System</title>
+      <link>https://c4software.github.io/dotarchy/docs/system/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://c4software.github.io/dotarchy/docs/system/</guid>
+      <description>&lt;p&gt;This section describes the system-level configurations and installations.&lt;/p&gt;&#xA;&lt;p&gt;It includes:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Base system setup&lt;/li&gt;&#xA;&lt;li&gt;Package management&lt;/li&gt;&#xA;&lt;li&gt;System services&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;packages&#34;&gt;&#xA;  Packages&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#packages&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h2&gt;&#xA;&lt;p&gt;The system installs a set of essential packages for a functional environment. These are defined in &lt;code&gt;archlinux/install/system/packages.txt&lt;/code&gt;.&lt;/p&gt;&#xA;&lt;p&gt;Key packages include:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;fuse&lt;/code&gt;&lt;/strong&gt;: For AppImage support.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;bluez&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;bluez-utils&lt;/code&gt;&lt;/strong&gt;: Bluetooth support.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;fwupd&lt;/code&gt;&lt;/strong&gt;: For firmware updates.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;power-profiles-daemon&lt;/code&gt;&lt;/strong&gt;: For managing power profiles.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;cups&lt;/code&gt;&lt;/strong&gt;: For printing support.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;ufw&lt;/code&gt;&lt;/strong&gt;: A simple firewall.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;bolt&lt;/code&gt;&lt;/strong&gt;: For Thunderbolt device management.&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+    <item>
+      <title>The User</title>
+      <link>https://c4software.github.io/dotarchy/docs/user/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://c4software.github.io/dotarchy/docs/user/</guid>
+      <description>&lt;p&gt;This section covers user-specific configurations.&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Shell environment (bash, zsh)&lt;/li&gt;&#xA;&lt;li&gt;Aliases and functions&lt;/li&gt;&#xA;&lt;li&gt;Input configuration&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;shell&#34;&gt;&#xA;  Shell&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#shell&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h2&gt;&#xA;&lt;p&gt;The primary shell is configured through files in &lt;code&gt;common/config/bash&lt;/code&gt;.&lt;/p&gt;&#xA;&lt;h3 id=&#34;aliases&#34;&gt;&#xA;  Aliases&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#aliases&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;p&gt;A number of aliases are defined in &lt;code&gt;common/config/bash/aliases&lt;/code&gt; to simplify common commands. Some examples:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;code&gt;ls=&#39;eza -lh --group-directories-first --icons=auto&#39;&lt;/code&gt;: A modern &lt;code&gt;ls&lt;/code&gt; replacement.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;ff=&#39;nvim &amp;quot;$(fzf -m --preview &amp;quot;bat --style=numbers --color=always {}&amp;quot;)&amp;quot;&#39;&lt;/code&gt;: Find and open files in Neovim with a fuzzy finder.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;g=&#39;git&#39;&lt;/code&gt;: Shortcut for &lt;code&gt;git&lt;/code&gt;.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;d=&#39;docker&#39;&lt;/code&gt;: Shortcut for &lt;code&gt;docker&lt;/code&gt;.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;n&lt;/code&gt;: A function to open Neovim, opening the current directory if no file is specified.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;tui-shortcuts&#34;&gt;&#xA;  TUI Shortcuts&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#tui-shortcuts&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;p&gt;A script &lt;code&gt;omarchy-tui-install&lt;/code&gt; located in &lt;code&gt;common/bin&lt;/code&gt; allows creating desktop shortcuts for terminal-based applications, making them launchable from the application menu.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>The Look</title>
+      <link>https://c4software.github.io/dotarchy/docs/look/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://c4software.github.io/dotarchy/docs/look/</guid>
+      <description>&lt;p&gt;This section is about the visual appearance of the environment.&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Themes for terminals and editors&lt;/li&gt;&#xA;&lt;li&gt;Fonts&lt;/li&gt;&#xA;&lt;li&gt;Wallpapers&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;themes&#34;&gt;&#xA;  Themes&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#themes&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h2&gt;&#xA;&lt;p&gt;The visual theme is a core part of the Dotarchy experience. Themes are managed in a centralized way and applied to multiple applications. The main theme configuration can be found in &lt;code&gt;common/config/theme&lt;/code&gt;.&lt;/p&gt;&#xA;&lt;p&gt;For example, &lt;code&gt;alacritty.toml&lt;/code&gt; in this directory defines the color scheme for the Alacritty terminal emulator.&lt;/p&gt;&#xA;&lt;h2 id=&#34;fonts&#34;&gt;&#xA;  Fonts&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#fonts&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h2&gt;&#xA;&lt;p&gt;A selection of fonts is installed to ensure a consistent and pleasant visual experience, especially for development. These are listed in &lt;code&gt;archlinux/install/desktop/packages.aur.txt&lt;/code&gt; and include:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>The Apps</title>
+      <link>https://c4software.github.io/dotarchy/docs/apps/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://c4software.github.io/dotarchy/docs/apps/</guid>
+      <description>&lt;p&gt;This section details the applications installed and their configurations.&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Development tools (Neovim, Git, Docker)&lt;/li&gt;&#xA;&lt;li&gt;Terminal emulators&lt;/li&gt;&#xA;&lt;li&gt;Web browsers&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;core-applications&#34;&gt;&#xA;  Core Applications&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#core-applications&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h2&gt;&#xA;&lt;p&gt;A set of applications is installed by default to provide a complete development and desktop environment. The package lists are located in &lt;code&gt;archlinux/install/apps/packages.txt&lt;/code&gt;, &lt;code&gt;archlinux/install/desktop/packages.txt&lt;/code&gt;, and &lt;code&gt;archlinux/install/desktop/packages.aur.txt&lt;/code&gt;.&lt;/p&gt;&#xA;&lt;h3 id=&#34;development&#34;&gt;&#xA;  Development&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#development&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;neovim&lt;/code&gt;&lt;/strong&gt;: The primary text editor.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;git&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;lazygit&lt;/code&gt;&lt;/strong&gt;: Version control.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;docker&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;docker-compose&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;lazydocker&lt;/code&gt;&lt;/strong&gt;: Containerization.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;mise&lt;/code&gt;&lt;/strong&gt;: A tool for managing development environments.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;visual-studio-code-bin&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;jetbrains-toolbox&lt;/code&gt;&lt;/strong&gt;: Alternative IDEs.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;terminal--shell&#34;&gt;&#xA;  Terminal &amp;amp; Shell&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#terminal--shell&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;alacritty&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;ghostty&lt;/code&gt;&lt;/strong&gt;: Terminal emulators.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;zellij&lt;/code&gt;&lt;/strong&gt;: A terminal multiplexer.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;starship&lt;/code&gt;&lt;/strong&gt;: A customizable shell prompt.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;fzf&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;ripgrep&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;bat&lt;/code&gt;&lt;/strong&gt;: Powerful command-line utilities.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;desktop&#34;&gt;&#xA;  Desktop&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#desktop&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;google-chrome&lt;/code&gt;&lt;/strong&gt;: Web browser.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;spotify&lt;/code&gt;&lt;/strong&gt;: Music streaming.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;signal-desktop&lt;/code&gt;&lt;/strong&gt;: Secure messaging.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;proton-vpn-gtk-app&lt;/code&gt;&lt;/strong&gt;: VPN client.&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+    <item>
+      <title>Hyprland</title>
+      <link>https://c4software.github.io/dotarchy/docs/hyprland/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://c4software.github.io/dotarchy/docs/hyprland/</guid>
+      <description>&lt;h2 id=&#34;hyprland-configuration&#34;&gt;&#xA;  Hyprland Configuration&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#hyprland-configuration&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h2&gt;&#xA;&lt;p&gt;Hyprland is a dynamic tiling Wayland compositor based on wlroots that doesn&amp;rsquo;t sacrifice on its looks. The configuration for Hyprland is located in &lt;code&gt;archlinux/install/hyprland/config/hypr&lt;/code&gt;.&lt;/p&gt;&#xA;&lt;h3 id=&#34;structure&#34;&gt;&#xA;  Structure&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#structure&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;p&gt;The configuration is split into multiple files for better organization:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;hyprland.conf&lt;/code&gt;&lt;/strong&gt;: The main configuration file that sources all other configuration files.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;autostart.conf&lt;/code&gt;&lt;/strong&gt;: Manages applications and scripts that are launched at startup.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;bindings.conf&lt;/code&gt;&lt;/strong&gt;: Defines all keybindings and mouse bindings for window management, application launching, and system controls.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;envs.conf&lt;/code&gt;&lt;/strong&gt;: Sets environment variables used by Hyprland and other applications.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;input.conf&lt;/code&gt;&lt;/strong&gt;: Configures input devices such as keyboards, mice, and touchpads.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;monitors.conf&lt;/code&gt;&lt;/strong&gt;: Defines monitor layouts, resolutions, and refresh rates.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;base/&lt;/code&gt;&lt;/strong&gt;: This directory contains the core configuration files for different aspects of the compositor:&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;code&gt;apps.conf&lt;/code&gt;: Window rules for specific applications.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;autostart.conf&lt;/code&gt;: Core startup applications.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;bindings.conf&lt;/code&gt;: Base keybindings.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;envs.conf&lt;/code&gt;: Essential environment variables.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;hyprlock.conf&lt;/code&gt;: Configuration for the screen locker.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;input.conf&lt;/code&gt;: General input settings.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;looknfeel.conf&lt;/code&gt;: Visual settings like gaps, borders, and animations.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;sidepad.conf&lt;/code&gt;: Configuration for side panels or special devices.&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;windows.conf&lt;/code&gt;: General window management rules.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;themes&#34;&gt;&#xA;  Themes&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#themes&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;p&gt;The look and feel of Hyprland, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in &lt;code&gt;archlinux/install/hyprland/config/themes&lt;/code&gt;. Each theme has its own directory containing specific configuration files.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Keybindings</title>
+      <link>https://c4software.github.io/dotarchy/docs/keybindings/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://c4software.github.io/dotarchy/docs/keybindings/</guid>
+      <description>&lt;h2 id=&#34;hyprland---keyboard-shortcuts&#34;&gt;&#xA;  Hyprland - Keyboard Shortcuts&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#hyprland---keyboard-shortcuts&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h2&gt;&#xA;&lt;h3 id=&#34;window-management&#34;&gt;&#xA;  Window Management&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#window-management&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Shortcut&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Description&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + W&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Close the active window&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + J&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Toggle &amp;ldquo;split&amp;rdquo; (division)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + P&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&amp;ldquo;Pseudo&amp;rdquo; window&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + V&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Toggle floating mode&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SHIFT + F11&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Force fullscreen&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + ↑/↓&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Toggle monocle mode (fullscreen with background window management)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + ←/→/↑/↓&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Move focus&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + [0-9]&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Switch to workspace&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + SHIFT + [0-9]&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Move window to workspace&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + TAB&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Next workspace&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + SHIFT + TAB&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Previous workspace&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + SHIFT + ←/→/↑/↓&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Swap active window with neighbor&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;ALT + Tab&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Next window in workspace&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;ALT + SHIFT + Tab&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Previous window in workspace&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + -/=&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Resize window horizontally&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + SHIFT + -/=&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Resize window vertically&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;ALT + ←/→/↑/↓&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Resize window horizontally/vertically&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + Mouse wheel&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Scroll through workspaces&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + Left click&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Move window&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + Right click&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Resize window&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;applications&#34;&gt;&#xA;  Applications&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#applications&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Shortcut&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Description&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + Enter&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch terminal&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + F&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch file manager&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + B&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch browser&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + N&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch Neovim&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + T&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch &lt;code&gt;btop&lt;/code&gt; (activity monitor)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + D&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch &lt;code&gt;lazydocker&lt;/code&gt;&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + C&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch AI menu&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + SHIFT + G&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch WhatsApp&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + ALT + G&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch Google Messages&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;utilities&#34;&gt;&#xA;  Utilities&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#utilities&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Shortcut&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Description&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + Space&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Launch application menu (&lt;code&gt;walker&lt;/code&gt;)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + CTRL + E&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Show clipboard (&lt;code&gt;walker&lt;/code&gt; Emojis)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + ALT + Space&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Omarchy menu&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + ESC&lt;/code&gt; or &lt;code&gt;XF86PowerOff&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Power menu&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + K&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Show keyboard shortcuts&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + SHIFT + Space&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Show/hide top bar (&lt;code&gt;waybar&lt;/code&gt;)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + CTRL + Space&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Next wallpaper in theme&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + SHIFT + CTRL + Space&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Choose a new theme&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + ,&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Dismiss last notification&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + SHIFT + ,&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Dismiss all notifications&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + CTRL + ,&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Toggle silent mode for notifications&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + CTRL + I&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Toggle lock on inactivity&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;Print Screen&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Screenshot menu&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + SHIFT + 4&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Screenshot menu&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;SUPER + Print Screen&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Color picker (&lt;code&gt;hyprpicker&lt;/code&gt;)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;media&#34;&gt;&#xA;  Media&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#media&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Shortcut&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Description&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;XF86AudioRaiseVolume&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Increase volume&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;XF86AudioLowerVolume&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Decrease volume&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;XF86AudioMute&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Mute/unmute sound&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;XF86AudioMicMute&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Mute/unmute microphone&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;XF86MonBrightnessUp&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Increase brightness&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;XF86MonBrightnessDown&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Decrease brightness&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;ALT + XF86AudioRaiseVolume&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Increase volume (precise)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;ALT + XF86AudioLowerVolume&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Decrease volume (precise)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;ALT + XF86MonBrightnessUp&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Increase brightness (precise)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;ALT + XF86MonBrightnessDown&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Decrease brightness (precise)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;XF86AudioNext&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Next track&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;XF86AudioPause&lt;/code&gt; / &lt;code&gt;XF86AudioPlay&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Play/pause&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;XF86AudioPrev&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Previous track&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;</description>
+    </item>
+  </channel>
+</rss>
