@@ -80,7 +80,7 @@ show_capture_menu() {
   *Screenshot*) show_screenshot_menu ;;
   *Screenrecord*) show_screenrecord_menu ;;
   *Color*) pkill hyprpicker || hyprpicker -a ;;
-  *) show_main_menu ;;
+  *) back_to show_main_menu ;;
   esac
 }
 
