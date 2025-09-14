@@ -64,13 +64,9 @@ weight: 7
 | `SUPER + SHIFT + ,` | Dismiss all notifications |
 | `SUPER + CTRL + ,` | Toggle silent mode for notifications |
 | `SUPER + CTRL + I` | Toggle lock on inactivity |
-| `Print Screen` | Screenshot of a region |
-| `SHIFT + Print Screen` | Screenshot of a window |
-| `CTRL + Print Screen` | Screenshot of the display |
-| `ALT + Print Screen` | Video recording of a region |
-| `CTRL + ALT + Print Screen` | Video recording of the display |
+| `Print Screen` | Screenshot menu |
+| `SUPER + SHIFT + 4` | Screenshot menu |
 | `SUPER + Print Screen` | Color picker (`hyprpicker`) |
-| `SUPER + SHIFT + 4` | Screen record menu |
 
 ---
 
