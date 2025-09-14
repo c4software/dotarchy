@@ -5,6 +5,8 @@ This folder contains installation and configuration scripts for multiple Linux d
 ⚠️ The Hyprland setup is extracted (with some cleanup and adjustments) from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
 [Hyprland Keybindings reference](./archlinux/install/hyprland/README.md)
 
+![Documentation](https://c4software.github.io/dotarchy/)
+
 ## Prerequisites
 
 - Sudo access on the machine.
