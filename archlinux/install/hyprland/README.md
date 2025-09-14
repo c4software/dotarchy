@@ -68,6 +68,7 @@
 | `ALT + Print Screen` | Video recording of a region |
 | `CTRL + ALT + Print Screen` | Video recording of the display |
 | `SUPER + Print Screen` | Color picker (`hyprpicker`) |
+| `SUPER + SHIFT + 4` | Screen record menu |
 
 ---
 
