@@ -89,8 +89,9 @@ For more information, see the [official documentation on environment variables](
 Example:
 
 ```ini
-# Set the default browser
-env = BROWSER,google-chrome-stable
+# Set cursor size
+env = XCURSOR_SIZE,24
+env = HYPRCURSOR_SIZE,24
 ```
 
 ### Input Devices
@@ -104,3 +105,5 @@ Consult the [official documentation on input configuration](https://wiki.hyprlan
 The `monitors.conf` file is used to define the layout, resolution, and refresh rate of your monitors. This is essential for multi-monitor setups.
 
 For detailed configuration options, visit the [official documentation on configuring monitors](https://wiki.hyprland.org/Configuring/Monitors/).
+
+Or use the `omarchy-monitor-resolution-picker` or `hyprmon` tools to help set up your monitors. Both are accessible via `Super + Space`.
