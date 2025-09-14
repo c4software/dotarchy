@@ -15,26 +15,25 @@ if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
     sudo systemctl enable greetd.service
     
     sudo tee /etc/greetd/config.toml > /dev/null <<EOF
-    [terminal]
-    # The VT to run the greeter on. Can be "next", "current" or a number
-    # designating the VT.
-    vt = 1
+[terminal]
+# The VT to run the greeter on. Can be "next", "current" or a number
+# designating the VT.
+vt = 1
 
-    # The default session, also known as the greeter.
-    [default_session]
-    command = "tuigreet --cmd 'uwsm start hyprland.desktop'"
-    user = "greeter"
+# The default session, also known as the greeter.
+[default_session]
+command = "tuigreet --cmd 'uwsm start hyprland.desktop'"
+user = "greeter"
+
 EOF
 
     # Ask the user if he wants to enable autologin for his user
     read -p "Do you want to enable autologin for your user? (y/n): " autologin_choice
     if [ "$autologin_choice" = "y" ] || [ "$autologin_choice" = "Y" ]; then
-        read -p "Enter your username: " username
         sudo tee -a /etc/greetd/config.toml > /dev/null <<EOF
-
-        [initial_session]
-        command = "uwsm start hyprland.desktop"
-        user="$USER"
+[initial_session]
+command = "uwsm start hyprland.desktop"
+user="$USER"
 
 EOF
     fi
