@@ -14,6 +14,9 @@ Dotarchy is a set of dotfiles and configurations to create a consistent and powe
 
 The main goal is to have a modular and easy-to-maintain system that can be quickly set up on a new machine.
 
+⚠️ The Hyprland setup is extracted (with some cleanup and adjustments) from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
+[Hyprland Keybindings reference](./archlinux/install/hyprland/README.md)
+
 ## Installation
 
 To set up Dotarchy on your system, follow these steps:
