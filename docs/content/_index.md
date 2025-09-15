@@ -1,6 +1,7 @@
 ---
 title: "Dotarchy Manual"
 type: "landing"
+weight: 1
 ---
 
 Welcome to the Dotarchy manual. This documentation provides a guide to understanding, installing, and using the Dotarchy dotfiles.
@@ -8,6 +9,11 @@ Welcome to the Dotarchy manual. This documentation provides a guide to understan
 ![Screenshot](./screenshot.jpg)
 
 - [Source code](https://github.com/c4software/dotarchy)
+
+Dotarchy is a set of dotfiles and configurations to create a consistent and powerful development environment across different operating systems like Arch Linux, Fedora, and macOS.
+
+The main goal is to have a modular and easy-to-maintain system that can be quickly set up on a new machine.
+
 
 ## Installation
 
