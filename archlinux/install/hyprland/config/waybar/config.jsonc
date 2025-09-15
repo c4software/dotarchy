@@ -48,7 +48,7 @@
   "clock": {
     "format": "{:%H:%M}",
     "tooltip": true,
-    "on-click": "omarchy-launch-webapp 'https://calendar.google.com/'",
+    "on-click": "omarchy-launch-or-focus-webapp 'calendar' 'https://calendar.google.com/'",
     "tooltip-format": "{:L%A %d %B W%V %Y}"
   },
   "network": {
