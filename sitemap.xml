@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://c4software.github.io/dotarchy/docs/introduction/</loc>
+    <loc>https://c4software.github.io/dotarchy/</loc>
   </url><url>
     <loc>https://c4software.github.io/dotarchy/docs/system/</loc>
   </url><url>
@@ -19,8 +19,6 @@
     <loc>https://c4software.github.io/dotarchy/categories/</loc>
   </url><url>
     <loc>https://c4software.github.io/dotarchy/docs/</loc>
-  </url><url>
-    <loc>https://c4software.github.io/dotarchy/</loc>
   </url><url>
     <loc>https://c4software.github.io/dotarchy/tags/</loc>
   </url>

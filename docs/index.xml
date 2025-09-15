@@ -8,13 +8,6 @@
     <language>en-us</language>
     <atom:link href="https://c4software.github.io/dotarchy/docs/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Introduction</title>
-      <link>https://c4software.github.io/dotarchy/docs/introduction/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://c4software.github.io/dotarchy/docs/introduction/</guid>
-      <description>&lt;h2 id=&#34;what-is-dotarchy&#34;&gt;&#xA;  What is Dotarchy?&#xA;  &#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#what-is-dotarchy&#34;&gt;#&lt;/a&gt;&#xA;  &#xA;&lt;/h2&gt;&#xA;&lt;p&gt;Dotarchy is a set of dotfiles and configurations to create a consistent and powerful development environment across different operating systems like Arch Linux, Fedora, and macOS.&lt;/p&gt;&#xA;&lt;p&gt;The main goal is to have a modular and easy-to-maintain system that can be quickly set up on a new machine.&lt;/p&gt;</description>
-    </item>
-    <item>
       <title>The System</title>
       <link>https://c4software.github.io/dotarchy/docs/system/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
