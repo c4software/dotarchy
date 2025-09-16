@@ -1,4 +1,5 @@
 @import "../theme/waybar.css";
+
 * {
   background-color: @background;
   color: @foreground;
@@ -7,6 +8,7 @@
   border-radius: 0;
   min-height: 0;
   font-family: CaskaydiaMono Nerd Font;
+  font-weight: bold;
   font-size: 12px;
 }
 
@@ -29,21 +31,29 @@
   opacity: 0.5;
 }
 
+#custom-weather,
+#memory,
+#custom-update,
+#backlight,
+#window,
+#mpris,
 #tray,
 #cpu,
 #battery,
 #network,
 #bluetooth,
 #pulseaudio,
+#clock,
 #custom-omarchy,
-#custom-screenrecording-indicator,
-#custom-update {
+#workspaces,
+#tray-expander {
   min-width: 12px;
   margin: 0 7.5px;
 }
 
 #custom-expand-icon {
-  margin-right: 7px;
+  margin-right: -4px;
+  padding: 1px;
 }
 
 tooltip {
@@ -56,18 +66,4 @@ tooltip {
 
 #clock {
   margin-left: 8.75px;
-}
-
-.hidden {
-  opacity: 0;
-}
-
-#custom-screenrecording-indicator {
-  min-width: 12px;
-  margin-left: 8.75px;
-  font-size: 10px;
-}
-
-#custom-screenrecording-indicator.active {
-  color: #a55555;
 }
