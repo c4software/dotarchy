@@ -21,6 +21,7 @@ menu() {
 
 launch_or_focus_and_pin() {
   omarchy-launch-or-focus-webapp "$1" "$2"
+  hyprctl dispatch tagwindow +centerpin
 }
 
 case $(menu "LLM" "󱚤  ChatGPT\n󱚤  Gemini\n󱚤  Claude\n󱚤  LeChat\n󱚤  Grok\n󱚤  Meta") in
