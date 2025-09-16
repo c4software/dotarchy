@@ -12,7 +12,7 @@
 | `SUPER + P` | "Pseudo" window |
 | `SUPER + V` | Toggle floating mode |
 | `SHIFT + F11` | Force fullscreen |
-| `SUPER + ↑/↓` | Toggle monocle mode (fullscreen with background window management) |
+| `SUPER + ALT +  ↑/↓` | Toggle monocle mode (fullscreen with background window management) |
 | `SUPER + ←/→/↑/↓` | Move focus |
 | `SUPER + [0-9]` | Switch to workspace |
 | `SUPER + SHIFT + [0-9]` | Move window to workspace |

@@ -19,12 +19,16 @@ menu() {
   echo -e "$options" | walker --dmenu --theme dmenu_250 -p "$prompt…" "${args[@]}"
 }
 
+launch_or_focus_and_pin() {
+  omarchy-launch-or-focus-webapp "$1" "$2"
+}
+
 case $(menu "LLM" "󱚤  ChatGPT\n󱚤  Gemini\n󱚤  Claude\n󱚤  LeChat\n󱚤  Grok\n󱚤  Meta") in
-*ChatGPT*) omarchy-launch-or-focus-webapp "ChatGPT" "https://chat.openai.com/" ;;
-*Gemini*) omarchy-launch-or-focus-webapp "Gemini" "https://gemini.google.com/" ;;
-*Claude*) omarchy-launch-or-focus-webapp "Claude" "https://claude.ai/" ;;
-*LeChat*) omarchy-launch-or-focus-webapp "LeChat" "https://chat.mistral.ai/chat" ;;
-*Grok*) omarchy-launch-or-focus-webapp "Grok" "https://grok.com/" ;;
-*Meta*) omarchy-launch-or-focus-webapp "Meta" "https://ai.meta.com/" ;;
+*ChatGPT*) launch_or_focus_and_pin "ChatGPT" "https://chat.openai.com/" ;;
+*Gemini*) launch_or_focus_and_pin "Gemini" "https://gemini.google.com/" ;;
+*Claude*) launch_or_focus_and_pin "Claude" "https://claude.ai/" ;;
+*LeChat*) launch_or_focus_and_pin "LeChat" "https://chat.mistral.ai/chat" ;;
+*Grok*) launch_or_focus_and_pin "Grok" "https://grok.com/" ;;
+*Meta*) launch_or_focus_and_pin "Meta" "https://ai.meta.com/" ;;
 *) exit ;;
 esac
