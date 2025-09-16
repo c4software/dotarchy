@@ -21,15 +21,14 @@ menu() {
 
 launch_or_focus_and_pin() {
   omarchy-launch-or-focus-webapp "$1" "$2"
-  hyprctl dispatch tagwindow +centerpin
 }
 
 case $(menu "LLM" "󱚤  ChatGPT\n󱚤  Gemini\n󱚤  Claude\n󱚤  LeChat\n󱚤  Grok\n󱚤  Meta") in
-*ChatGPT*) launch_or_focus_and_pin "ChatGPT" "https://chat.openai.com/" ;;
-*Gemini*) launch_or_focus_and_pin "Gemini" "https://gemini.google.com/" ;;
-*Claude*) launch_or_focus_and_pin "Claude" "https://claude.ai/" ;;
-*LeChat*) launch_or_focus_and_pin "LeChat" "https://chat.mistral.ai/chat" ;;
-*Grok*) launch_or_focus_and_pin "Grok" "https://grok.com/" ;;
-*Meta*) launch_or_focus_and_pin "Meta" "https://ai.meta.com/" ;;
+*ChatGPT*) launch_or_focus_and_pin "PIN-ChatGPT" "https://chat.openai.com/" ;;
+*Gemini*) launch_or_focus_and_pin "PIN-Gemini" "https://gemini.google.com/" ;;
+*Claude*) launch_or_focus_and_pin "PIN-Claude" "https://claude.ai/" ;;
+*LeChat*) launch_or_focus_and_pin "PIN-LeChat" "https://chat.mistral.ai/chat" ;;
+*Grok*) launch_or_focus_and_pin "PIN-Grok" "https://grok.com/" ;;
+*Meta*) launch_or_focus_and_pin "PIN-Meta" "https://ai.meta.com/" ;;
 *) exit ;;
 esac
