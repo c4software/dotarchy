@@ -5,11 +5,12 @@
   color: @foreground;
 
   border: none;
-  border-radius: 0;
+  border-radius: 10px;
+  padding: 2px 2px;
   min-height: 0;
   font-family: CaskaydiaMono Nerd Font;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .modules-left {
