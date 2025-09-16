@@ -4,8 +4,8 @@ window-padding-x = 4
 window-padding-y = 4
 
 macos-option-as-alt = left
-keybind = cmd+enter=new_split:auto
-keybind = cmd+f11=toggle_fullscreen
+keybind = super+enter=new_split:auto
+keybind = super+f11=toggle_fullscreen
 #keybind = alt+left=unbind
 #keybind = alt+right=unbind
 
