@@ -39,8 +39,9 @@ else
   gsettings set org.gnome.desktop.interface icon-theme "Yaru-blue"
 fi
 
-# Trigger alacritty config reload
+# Trigger terminal config reload
 touch "$HOME/.config/alacritty/alacritty.toml"
+killall -SIGUSR2 ghostty
 
 # ln the btop current.theme to the current theme
 ln -nsf "$CURRENT_THEME_DIR/btop.theme" "$HOME/.config/btop/themes/current.theme"
@@ -48,6 +49,14 @@ ln -nsf "$CURRENT_THEME_DIR/btop.theme" "$HOME/.config/btop/themes/current.theme
 # Set the mako theme
 mkdir -p ~/.config/mako
 ln -snf ~/.config/theme/mako.ini ~/.config/mako/config
+
+# Theme eza
+mkdir -p ~/.config/eza
+if [ -f ~/.config/omarchy/current/theme/eza.yml ]; then
+  ln -snf ~/.config/omarchy/current/theme/eza.yml ~/.config/eza/theme.yml
+else
+  rm -f ~/.config/eza/theme.yml
+fi
 
 # Restart components to apply new theme
 pkill -SIGUSR2 btop
