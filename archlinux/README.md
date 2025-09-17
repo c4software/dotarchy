@@ -12,9 +12,9 @@ This repository contains scripts and configuration files to set up a development
 
 3. Execute the main installation script with the following command:
 
-    ```bash
-    ./setup.sh
-    ```
+```bash
+./setup.sh
+```
 
 -----
 
@@ -39,6 +39,10 @@ To update only the configuration files without installing packages, you can run 
 ```bash
 ./install/hyprland/setup.sh --skip-packages
 ```
+
+⚠️ This will overwrite your existing configuration files. Make sure to back up any important configurations before running this command.
+⚠️ This will not update all [common configuration](../common/) files, only those related to Hyprland. To **update all configuration files**, please use `update-arch-hypr.sh`.
+
 
 [Keybindings reference](./install/hyprland/README.md)
 
