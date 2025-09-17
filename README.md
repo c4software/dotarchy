@@ -28,6 +28,14 @@ git clone https://github.com/c4software/dotarchy.git /tmp/dotfiles
 
 This script detects your distribution (`pacman` → Arch, `dnf` → Fedora, `$OSTYPE == darwin` → macOS) and launches the appropriate setup process.
 
+### Archlinux Only : Dotfiles and Hyprland update
+
+To update the dotfiles and Hyprland setup, run:
+
+```bash
+./update-arch-hypr.sh
+```
+
 ## Main Structure
 
 - `setup.sh`: Entry script that loads the common bootstrap and selects the distribution.

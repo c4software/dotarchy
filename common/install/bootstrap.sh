@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo -e "Déplacement des fichiers de configuration..."
+echo -e "Move configuration files..."
 
 cp -R "$SCRIPT_DIR/../config/"* ~/.config/
 
@@ -18,7 +18,7 @@ cp "$SCRIPT_DIR/../bin/"* ~/.local/bin/
 # Install Bash configuration
 cp "$SCRIPT_DIR/../default/bashrc" ~/.bashrc
 
-# If not MacOS
+# If not MacOS, install the Bépo Dev keyboard layout
 if [[ "$OSTYPE" != "darwin"* ]]; then
   # Installation du layout de clavier Bépo Dev
   echo "Installing Bépo Dev keyboard layout (Système)..."
