@@ -42,6 +42,10 @@ present_terminal() {
   alacritty --class Omarchy -e bash -c "eval \"$1\"; omarchy-show-done;"
 }
 
+install_terminal() {
+  present_terminal "omarchy-install-terminal $1"
+}
+
 edit_in_nvim() {
   notify-send "Editing config file" "$1"
   alacritty -e nvim "$1"
@@ -159,7 +163,7 @@ show_setup_config_menu() {
 }
 
 show_install_menu() {
-  case $(menu "Install" "󰣇  Package\n󰣇  AUR\n  Web App\n  TUI\n  Service\n󰵮  Development\n  Editor\n󱚤  AI") in
+  case $(menu "Install" "󰣇  Package\n󰣇  AUR\n  Web App\n  TUI\n  Service\n󰵮  Development\n  Editor\n󱚤  AI\n  Terminal") in
   *Package*) terminal omarchy-pkg-install ;;
   *AUR*) terminal omarchy-pkg-aur-install ;;
   *Web*) present_terminal omarchy-webapp-install ;;
@@ -168,6 +172,7 @@ show_install_menu() {
   *Development*) show_install_development_menu ;;
   *Editor*) show_install_editor_menu ;;
   *AI*) show_install_ai_menu ;;
+  *Terminal*) show_install_terminal_menu ;;
   *) show_main_menu ;;
   esac
 }
@@ -229,6 +234,16 @@ show_install_javascript_menu() {
   *) show_install_development_menu ;;
   esac
 }
+
+show_install_terminal_menu() {
+  case $(menu "Install" "  Alacritty\n  Ghostty\n  Kitty") in
+  *Alacritty*) install_terminal "alacritty" ;;
+  *Ghostty*) install_terminal "ghostty" ;;
+  *Kitty*) install_terminal "kitty" ;;
+  *) show_install_menu ;;
+  esac
+}
+
 show_remove_menu() {
   case $(menu "Remove" "  Web App\n  TUI") in
   *Web*) present_terminal omarchy-webapp-remove ;;

@@ -40,8 +40,11 @@ else
 fi
 
 # Trigger terminal config reload
-touch "$HOME/.config/alacritty/alacritty.toml"
-killall -SIGUSR2 ghostty
+case "$TERMINAL" in
+"alacritty") touch ~/.config/alacritty/alacritty.toml ;;
+"kitty") killall -SIGUSR1 kitty ;;
+"ghostty") killall -SIGUSR2 ghostty ;;
+esac
 
 # ln the btop current.theme to the current theme
 ln -nsf "$CURRENT_THEME_DIR/btop.theme" "$HOME/.config/btop/themes/current.theme"
