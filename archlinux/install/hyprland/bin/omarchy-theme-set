@@ -3,6 +3,10 @@
 # omarchy-theme-set: Set a theme, specified by its name.
 # Usage: omarchy-theme-set <theme-name>
 
+cmd_present() {
+  command -v "$1" >/dev/null 2>&1
+}
+
 if [[ -z "$1" && "$1" != "CNCLD" ]]; then
   echo "Usage: omarchy-theme-set <theme-name>" >&2
   exit 1
@@ -60,6 +64,32 @@ if [ -f ~/.config/omarchy/current/theme/eza.yml ]; then
 else
   rm -f ~/.config/eza/theme.yml
 fi
+
+# Theme Chromium / Brave
+CHROMIUM_THEME=~/.config/theme/chromium.theme
+
+if cmd_present chromium || cmd_present brave; then
+  if [[ -f $CHROMIUM_THEME ]]; then
+    rgb=$(<$CHROMIUM_THEME)
+    THEME_HEX_COLOR=$(printf '#%02x%02x%02x' ${rgb//,/ })
+  else
+    # Use a default, neutral grey if theme doesn't have a color
+    THEME_HEX_COLOR="#1c2027"
+  fi
+
+  if cmd_present chromium; then
+    mkdir -p /etc/chromium/policies/managed
+    echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}" | tee "/etc/chromium/policies/managed/color.json" >/dev/null
+    chromium --refresh-platform-policy --no-startup-window
+  fi
+
+  if cmd_present brave; then
+    mkdir -p /etc/brave/policies/managed
+    echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}" | tee "/etc/brave/policies/managed/color.json" >/dev/null
+    brave --refresh-platform-policy --no-startup-window
+  fi
+fi
+
 
 # Restart components to apply new theme
 pkill -SIGUSR2 btop
