@@ -156,12 +156,11 @@ show_setup_power_menu() {
 }
 
 show_setup_config_menu() {
-  case $(menu "Setup" "  Hyprland\n  Hypridle\n  Hyprlock\n  Swayosd\n󰌧  Walker\n󰍜  Waybar") in
+  case $(menu "Setup" "  Hyprland\n  Hypridle\n  Hyprlock\n  Swayosd\n󰍜  Waybar") in
   *Hyprland*) edit_in_nvim ~/.config/hypr/hyprland.conf ;;
   *Hypridle*) edit_in_nvim ~/.config/hypr/hypridle.conf && omarchy-restart-hypridle ;;
   *Hyprlock*) edit_in_nvim ~/.config/hypr/hyprlock.conf ;;
   *Swayosd*) edit_in_nvim ~/.config/swayosd/config.toml && omarchy-restart-swayosd ;;
-  *Walker*) edit_in_nvim ~/.config/walker/config.toml && omarchy-restart-walker ;;
   *Waybar*) edit_in_nvim ~/.config/waybar/config.jsonc && omarchy-restart-waybar ;;
   *) show_main_menu ;;
   esac
@@ -284,7 +283,7 @@ show_main_menu() {
 
 go_to_menu() {
   case "${1,,}" in
-  *apps*) walker -p "Launch…" ;;
+  *apps*) rofi -show drun
   *learn*) show_learn_menu ;;
   *capture*) show_capture_menu ;;
   *screenshot*) show_screenshot_menu ;;

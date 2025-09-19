@@ -50,8 +50,7 @@
 
 | Shortcut | Description |
 | :--- | :--- |
-| `SUPER + Space` | Launch application menu (`walker`) |
-| `SUPER + CTRL + E` | Show clipboard (`walker` Emojis) |
+| `SUPER + Space` | Launch application menu (`rofi`) |
 | `SUPER + ALT + Space` | Omarchy menu |
 | `SUPER + ESC` or `XF86PowerOff` | Power menu |
 | `SUPER + K` | Show keyboard shortcuts |
