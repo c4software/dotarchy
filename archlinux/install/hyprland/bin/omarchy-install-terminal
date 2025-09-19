@@ -12,7 +12,7 @@ pacman -Sy --noconfirm "$package"
 
 # Set as default terminal
 echo "Setting $package as new default terminal..."
-sed -i "/export TERMINAL=/ c\export TERMINAL=$package" ~/.config/uwsm/default
+sed -i "/export TERMINAL=/ c\export TERMINAL=$package" ~/.config/uwsm/env
 
 # Relaunch is needed for new default to take effect
 echo
