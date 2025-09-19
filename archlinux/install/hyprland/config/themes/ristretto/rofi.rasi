@@ -7,6 +7,6 @@
   selected-text: #fabd2f;
   border-color: #e6d9db;
 
-  background-color: transparent;
+  background-color: @background;
   text-color: @foreground;
 }
