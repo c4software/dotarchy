@@ -3,7 +3,28 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo -e "Move configuration files..."
 
-cp -R "$SCRIPT_DIR/../config/"* ~/.config/
+# Install rsync if not present
+if ! command -v rsync &> /dev/null; then
+  if command -v apt &> /dev/null; then
+    sudo apt-get update
+    sudo apt-get install -y rsync
+  elif command -v pacman &> /dev/null; then
+    sudo pacman -Sy --noconfirm rsync
+  elif command -v dnf &> /dev/null; then
+    sudo dnf install -y rsync
+  else
+    echo "Package manager not found. Please install rsync manually." >&2
+    exit 1
+  fi
+fi
+
+# If .config/theme (folder or symlink) exists, exclude it from being overwritten
+if [ -d ~/.config/theme ] || [ -L ~/.config/theme ]; then
+  rsync -av --exclude='theme' "$SCRIPT_DIR/../config/" ~/.config/
+else
+  rsync -av "$SCRIPT_DIR/../config/" ~/.config/
+fi
+
 
 # Ensure local bin exists
 mkdir -p ~/.local/bin
