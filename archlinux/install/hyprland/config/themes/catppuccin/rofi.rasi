@@ -1,0 +1,61 @@
+/* Thème personnalisé rofi */
+@define-color selected-text #8caaee;
+@define-color text #c6d0f5;
+@define-color base #24273a;
+@define-color border #c6d0f5;
+@define-color foreground #c6d0f5;
+@define-color background #24273a;
+
+* {
+    background: @background;
+    foreground: @foreground;
+    border-color: @border;
+    text-color: @text;
+    highlight: @selected-text;
+    spacing: 2px;
+    border: 2px;
+    padding: 6px;
+    font: "JetBrains Mono 12";
+}
+
+window {
+    background-color: @background;
+    border: 2px;
+    border-color: @border;
+    padding: 12px;
+}
+
+mainbox {
+    background-color: @background;
+    children: [ inputbar, listview ];
+    spacing: 8px;
+}
+
+inputbar {
+    background-color: @base;
+    text-color: @text;
+    padding: 6px;
+    border: 1px;
+    border-color: @border;
+}
+
+listview {
+    background-color: @background;
+    columns: 1;
+    spacing: 2px;
+    fixed-height: false;
+}
+
+element {
+    background-color: @background;
+    text-color: @text;
+    padding: 4px 8px;
+    border: 0;
+}
+
+element selected {
+    background-color: @base;
+    text-color: @selected-text;
+    border: 1px;
+    border-color: @selected-text;
+}
