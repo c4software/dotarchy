@@ -1,61 +1,118 @@
-/* Thème personnalisé rofi */
-@define-color selected-text #8caaee;
-@define-color text #c6d0f5;
-@define-color base #24273a;
-@define-color border #c6d0f5;
-@define-color foreground #c6d0f5;
-@define-color background #24273a;
+configuration {
+  font: "monospace 16";
+
+  drun {
+    display-name: "";
+  }
+
+  run {
+    display-name: "";
+  }
+
+  window {
+    display-name: "";
+  }
+
+  timeout {
+    delay: 10;
+    action: "kb-cancel";
+  }
+}
 
 * {
-    background: @background;
-    foreground: @foreground;
-    border-color: @border;
-    text-color: @text;
-    highlight: @selected-text;
-    spacing: 2px;
-    border: 2px;
-    padding: 6px;
-    font: "JetBrains Mono 12";
+  border: 0;
+  margin: 0;
+  padding: 0;
+  spacing: 0;
+
+  background: #24273a;
+  background-alt: #24273a;
+  foreground: #c6d0f5;
+  selected-text: #8caaee;
+  border-color: #c6d0f5;
+
+  background-color: transparent;
+  text-color: @foreground;
 }
 
 window {
-    background-color: @background;
-    border: 2px;
-    border-color: @border;
-    padding: 12px;
+  border: 2;
+  border-color: @border-color;
+  border-radius: 0;
+  transparency: "real";
+  background-color: rgba(36, 39, 58, 0.95);
+  padding: 20px;
 }
 
 mainbox {
-    background-color: @background;
-    children: [ inputbar, listview ];
-    spacing: 8px;
+  children: [inputbar, listview];
+  background-color: transparent;
+  spacing: 0px;
 }
 
 inputbar {
-    background-color: @base;
-    text-color: @text;
-    padding: 6px;
-    border: 1px;
-    border-color: @border;
+  background-color: @background;
+  children: [entry];
+  padding: 10px;
+  margin: 0px 0px 0px 0px;
+}
+
+entry {
+  background-color: transparent;
+  padding: 0px;
+  placeholder: "";
+  placeholder-color: rgba(198, 208, 245, 0.5);
+}
+
+prompt {
+  enabled: false;
 }
 
 listview {
-    background-color: @background;
-    columns: 1;
-    spacing: 2px;
-    fixed-height: false;
+  lines: 8;
+  background-color: transparent;
+  spacing: 0px;
+  cycle: true;
+  dynamic: true;
+  layout: vertical;
 }
 
 element {
-    background-color: @background;
-    text-color: @text;
-    padding: 4px 8px;
-    border: 0;
+  children: [element-icon, element-text];
+  background-color: transparent;
+  padding: 0px 12px;
+  border-radius: 0;
+}
+
+element selected,
+element-icon selected,
+element-text selected {
+  background-color: transparent;
+}
+
+element-icon {
+  padding: 14px 10px 14px 0px;
+  size: 0.7em;
+  background-color: transparent;
+}
+
+element-text {
+  padding: 14px 0px;
+  background-color: transparent;
+}
+
+element-text selected {
+  text-color: @selected-text;
+  background-color: transparent;
 }
 
 element selected {
-    background-color: @base;
-    text-color: @selected-text;
-    border: 1px;
-    border-color: @selected-text;
+  background-color: transparent;
+}
+
+scrollbar {
+  width: 0px;
+  handle-width: 0px;
+  handle-color: transparent;
+  background-color: transparent;
 }
