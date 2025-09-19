@@ -72,16 +72,6 @@ CHROMIUM_THEME=~/.config/theme/chromium.theme
 
 if cmd_present chromium || cmd_present brave; then
 
-  if ! [ -d /etc/chromium/policies/managed ]; then
-    pkexec mkdir -p /etc/chromium/policies/managed
-    pkexec chmod a+rw /etc/chromium/policies/managed
-  fi
-
-  if ! [ -d /etc/brave/policies/managed ]; then
-    pkexec mkdir -p /etc/brave/policies/managed
-    pkexec chmod a+rw /etc/brave/policies/managed
-  fi
-
   if [[ -f $CHROMIUM_THEME ]]; then
     rgb=$(<$CHROMIUM_THEME)
     THEME_HEX_COLOR=$(printf '#%02x%02x%02x' ${rgb//,/ })
@@ -90,15 +80,29 @@ if cmd_present chromium || cmd_present brave; then
     THEME_HEX_COLOR="#1c2027"
   fi
 
+  pkexec bash -c '
+      set -e
+
+      if command -v chromium >/dev/null 2>&1; then
+        mkdir -p /etc/chromium/policies/managed
+        echo "{\"BrowserThemeColor\": "'"$THEME_HEX_COLOR"'"}" > /etc/chromium/policies/managed/color.json
+      fi
+
+      if command -v brave >/dev/null 2>&1; then
+        mkdir -p /etc/brave/policies/managed
+        echo "{\"BrowserThemeColor\": "'"$THEME_HEX_COLOR"'"}" > /etc/brave/policies/managed/color.json
+      fi
+    '
+  fi
+
   if cmd_present chromium; then
-    echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}" | tee "/etc/chromium/policies/managed/color.json" >/dev/null
     chromium --refresh-platform-policy --no-startup-window
   fi
 
   if cmd_present brave; then
-    echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}" | tee "/etc/brave/policies/managed/color.json" >/dev/null
     brave --refresh-platform-policy --no-startup-window
   fi
+
 fi
 
 
