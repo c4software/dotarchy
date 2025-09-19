@@ -1,5 +1,5 @@
 configuration {
-  font: "monospace 18";
+  font: "monospace 16";
 
   drun {
     display-name: "";
@@ -99,7 +99,6 @@ element-icon {
 element-text {
   padding: 14px 0px;
   background-color: transparent;
-  font-weight: normal;
 }
 
 element-text selected {
