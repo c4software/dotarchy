@@ -1,118 +1,12 @@
-configuration {
-  font: "monospace 16";
-
-  drun {
-    display-name: "";
-  }
-
-  run {
-    display-name: "";
-  }
-
-  window {
-    display-name: "";
-  }
-
-  timeout {
-    delay: 10;
-    action: "kb-cancel";
-  }
-}
+@import "base-theme.rasi"
 
 * {
-  border: 0;
-  margin: 0;
-  padding: 0;
-  spacing: 0;
-
   background: #11221C;
   background-alt: #11221C;
   foreground: #ebfff2;
   selected-text: #e1b55e;
   border-color: #214237;
-
-  background-color: transparent;
-  text-color: @foreground;
-}
-
-window {
-  border: 2;
-  border-color: @border-color;
-  border-radius: 0;
-  transparency: "real";
-  background-color: rgba(17, 34, 28, 0.95);
-  padding: 20px;
-}
-
-mainbox {
-  children: [inputbar, listview];
-  background-color: transparent;
-  spacing: 0px;
-}
-
-inputbar {
-  background-color: @background;
-  children: [entry];
-  padding: 10px;
-  margin: 0px 0px 0px 0px;
-}
-
-entry {
-  background-color: transparent;
-  padding: 0px;
-  placeholder: "";
+  
+  window-background: rgba(17, 34, 28, 0.95);
   placeholder-color: rgba(235, 255, 242, 0.5);
-}
-
-prompt {
-  enabled: false;
-}
-
-listview {
-  lines: 8;
-  background-color: transparent;
-  spacing: 0px;
-  cycle: true;
-  dynamic: true;
-  layout: vertical;
-}
-
-element {
-  children: [element-icon, element-text];
-  background-color: transparent;
-  padding: 0px 12px;
-  border-radius: 0;
-}
-
-element selected,
-element-icon selected,
-element-text selected {
-  background-color: transparent;
-}
-
-element-icon {
-  padding: 14px 10px 14px 0px;
-  size: 0.7em;
-  background-color: transparent;
-}
-
-element-text {
-  padding: 14px 0px;
-  background-color: transparent;
-}
-
-element-text selected {
-  text-color: @selected-text;
-  background-color: transparent;
-}
-
-element selected {
-  background-color: transparent;
-}
-
-scrollbar {
-  width: 0px;
-  handle-width: 0px;
-  handle-color: transparent;
-  background-color: transparent;
 }

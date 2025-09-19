@@ -6,7 +6,7 @@
   foreground: #e6d9db;
   selected-text: #fabd2f;
   border-color: #e6d9db;
-
-  background-color: @background;
-  text-color: @foreground;
+  
+  window-background: rgba(44, 37, 37, 0.95);
+  placeholder-color: rgba(230, 217, 219, 0.5);
 }
