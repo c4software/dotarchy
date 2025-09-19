@@ -82,19 +82,19 @@ if cmd_present chromium || cmd_present brave; then
   fi
 
   # Update system-wide policies (requires pkexec)
-  pkexec bash -c '
+  pkexec bash -c "
       set -e
 
       if command -v chromium >/dev/null 2>&1; then
         mkdir -p /etc/chromium/policies/managed
-        echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}" > /etc/chromium/policies/managed/color.json
+        echo '{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}' > /etc/chromium/policies/managed/color.json
       fi
 
       if command -v brave >/dev/null 2>&1; then
         mkdir -p /etc/brave/policies/managed
-        echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}" > /etc/brave/policies/managed/color.json
+        echo '{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}' > /etc/brave/policies/managed/color.json
       fi
-    '
+    "
 
   # Refresh browser policies
   if cmd_present chromium; then
