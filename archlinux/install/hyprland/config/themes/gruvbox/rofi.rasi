@@ -1,61 +1,83 @@
-/* Thème rofi Gruvbox */
-@define-color selected-text #fabd2f;
-@define-color text #ebdbb2;
-@define-color base #282828;
-@define-color border #ebdbb2;
-@define-color foreground #ebdbb2;
-@define-color background #282828;
+/*
+ * ROFI color theme
+ *
+ * Based on Something Found in the Internet
+ *
+ * User: Contributors
+ * Copyright: *!
+ */
+
+configuration {
+  font: "JetBrainsMono Nerd Font Medium 10";
+
+  drun {
+    display-name: "";
+  }
+
+  run {
+    display-name: "";
+  }
+
+  window {
+    display-name: "";
+  }
+
+  timeout {
+    delay: 10;
+    action: "kb-cancel";
+  }
+}
 
 * {
-    background: @background;
-    foreground: @foreground;
-    border-color: @border;
-    text-color: @text;
-    highlight: @selected-text;
-    spacing: 2px;
-    border: 2px;
-    padding: 6px;
-    font: "JetBrains Mono 12";
+  border: 0;
+  margin: 0;
+  padding: 0;
+  spacing: 0;
+
+  bg: #282828;
+  bg-alt: #3c3836;
+  fg: #fbf1c7;
+  blue: #83a598;
+
+  background-color: @bg;
+  text-color: @fg;
 }
 
 window {
-    background-color: @background;
-    border: 2px;
-    border-color: @border;
-    padding: 12px;
+  transparency: "real";
 }
 
 mainbox {
-    background-color: @background;
-    children: [ inputbar, listview ];
-    spacing: 8px;
+  children: [inputbar, listview];
 }
 
 inputbar {
-    background-color: @base;
-    text-color: @text;
-    padding: 6px;
-    border: 1px;
-    border-color: @border;
+  background-color: @bg-alt;
+  children: [prompt, entry];
+}
+
+entry {
+  background-color: inherit;
+  padding: 12px 3px;
+}
+
+prompt {
+  background-color: inherit;
+  padding: 12px 16px 12px 12px;
 }
 
 listview {
-    background-color: @background;
-    columns: 1;
-    spacing: 2px;
-    fixed-height: false;
+  lines: 8;
 }
 
 element {
-    background-color: @background;
-    text-color: @text;
-    padding: 4px 8px;
-    border: 0;
+  children: [element-text];
 }
 
-element selected {
-    background-color: @base;
-    text-color: @selected-text;
-    border: 1px;
-    border-color: @selected-text;
+element-text {
+  padding: 10px;
+}
+
+element-text selected {
+  text-color: @blue;
 }
