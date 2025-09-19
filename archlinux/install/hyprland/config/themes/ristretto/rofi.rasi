@@ -1,25 +1,16 @@
-/*
- * ROFI color theme
- *
- * Based on Something Found in the Internet
- *
- * User: Contributors
- * Copyright: *!
- */
-
 configuration {
-  font: "JetBrainsMono Nerd Font Medium 10";
+  font: "monospace 18";
 
   drun {
-    display-name: "";
+    display-name: "";
   }
 
   run {
-    display-name: "";
+    display-name: "";
   }
 
   window {
-    display-name: "";
+    display-name: "";
   }
 
   timeout {
@@ -40,50 +31,89 @@ configuration {
   selected-text: #fabd2f;
   border-color: #e6d9db;
 
-  background-color: @background;
+  background-color: transparent;
   text-color: @foreground;
 }
 
 window {
   border: 2;
+  border-color: @border-color;
+  border-radius: 0;
   transparency: "real";
+  background-color: rgba(44, 37, 37, 0.95);
+  padding: 20px;
 }
 
 mainbox {
   children: [inputbar, listview];
+  background-color: transparent;
+  spacing: 0px;
 }
 
 inputbar {
-  background-color: @background-alt;
-  children: [prompt, entry];
+  background-color: @background;
+  children: [entry];
+  padding: 10px;
+  margin: 0px 0px 0px 0px;
 }
 
 entry {
-  background-color: inherit;
-  padding: 12px 3px;
+  background-color: transparent;
+  padding: 0px;
+  placeholder: "";
+  placeholder-color: rgba(230, 217, 219, 0.5);
 }
 
 prompt {
-  background-color: inherit;
-  padding: 12px;
+  enabled: false;
 }
 
 listview {
   lines: 8;
+  background-color: transparent;
+  spacing: 0px;
+  cycle: true;
+  dynamic: true;
+  layout: vertical;
 }
 
 element {
   children: [element-icon, element-text];
+  background-color: transparent;
+  padding: 0px 12px;
+  border-radius: 0;
+}
+
+element selected,
+element-icon selected,
+element-text selected {
+  background-color: transparent;
 }
 
 element-icon {
-  padding: 10px 10px;
+  padding: 14px 10px 14px 0px;
+  size: 0.7em;
+  background-color: transparent;
 }
 
 element-text {
-  padding: 10px 0;
+  padding: 14px 0px;
+  background-color: transparent;
+  font-weight: normal;
 }
 
 element-text selected {
   text-color: @selected-text;
+  background-color: transparent;
+}
+
+element selected {
+  background-color: transparent;
+}
+
+scrollbar {
+  width: 0px;
+  handle-width: 0px;
+  handle-color: transparent;
+  background-color: transparent;
 }
