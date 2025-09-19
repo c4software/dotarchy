@@ -11,6 +11,11 @@ menu() {
   local options="$2"
   local extra="$3"
   local preselect="$4"
+  
+  local options_count=$(echo -e "$options" | wc -l)
+  if (( options_count > 10 )); then
+    options_count=10
+  fi
 
   read -r -a args <<<"$extra"
 
@@ -22,7 +27,7 @@ menu() {
     fi
   fi
 
-  echo -e "$options" | walker --dmenu --theme dmenu_250 -p "$prompt…" "${args[@]}"
+  echo -e "$options" | rofi -i -dmenu -theme-str "window { width: 250px; padding: 10px; } listview { lines: $options_count; }" "${args[@]}"
 }
 
 # Function to persist the new configuration in Hyprland config file
