@@ -83,7 +83,12 @@ parse_bindings() {
 }'
 }
 
+local options_count=$(dynamic_bindings | wc -l)
+if (( options_count > 20 )); then
+  options_count=20
+fi
+
 dynamic_bindings | \
   sort -u | \
   parse_bindings | \
-  walker --dmenu --theme keybindings -p 'Keybindings'
+  rofi -i -dmenu -theme-str "window { width: 250px; padding: 10px; } listview { lines: $options_count; }" "${args[@]}"
