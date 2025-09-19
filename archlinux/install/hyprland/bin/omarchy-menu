@@ -35,7 +35,6 @@ menu() {
 
   # echo -e "$options" | walker --dmenu --theme dmenu_250 -p "$prompt…" "${args[@]}"
   echo -e "$options" | rofi -i -dmenu -theme-str "window { width: 250px; padding: 10px; } listview { lines: $options_count; }" "${args[@]}"
-
 }
 
 terminal() {

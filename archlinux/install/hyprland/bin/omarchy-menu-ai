@@ -5,6 +5,7 @@ menu() {
   local options="$2"
   local extra="$3"
   local preselect="$4"
+  local options_count=$(echo -e "$options" | wc -l)
 
   read -r -a args <<<"$extra"
 
@@ -16,7 +17,7 @@ menu() {
     fi
   fi
 
-  echo -e "$options" | walker --dmenu --theme dmenu_250 -p "$prompt…" "${args[@]}"
+  echo -e "$options" | rofi -i -dmenu -theme-str "window { width: 250px; padding: 10px; } listview { lines: $options_count; }" "${args[@]}"
 }
 
 launch_or_focus_and_pin() {
