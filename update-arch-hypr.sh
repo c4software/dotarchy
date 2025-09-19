@@ -12,4 +12,4 @@ fi
 source ./common/install/bootstrap.sh
 
 # Update Hyprland (without reinstalling packages)
-./archlinux/install/hyprland/install.sh --skip-packages
+./archlinux/install/hyprland/setup.sh --skip-packages
