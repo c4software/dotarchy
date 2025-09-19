@@ -34,13 +34,6 @@ configuration {
   padding: 0;
   spacing: 0;
 
-  /* Couleurs originales */
-  /* bg: #2E3440; */
-  /* bg-alt: #3B4252; */
-  /* fg: #81A1C1; */
-  /* fg-alt: #EBCB8B; */
-
-  /* Nouvelles couleurs */
   background: #2c2525;
   background-alt: #2c2525;
   foreground: #e6d9db;
@@ -51,6 +44,7 @@ configuration {
 }
 
 window {
+  border: 2;
   transparency: "real";
 }
 
