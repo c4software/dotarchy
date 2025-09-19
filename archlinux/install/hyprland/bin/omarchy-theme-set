@@ -72,6 +72,7 @@ CHROMIUM_THEME=~/.config/theme/chromium.theme
 
 if cmd_present chromium || cmd_present brave; then
 
+  # Extract RGB color from theme file
   if [[ -f $CHROMIUM_THEME ]]; then
     rgb=$(<$CHROMIUM_THEME)
     THEME_HEX_COLOR=$(printf '#%02x%02x%02x' ${rgb//,/ })
@@ -80,6 +81,7 @@ if cmd_present chromium || cmd_present brave; then
     THEME_HEX_COLOR="#1c2027"
   fi
 
+  # Update system-wide policies (requires pkexec)
   pkexec bash -c '
       set -e
 
@@ -93,8 +95,8 @@ if cmd_present chromium || cmd_present brave; then
         echo "{\"BrowserThemeColor\": "'"$THEME_HEX_COLOR"'"}" > /etc/brave/policies/managed/color.json
       fi
     '
-  fi
 
+  # Refresh browser policies
   if cmd_present chromium; then
     chromium --refresh-platform-policy --no-startup-window
   fi
