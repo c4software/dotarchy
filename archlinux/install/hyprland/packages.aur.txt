@@ -28,3 +28,4 @@ wf-recorder
 hyprmon-bin
 python-terminaltexteffects
 yaru-icon-theme
+rofi
