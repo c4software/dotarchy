@@ -38,6 +38,7 @@ configuration {
   background-alt: #2c2525;
   foreground: #e6d9db;
   selected-text: #fabd2f;
+  border-color: #e6d9db;
 
   background-color: @background;
   text-color: @foreground;
