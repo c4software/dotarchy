@@ -25,5 +25,5 @@ if [[ -n "$preselect" ]]; then
 fi
 
 echo -e "$options" | rofi -i -dmenu \
-  -theme-str "window { width: ${width}px; padding: 10px; } listview { lines: $options_count; } #textbox-prompt-colon { content: '$prompt'; }" \
+  -theme-str "window { width: ${width}px; padding: 10px; } listview { lines: $options_count; } #entry { placeholder: '$prompt'; }" \
   "${args[@]}"
