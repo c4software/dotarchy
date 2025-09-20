@@ -10,9 +10,6 @@ extra="$3"
 preselect="$4"
 width="${5:-250}"
 
-# Trim spacing from the start of each option line
-options=$(echo -e "$options" | sed 's/^[ ]*//')
-
 options_count=$(echo -e "$options" | wc -l)
 if (( options_count > 10 )); then
   options_count=10
