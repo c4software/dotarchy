@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# A generic menu function using rofi
+# Usage: display-menu "Prompt" "Option1\nOption2\nOption3" "-extra -rofi -args" "PreselectedOption" Width
+# Example: display-menu "Choose an option:" "Option 1\nOption 2\nOption 3" "-p 'Select an option'" "Option 2" 300
+
+prompt="$1"
+options="$2"
+extra="$3"
+preselect="$4"
+width="${5:-250}"
+
+options_count=$(echo -e "$options" | wc -l)
+if (( options_count > 10 )); then
+  options_count=10
+fi
+
+read -r -a args <<<"$extra"
+
+if [[ -n "$preselect" ]]; then
+  index=$(echo -e "$options" | grep -nxF "$preselect" | cut -d: -f1)
+  if [[ -n "$index" ]]; then
+    args+=("-a" "$index")
+  fi
+fi
+
+echo -e "$options" | rofi -i -dmenu \
+  -p "$prompt" \
+  -theme-str "window { width: ${width}px; padding: 10px; } listview { lines: $options_count; }" \
+  "${args[@]}"
