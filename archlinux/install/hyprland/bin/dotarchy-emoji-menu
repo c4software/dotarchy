@@ -28,7 +28,7 @@ main() {
     
     # Afficher le menu de sélection
     local selected
-    selected=$(dotarchy-display-menu "Choisissez un emoji:" "$emoji_options" "-p Emoji" 500)
+    selected=$(dotarchy-display-menu "Choisissez un emoji:" "$emoji_options" "-p Emoji" "" 500)
     
     if [[ -n "$selected" ]]; then
         # Extraire seulement l'emoji (premier caractère avant l'espace)
