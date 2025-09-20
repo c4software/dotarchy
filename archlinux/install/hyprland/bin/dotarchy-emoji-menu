@@ -1,23 +1,18 @@
 #!/bin/bash
 
-# Fonction pour lire les emojis depuis le fichier statique
 read_emoji_list() {
     local script_dir="$(dirname "$(readlink -f "$0")")"
     local emoji_file="$script_dir/dotarchy-emoji-list.txt"
     
-    # Vérifier si le fichier existe
     if [[ ! -f "$emoji_file" ]]; then
-        echo "Fichier d'emojis non trouvé : $emoji_file" >&2
+        echo "No emoji file found: $emoji_file" >&2
         exit 1
     fi
-    
-    # Lire les emojis en filtrant les lignes vides
+
     grep -v '^$' "$emoji_file"
 }
 
-# Fonction principale
 main() {
-    # Lire les emojis depuis le fichier
     local emoji_options
     emoji_options=$(read_emoji_list)
     
@@ -28,16 +23,13 @@ main() {
     
     # Afficher le menu de sélection
     local selected
-    selected=$(dotarchy-display-menu "Choisissez un emoji:" "$emoji_options" "-p Emoji" "" 500)
+    selected=$(dotarchy-display-menu "Pick an emoji:" "$emoji_options" "" "" 500)
     
     if [[ -n "$selected" ]]; then
-        # Extraire seulement l'emoji (premier caractère avant l'espace)
         local emoji="${selected%% *}"
         
-        # Copier dans le presse-papiers
         echo -n "$emoji" | wl-copy
     fi
 }
 
-# Lancer le script
 main "$@"
