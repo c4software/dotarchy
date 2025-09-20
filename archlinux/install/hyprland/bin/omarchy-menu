@@ -15,30 +15,6 @@ back_to() {
   fi
 }
 
-menu() {
-  local prompt="$1"
-  local options="$2"
-  local extra="$3"
-  local preselect="$4"
-  
-  local options_count=$(echo -e "$options" | wc -l)
-  if (( options_count > 10 )); then
-    options_count=10
-  fi
-
-  read -r -a args <<<"$extra"
-
-  if [[ -n "$preselect" ]]; then
-    local index
-    index=$(echo -e "$options" | grep -nxF "$preselect" | cut -d: -f1)
-    if [[ -n "$index" ]]; then
-      args+=("-a" "$index")
-    fi
-  fi
-
-  echo -e "$options" | rofi -i -dmenu -theme-str "window { width: 250px; padding: 10px; } listview { lines: $options_count; }" "${args[@]}"
-}
-
 terminal() {
   alacritty --class Omarchy -e "$@"
 }
