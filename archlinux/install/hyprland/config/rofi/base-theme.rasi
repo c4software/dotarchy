@@ -45,7 +45,7 @@ mainbox {
 }
 
 inputbar {
-  enabled: false;
+  enabled: true;
   background-color: @background;
   children: [entry];
   padding: 10px;
