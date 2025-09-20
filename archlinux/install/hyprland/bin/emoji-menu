@@ -1,0 +1,216 @@
+#!/bin/bash
+
+# Fonction menu fournie
+menu() {
+  local prompt="$1"
+  local options="$2"
+  local extra="$3"
+  local preselect="$4"
+  
+  local options_count=$(echo -e "$options" | wc -l)
+  if (( options_count > 10 )); then
+    options_count=10
+  fi
+
+  read -r -a args <<<"$extra"
+
+  if [[ -n "$preselect" ]]; then
+    local index
+    index=$(echo -e "$options" | grep -nxF "$preselect" | cut -d: -f1)
+    if [[ -n "$index" ]]; then
+      args+=("-a" "$index")
+    fi
+  fi
+
+  echo -e "$options" | rofi -i -dmenu -theme-str "window { width: 500px; padding: 10px; } listview { lines: $options_count; }" "${args[@]}"
+}
+
+# Fonction pour convertir hexadécimal en décimal
+hex_to_dec() {
+    printf "%d" "0x$1"
+}
+
+# Fonction pour convertir décimal en caractère Unicode
+dec_to_char() {
+    local dec="$1"
+    if (( dec > 0x10FFFF )); then
+        return 1
+    fi
+    printf "\\U$(printf "%08x" "$dec")"
+}
+
+# Fonction pour vérifier si un code point est un emoji
+is_emoji_range() {
+    local code="$1"
+    
+    # Plages Unicode principales pour les emojis
+    if (( (code >= 0x1F600 && code <= 0x1F64F) ||  # Emoticons
+          (code >= 0x1F300 && code <= 0x1F5FF) ||  # Misc Symbols and Pictographs
+          (code >= 0x1F680 && code <= 0x1F6FF) ||  # Transport and Map
+          (code >= 0x1F700 && code <= 0x1F77F) ||  # Alchemical Symbols
+          (code >= 0x1F780 && code <= 0x1F7FF) ||  # Geometric Shapes Extended
+          (code >= 0x1F800 && code <= 0x1F8FF) ||  # Supplemental Arrows-C
+          (code >= 0x1F900 && code <= 0x1F9FF) ||  # Supplemental Symbols and Pictographs
+          (code >= 0x1FA00 && code <= 0x1FA6F) ||  # Chess Symbols
+          (code >= 0x1FA70 && code <= 0x1FAFF) ||  # Symbols and Pictographs Extended-A
+          (code >= 0x2600 && code <= 0x26FF) ||    # Miscellaneous symbols
+          (code >= 0x2700 && code <= 0x27BF) ||    # Dingbats
+          (code >= 0x1F1E6 && code <= 0x1F1FF) ||  # Regional Indicator Symbols
+          (code == 0x1F004) ||                     # Mahjong
+          (code == 0x1F0CF) ||                     # Playing cards
+          (code == 0x1F18E) ||                     # Negative squared AB
+          (code == 0x3030) ||                      # Wavy dash
+          (code == 0x303D) )); then               # Part alternation mark
+        return 0
+    fi
+    return 1
+}
+
+# Fonction pour extraire les emojis des polices Noto
+extract_noto_emojis() {
+    local cache_file="$HOME/.cache/noto-emojis-bash.txt"
+    local cache_dir="$(dirname "$cache_file")"
+    
+    # Créer le répertoire cache si nécessaire
+    mkdir -p "$cache_dir"
+    
+    # Vérifier si le cache existe et est récent (moins de 24h)
+    if [[ -f "$cache_file" ]] && [[ $(find "$cache_file" -mtime -1 2>/dev/null) ]]; then
+        cat "$cache_file"
+        return
+    fi
+    
+    echo "Extraction des emojis depuis les polices Noto..." >&2
+    
+    # Trouver les fichiers de police Noto Emoji
+    local noto_fonts
+    noto_fonts=$(fc-list : file family | grep -i "noto.*emoji" | cut -d: -f1 | sort -u)
+    
+    if [[ -z "$noto_fonts" ]]; then
+        echo "Aucune police Noto Emoji trouvée. Assurez-vous que noto-fonts-emoji est installé." >&2
+        exit 1
+    fi
+    
+    local emoji_list=""
+    local processed_codes=()
+    
+    echo "Polices Noto Emoji trouvées:" >&2
+    echo "$noto_fonts" >&2
+    echo "" >&2
+    
+    # Pour chaque police Noto Emoji trouvée
+    while IFS= read -r font_file; do
+        [[ -z "$font_file" ]] && continue
+        
+        echo "Traitement de: $(basename "$font_file")" >&2
+        
+        # Extraire le charset de la police avec fc-query
+        local charset
+        charset=$(fc-query --format="%{charset}\n" "$font_file" 2>/dev/null)
+        
+        if [[ -z "$charset" ]]; then
+            echo "  Impossible de lire le charset de cette police" >&2
+            continue
+        fi
+        
+        # Parser le charset (format: 20-7e a0-ff 1f004 1f0cf 1f18e ...)
+        local count=0
+        for range in $charset; do
+            if [[ "$range" =~ ^([0-9a-f]+)-([0-9a-f]+)$ ]]; then
+                # Plage de caractères
+                local start_hex="${BASH_REMATCH[1]}"
+                local end_hex="${BASH_REMATCH[2]}"
+                local start_dec end_dec
+                start_dec=$(hex_to_dec "$start_hex")
+                end_dec=$(hex_to_dec "$end_hex")
+                
+                for (( code = start_dec; code <= end_dec; code++ )); do
+                    if is_emoji_range "$code"; then
+                        # Vérifier si déjà traité
+                        local already_processed=false
+                        for processed in "${processed_codes[@]}"; do
+                            if (( processed == code )); then
+                                already_processed=true
+                                break
+                            fi
+                        done
+                        
+                        if [[ "$already_processed" == "false" ]]; then
+                            local char
+                            char=$(dec_to_char "$code")
+                            if [[ -n "$char" ]]; then
+                                emoji_list+="$char U+$(printf "%04X" "$code")\n"
+                                processed_codes+=("$code")
+                                ((count++))
+                            fi
+                        fi
+                    fi
+                done
+            elif [[ "$range" =~ ^[0-9a-f]+$ ]]; then
+                # Caractère individuel
+                local code
+                code=$(hex_to_dec "$range")
+                if is_emoji_range "$code"; then
+                    # Vérifier si déjà traité
+                    local already_processed=false
+                    for processed in "${processed_codes[@]}"; do
+                        if (( processed == code )); then
+                            already_processed=true
+                            break
+                        fi
+                    done
+                    
+                    if [[ "$already_processed" == "false" ]]; then
+                        local char
+                        char=$(dec_to_char "$code")
+                        if [[ -n "$char" ]]; then
+                            emoji_list+="$char U+$(printf "%04X" "$code")\n"
+                            processed_codes+=("$code")
+                            ((count++))
+                        fi
+                    fi
+                fi
+            fi
+        done
+        
+        echo "  $count emojis trouvés" >&2
+        
+    done <<< "$noto_fonts"
+    
+    if [[ -z "$emoji_list" ]]; then
+        echo "Aucun emoji trouvé dans les polices Noto." >&2
+        exit 1
+    fi
+    
+    # Trier les emojis par code Unicode et sauvegarder en cache
+    echo -e "$emoji_list" | sort -k2 | tee "$cache_file"
+    
+    echo "Total: ${#processed_codes[@]} emojis extraits et mis en cache." >&2
+}
+
+# Fonction principale
+main() {
+    # Extraire les emojis
+    local emoji_options
+    emoji_options=$(extract_noto_emojis)
+    
+    if [[ -z "$emoji_options" ]]; then
+        echo "Aucun emoji disponible." >&2
+        exit 1
+    fi
+    
+    # Afficher le menu de sélection
+    local selected
+    selected=$(menu "Choisissez un emoji:" "$emoji_options" "-p Emoji")
+    
+    if [[ -n "$selected" ]]; then
+        # Extraire seulement l'emoji (premier caractère avant l'espace)
+        local emoji="${selected%% *}"
+        
+        # Copier dans le presse-papiers
+        echo -n "$emoji" | wl-copy
+    fi
+}
+
+# Lancer le script
+main "$@"
