@@ -17,6 +17,10 @@ fi
 
 read -r -a args <<<"$extra"
 
+if [[ -n "$prompt" ]]; then
+  prompt="$prompt..."
+fi
+
 if [[ -n "$preselect" ]]; then
   index=$(echo -e "$options" | grep -nxF "$preselect" | cut -d: -f1)
   if [[ -n "$index" ]]; then
