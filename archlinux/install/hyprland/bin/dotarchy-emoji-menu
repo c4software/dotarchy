@@ -11,21 +11,8 @@ read_emoji_list() {
         exit 1
     fi
     
-    # Lire et formater les emojis (convertir "emoji description" en "emoji U+code")
-    while IFS= read -r line; do
-        # Ignorer les lignes vides
-        [[ -z "$line" ]] && continue
-        
-        # Extraire l'emoji (premier caractère)
-        local emoji="${line%% *}"
-        
-        # Calculer le code Unicode de l'emoji
-        local code_point
-        code_point=$(printf "%s" "$emoji" | od -An -tx4 | tr -d ' ' | tr '[:lower:]' '[:upper:]')
-        
-        # Afficher au format attendu par le menu
-        echo "$emoji U+$code_point"
-    done < "$emoji_file"
+    # Lire les emojis en filtrant les lignes vides
+    grep -v '^$' "$emoji_file"
 }
 
 # Fonction principale
