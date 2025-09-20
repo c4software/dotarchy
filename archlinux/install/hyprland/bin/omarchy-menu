@@ -49,7 +49,7 @@ aur_install_and_launch() {
 }
 
 show_learn_menu() {
-  case $(display-menu "Learn" "  Keybindings\n  Omarchy\n  Hyprland\n󰣇  Arch\n  Neovim\n󱆃  Bash") in
+  case $(dotarchy-display-menu "Learn" "  Keybindings\n  Omarchy\n  Hyprland\n󰣇  Arch\n  Neovim\n󱆃  Bash") in
   *Keybindings*) omarchy-menu-keybindings ;;
   *Omarchy*) xdg-open "https://learn.omacom.io/2/the-omarchy-manual" ;;
   *Hyprland*) xdg-open "https://wiki.hypr.land/" ;;
@@ -61,7 +61,7 @@ show_learn_menu() {
 }
 
 show_capture_menu() {
-  case $(display-menu "Capture" "  Screenshot\n  Screenrecord\n󰃉  Color") in
+  case $(dotarchy-display-menu "Capture" "  Screenshot\n  Screenrecord\n󰃉  Color") in
   *Screenshot*) show_screenshot_menu ;;
   *Screenrecord*) show_screenrecord_menu ;;
   *Color*) pkill hyprpicker || hyprpicker -a ;;
@@ -70,7 +70,7 @@ show_capture_menu() {
 }
 
 show_screenshot_menu() {
-  case $(display-menu "Screenshot" "  Region\n  Window\n  Display") in
+  case $(dotarchy-display-menu "Screenshot" "  Region\n  Window\n  Display") in
   *Region*) omarchy-cmd-screenshot ;;
   *Window*) omarchy-cmd-screenshot window ;;
   *Display*) omarchy-cmd-screenshot output ;;
@@ -79,7 +79,7 @@ show_screenshot_menu() {
 }
 
 show_screenrecord_menu() {
-  case $(display-menu "Screenrecord" "  Region\n  Display") in
+  case $(dotarchy-display-menu "Screenrecord" "  Region\n  Display") in
   *Region*) omarchy-cmd-screenrecord ;;
   *Display*) omarchy-cmd-screenrecord output ;;
   *) show_capture_menu ;;
@@ -87,7 +87,7 @@ show_screenrecord_menu() {
 }
 
 show_toggle_menu() {
-  case $(display-menu "Toggle" "󱫖  Idle Lock\n󰍜  Top Bar") in
+  case $(dotarchy-display-menu "Toggle" "󱫖  Idle Lock\n󰍜  Top Bar") in
   *Idle*) omarchy-toggle-idle ;;
   *Bar*) omarchy-toggle-waybar ;;
   *) show_main_menu ;;
@@ -100,7 +100,7 @@ show_setup_menu() {
   [ -f ~/.config/hypr/input.conf ] && options="$options\n  Input"
   options="$options\n  Config\n󰈷  Fingerprint"
 
-  case $(display-menu "Setup" "$options") in
+  case $(dotarchy-display-menu "Setup" "$options") in
   *Audio*) alacritty --class=Wiremix -e wiremix ;;
   *Wifi*)
     rfkill unblock wifi
@@ -122,7 +122,7 @@ show_setup_menu() {
 }
 
 show_setup_power_menu() {
-  profile=$(display-menu "Power Profile" "$(omarchy-powerprofiles-list)" "" "$(powerprofilesctl get)")
+  profile=$(dotarchy-display-menu "Power Profile" "$(omarchy-powerprofiles-list)" "" "$(powerprofilesctl get)")
 
   if [[ "$profile" == "CNCLD" || -z "$profile" ]]; then
       back_to show_main_menu
@@ -132,7 +132,7 @@ show_setup_power_menu() {
 }
 
 show_setup_config_menu() {
-  case $(display-menu "Setup" "  Hyprland\n  Hypridle\n  Hyprlock\n  Swayosd\n󰍜  Waybar") in
+  case $(dotarchy-display-menu "Setup" "  Hyprland\n  Hypridle\n  Hyprlock\n  Swayosd\n󰍜  Waybar") in
   *Hyprland*) edit_in_nvim ~/.config/hypr/hyprland.conf ;;
   *Hypridle*) edit_in_nvim ~/.config/hypr/hypridle.conf && omarchy-restart-hypridle ;;
   *Hyprlock*) edit_in_nvim ~/.config/hypr/hyprlock.conf ;;
@@ -143,7 +143,7 @@ show_setup_config_menu() {
 }
 
 show_install_menu() {
-  case $(display-menu "Install" "󰣇  Package\n󰣇  AUR\n  Web App\n  TUI\n  Service\n󰵮  Development\n  Editor\n󱚤  AI\n  Terminal") in
+  case $(dotarchy-display-menu "Install" "󰣇  Package\n󰣇  AUR\n  Web App\n  TUI\n  Service\n󰵮  Development\n  Editor\n󱚤  AI\n  Terminal") in
   *Package*) terminal omarchy-pkg-install ;;
   *AUR*) terminal omarchy-pkg-aur-install ;;
   *Web*) present_terminal omarchy-webapp-install ;;
@@ -158,7 +158,7 @@ show_install_menu() {
 }
 
 show_install_service_menu() {
-  case $(display-menu "Install" "󱨑  Firewall\n  Dropbox") in
+  case $(dotarchy-display-menu "Install" "󱨑  Firewall\n  Dropbox") in
   *Firewall*) present_terminal omarchy-install-firewall ;;
   *Dropbox*) present_terminal omarchy-install-dropbox ;;
   *) show_install_menu ;;
@@ -166,7 +166,7 @@ show_install_service_menu() {
 }
 
 show_install_ai_menu() {
-  case $(display-menu "Install" "󱚤  Claude Code\n󱚤  Gemini\n󱚤  LM Studio\n󱚤  Ollama\n󱚤  Crush\n󱚤  opencode") in
+  case $(dotarchy-display-menu "Install" "󱚤  Claude Code\n󱚤  Gemini\n󱚤  LM Studio\n󱚤  Ollama\n󱚤  Crush\n󱚤  opencode") in
   *Claude*) install "Claude Code" "claude-code" ;;
   *Gemini*) install "Gemini" "gemini-cli-bin" ;;
   *Studio*) install "LM Studio" "lmstudio" ;;
@@ -178,7 +178,7 @@ show_install_ai_menu() {
 }
 
 show_install_development_menu() {
-  case $(display-menu "Install" "󰫏  Ruby on Rails\n  Docker DB\n  JavaScript\n  Go\n  PHP\n  Python\n  Elixir\n  Zig\n  Rust\n  Java\n  .NET\n  OCaml") in
+  case $(dotarchy-display-menu "Install" "󰫏  Ruby on Rails\n  Docker DB\n  JavaScript\n  Go\n  PHP\n  Python\n  Elixir\n  Zig\n  Rust\n  Java\n  .NET\n  OCaml") in
   *Rails*) present_terminal "omarchy-install-dev-env ruby" ;;
   *Docker*) present_terminal omarchy-install-docker-dbs ;;
   *JavaScript*) show_install_javascript_menu ;;
@@ -195,7 +195,7 @@ show_install_development_menu() {
 }
 
 show_install_editor_menu() {
-  case $(display-menu "Install" "  VSCode\n  Cursor [AUR]\n  Zed\n  Sublime Text\n  Helix\n  JetBrains [AUR]") in
+  case $(dotarchy-display-menu "Install" "  VSCode\n  Cursor [AUR]\n  Zed\n  Sublime Text\n  Helix\n  JetBrains [AUR]") in
   *VSCode*) install_and_launch "VSCode" "visual-studio-code-bin" "code" ;;
   *Cursor*) aur_install_and_launch "Cursor" "cursor-bin" "cursor" ;;
   *Zed*) install_and_launch "Zed" "zed" "dev.zed.Zed" ;;
@@ -207,7 +207,7 @@ show_install_editor_menu() {
 }
 
 show_install_javascript_menu() {
-  case $(display-menu "Install" "  Node.js\n  Bun\n  Deno") in
+  case $(dotarchy-display-menu "Install" "  Node.js\n  Bun\n  Deno") in
   *Node*) present_terminal "omarchy-install-dev-env node" ;;
   *Bun*) present_terminal "omarchy-install-dev-env bun" ;;
   *Deno*) present_terminal "omarchy-install-dev-env deno" ;;
@@ -216,7 +216,7 @@ show_install_javascript_menu() {
 }
 
 show_install_terminal_menu() {
-  case $(display-menu "Install" "  Alacritty\n  Ghostty\n  Kitty") in
+  case $(dotarchy-display-menu "Install" "  Alacritty\n  Ghostty\n  Kitty") in
   *Alacritty*) install_terminal "alacritty" ;;
   *Ghostty*) install_terminal "ghostty" ;;
   *Kitty*) install_terminal "kitty" ;;
@@ -225,7 +225,7 @@ show_install_terminal_menu() {
 }
 
 show_remove_menu() {
-  case $(display-menu "Remove" "  Web App\n  TUI") in
+  case $(dotarchy-display-menu "Remove" "  Web App\n  TUI") in
   *Web*) present_terminal omarchy-webapp-remove ;;
   *TUI*) present_terminal omarchy-tui-remove ;;
   *) show_main_menu ;;
@@ -233,7 +233,7 @@ show_remove_menu() {
 }
 
 show_system_menu() {
-  case $(display-menu "System" "  Lock\n󱄄  Screensaver\n󰤄  Suspend\n  Relaunch\n󰜉  Restart\n󰐥  Shutdown") in
+  case $(dotarchy-display-menu "System" "  Lock\n󱄄  Screensaver\n󰤄  Suspend\n  Relaunch\n󰜉  Restart\n󰐥  Shutdown") in
   *Lock*) omarchy-lock-screen ;;
   *Screensaver*) omarchy-launch-screensaver force ;;
   *Suspend*) systemctl suspend ;;
@@ -245,7 +245,7 @@ show_system_menu() {
 }
 
 show_theme_menu() {
-  theme=$(display-menu "Theme" "$(omarchy-theme-list)" "" "$(omarchy-theme-current)")
+  theme=$(dotarchy-display-menu "Theme" "$(omarchy-theme-list)" "" "$(omarchy-theme-current)")
   if [[ "$theme" == "CNCLD" || -z "$theme" ]]; then
     show_main_menu
   else
@@ -254,7 +254,7 @@ show_theme_menu() {
 }
 
 show_main_menu() {
-  go_to_menu "$(display-menu "Go" "󰀻  Apps\n󰧑  Learn\n  Capture\n󰔎  Toggle\n󰸌  Themes\n  Setup\n󰉉  Install\n󰭌  Remove\n  About\n  System")"
+  go_to_menu "$(dotarchy-display-menu "Go" "󰀻  Apps\n󰧑  Learn\n  Capture\n󰔎  Toggle\n󰸌  Themes\n  Setup\n󰉉  Install\n󰭌  Remove\n  About\n  System")"
 }
 
 go_to_menu() {

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # A generic menu function using rofi
-# Usage: display-menu "Prompt" "Option1\nOption2\nOption3" "-extra -rofi -args" "PreselectedOption" Width
-# Example: display-menu "Choose an option:" "Option 1\nOption 2\nOption 3" "-p 'Select an option'" "Option 2" 300
+# Usage: dotarchy-display-menu "Prompt" "Option1\nOption2\nOption3" "-extra -rofi -args" "PreselectedOption" Width
+# Example: dotarchy-display-menu "Choose an option:" "Option 1\nOption 2\nOption 3" "-p 'Select an option'" "Option 2" 300
 
 prompt="$1"
 options="$2"
