@@ -86,8 +86,8 @@ element-text selected {
 }
 
 element-icon {
-  padding: 14px 10px 14px 0px;
-  size: 0.7em;
+  padding: 10px 10px 10px 0px;
+  size: 1em;
   background-color: transparent;
 }
 
