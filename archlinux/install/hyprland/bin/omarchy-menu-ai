@@ -28,7 +28,7 @@ launch_or_focus_and_pin() {
   omarchy-launch-or-focus-webapp "$1" "$2"
 }
 
-case $(menu "LLM" "󱚤  ChatGPT\n󱚤  Gemini\n󱚤  Claude\n󱚤  LeChat\n󱚤  Grok\n󱚤  Meta") in
+case $(display-menu "LLM" "󱚤  ChatGPT\n󱚤  Gemini\n󱚤  Claude\n󱚤  LeChat\n󱚤  Grok\n󱚤  Meta") in
 *ChatGPT*) launch_or_focus_and_pin "ChatGPT" "https://chat.openai.com/" ;;
 *Gemini*) launch_or_focus_and_pin "Gemini" "https://gemini.google.com/" ;;
 *Claude*) launch_or_focus_and_pin "Claude" "https://claude.ai/" ;;

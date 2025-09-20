@@ -128,7 +128,7 @@ save_profile() {
   echo "$profile_config" > "$PROFILES_DIR/$profile_name.conf"
 
   # Ask the user if we want to make this as default configuration (persist in monitors.conf)
-  action=$(menu "Permanent configuration?" "Yes\nNo" "" "")
+  action=$(display-menu "Permanent configuration?" "Yes\nNo" "" "")
   if [[ "$action" == "Yes" ]]; then
     persist_configuration
   fi
@@ -151,7 +151,7 @@ load_profile() {
   done < "$config_file"
 
   # Ask the user if we want to make this as default configuration (persist in monitors.conf)
-  action=$(menu "Permanent configuration?" "Yes\nNo" "" "")
+  action=$(display-menu "Permanent configuration?" "Yes\nNo" "" "")
   if [[ "$action" == "Yes" ]]; then
     persist_configuration
   fi
@@ -161,11 +161,11 @@ load_profile() {
 
 manage_profiles() {
   local action
-  action=$(menu "Profiles" "Save\nLoad\nDelete" "" "")
+  action=$(display-menu "Profiles" "Save\nLoad\nDelete" "" "")
 
   if [[ "$action" == "Save" ]]; then
     local profile_name
-    profile_name=$(menu "Profile name" "" "--forceprint" "")
+    profile_name=$(display-menu "Profile name" "" "--forceprint" "")
     [[ -z "$profile_name" ]] && return
     save_profile "$profile_name"
 
@@ -175,7 +175,7 @@ manage_profiles() {
     [[ -z "$profiles" ]] && { notify-send "Profiles" "No existing profiles."; return; }
 
     local p
-    p=$(menu "Choose profile" "$profiles" "" "")
+    p=$(display-menu "Choose profile" "$profiles" "" "")
     [[ -n "$p" ]] && load_profile "$p"
 
   elif [[ "$action" == "Delete" ]]; then
@@ -184,14 +184,14 @@ manage_profiles() {
     [[ -z "$profiles" ]] && { notify-send "Profiles" "No existing profiles."; return; }
 
     local p
-    p=$(menu "Delete profile" "$profiles" "" "")
+    p=$(display-menu "Delete profile" "$profiles" "" "")
     [[ -n "$p" ]] && rm -f "$PROFILES_DIR/$p.conf" && notify-send "Profile deleted" "'$p' deleted."
   fi
 }
 
 main() {
   # First menu: choose between profiles or configure a screen
-  first_action=$(menu "What do you want to do?" "Configure a screen\nProfiles" "" "")
+  first_action=$(display-menu "What do you want to do?" "Configure a screen\nProfiles" "" "")
 
   if [[ "$first_action" == "Profiles" ]]; then
     manage_profiles
@@ -219,7 +219,7 @@ main() {
 
     focused_monitor=$(echo "$monitors_json" | jq -r '.[] | select(.focused) | .name')
 
-    selected_monitor_line=$(menu "Screen" "$monitor_list" "" "$focused_monitor")
+    selected_monitor_line=$(display-menu "Screen" "$monitor_list" "" "$focused_monitor")
     [[ -z "$selected_monitor_line" ]] && exit 0
 
     monitor_name=$(echo "$selected_monitor_line" | cut -f1)
@@ -238,7 +238,7 @@ main() {
     available_modes="$available_modes\nDisable monitor"
   fi
 
-  chosen_mode_raw=$(menu "Resolution" "$available_modes" "" "$current_mode")
+  chosen_mode_raw=$(display-menu "Resolution" "$available_modes" "" "$current_mode")
   [[ -z "$chosen_mode_raw" ]] && exit 0
 
   if [[ "$chosen_mode_raw" != "Disable monitor" ]]; then
@@ -246,11 +246,11 @@ main() {
     scale_options="auto\n1.00\n1.25\n1.50\n1.666667\n2.00"
     current_scale=$(echo "$monitor_details" | jq -r '.scale')
 
-    chosen_scale=$(menu "Scale" "$scale_options" "" "$current_scale")
+    chosen_scale=$(display-menu "Scale" "$scale_options" "" "$current_scale")
     [[ -z "$chosen_scale" ]] && exit 0
   fi
 
-  action=$(menu "Action" "Apply once\nSave configuration" "" "")
+  action=$(display-menu "Action" "Apply once\nSave configuration" "" "")
   [[ -z "$action" ]] && exit 0
 
   if [[ "$action" == "Apply once" ]]; then
