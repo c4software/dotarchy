@@ -29,5 +29,5 @@ if [[ -n "$preselect" ]]; then
 fi
 
 echo -e "$options" | rofi -i -dmenu \
-  -theme-str "window { width: ${width}px; padding: 10px; } listview { lines: $options_count; } element { padding: 0px; } element-text { padding: 10px 0px; } element-icon { padding: 0px; size: 0em; } #entry { placeholder: '$prompt'; }" \
+  -theme-str "window { width: ${width}px; padding: 10px; } listview { lines: $options_count; } element-text { padding: 10px 0px; } element-icon { padding: 0px; size: 0em; } #entry { placeholder: '$prompt'; }" \
   "${args[@]}"
