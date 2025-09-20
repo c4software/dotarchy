@@ -75,7 +75,7 @@ listview {
 element {
   children: [element-icon, element-text];
   background-color: transparent;
-  padding: 0px 12px;
+  padding: 0px 5px;
   border-radius: 0;
 }
 
