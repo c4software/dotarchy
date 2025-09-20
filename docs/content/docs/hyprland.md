@@ -77,7 +77,7 @@ exec-once = uwsm app -- mako
 exec-once = uwsm app -- waybar
 
 # Set a random background
-exec-once = uwsm app -- random-bg
+exec-once = uwsm app -- dotarchy-random-bg
 ```
 
 ### Environment Variables
@@ -106,4 +106,4 @@ The `monitors.conf` file is used to define the layout, resolution, and refresh r
 
 For detailed configuration options, visit the [official documentation on configuring monitors](https://wiki.hyprland.org/Configuring/Monitors/).
 
-Or use the `omarchy-monitor-resolution-picker` or `hyprmon` tools to help set up your monitors. Both are accessible via `Super + Space`.
+Or use the `dotarchy-monitor-resolution-picker` or `hyprmon` tools to help set up your monitors. Both are accessible via `Super + Space`.
