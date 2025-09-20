@@ -15,6 +15,9 @@ if (( options_count > 10 )); then
   options_count=10
 fi
 
+# Trim spacing from the start of each option line
+options=$(echo -e "$options" | sed 's/^[ \t]*//')
+
 read -r -a args <<<"$extra"
 
 if [[ -n "$preselect" ]]; then
