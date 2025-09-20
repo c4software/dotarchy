@@ -51,6 +51,7 @@
 | Shortcut | Description |
 | :--- | :--- |
 | `SUPER + Space` | Launch application menu (`rofi`) |
+| `SUPER + CTRL + E` | Show emoji menu |
 | `SUPER + ALT + Space` | Omarchy menu |
 | `SUPER + ESC` or `XF86PowerOff` | Power menu |
 | `SUPER + K` | Show keyboard shortcuts |
