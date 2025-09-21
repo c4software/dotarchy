@@ -7,6 +7,28 @@ cmd_present() {
   command -v "$1" >/dev/null 2>&1
 }
 
+# Update system-wide policies
+update_browser_policy() {
+  local browser="$1"
+  local policy_dir="/etc/$browser/policies/managed"
+  local policy_file="$policy_dir/color.json"
+
+  if command -v "$browser" >/dev/null 2>&1; then
+    if [ -d "$policy_dir" ] && [ -w "$policy_dir" ]; then
+      echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}" > "$policy_file"
+    else
+      pkexec bash -c "
+        set -e
+        mkdir -p \"$policy_dir\"
+        echo '{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}' > \"$policy_file\"
+        chmod u+rw \"$policy_file\"
+      "
+    fi
+
+    "$browser" --refresh-platform-policy --no-startup-window
+  fi
+}
+
 if [[ -z "$1" && "$1" != "CNCLD" ]]; then
   echo "Usage: omarchy-theme-set <theme-name>" >&2
   exit 1
@@ -67,9 +89,6 @@ fi
 
 # Theme Chromium / Brave
 CHROMIUM_THEME=~/.config/theme/chromium.theme
-
-
-
 if cmd_present chromium || cmd_present brave; then
 
   # Extract RGB color from theme file
@@ -81,30 +100,8 @@ if cmd_present chromium || cmd_present brave; then
     THEME_HEX_COLOR="#1c2027"
   fi
 
-  # Update system-wide policies (requires pkexec)
-  pkexec bash -c "
-      set -e
-
-      if command -v chromium >/dev/null 2>&1; then
-        mkdir -p /etc/chromium/policies/managed
-        echo '{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}' > /etc/chromium/policies/managed/color.json
-      fi
-
-      if command -v brave >/dev/null 2>&1; then
-        mkdir -p /etc/brave/policies/managed
-        echo '{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}' > /etc/brave/policies/managed/color.json
-      fi
-    "
-
-  # Refresh browser policies
-  if cmd_present chromium; then
-    chromium --refresh-platform-policy --no-startup-window
-  fi
-
-  if cmd_present brave; then
-    brave --refresh-platform-policy --no-startup-window
-  fi
-
+  update_browser_policy chromium
+  update_browser_policy brave
 fi
 
 
