@@ -32,3 +32,9 @@ fi
 
 echo "First, we update package list and system"
 sudo pacman -Syu
+
+# Install gum for menus
+if ! command -v gum &>/dev/null; then
+    echo -e "Installing gum (for menus)"
+    sudo pacman -S --noconfirm gum
+fi

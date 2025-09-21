@@ -20,39 +20,34 @@ cd "$SCRIPT_DIR" || exit
 export PATH="$HOME/.local/bin:$PATH"
 
 # Source all script under install/system with confirmation
-read -p "Do you want to run system setup scripts? (y/n) " confirm_system
-if [[ $confirm_system == [yY] ]]; then
+if gum confirm "Do you want to run system setup scripts?"; then
   for script in "$SCRIPT_DIR/install/system/"*.sh; do
     source "$script"
   done
 fi
 
 # Source all script under install/apps with confirmation
-read -p "Do you want to run apps setup scripts? (y/n) " confirm_apps
-if [[ $confirm_apps == [yY] ]]; then
+if gum confirm "Do you want to run apps setup scripts?"; then
   for script in "$SCRIPT_DIR/install/apps/"*.sh; do
     source "$script"
   done
 fi
 
 # Source all scripts under desktop with confirmation
-read -p "Do you want to run desktop setup scripts? (y/n) " confirm_desktop
-if [[ $confirm_desktop == [yY] ]]; then
+if gum confirm "Do you want to run desktop setup scripts?"; then
   for script in "$SCRIPT_DIR/install/desktop/"*.sh; do
     source "$script"
   done
 fi
 
 # Source all scripts under config with confirmation
-read -p "Do you want to run config setup scripts? (y/n) " confirm_config
-if [[ $confirm_config == [yY] ]]; then
+if gum confirm "Do you want to run config setup scripts?"; then
   for script in "$SCRIPT_DIR/install/config/"*.sh; do
     source "$script"
   done
 fi
 
 # Asking for user confirmation before enable hyprland
-read -p "Do you want to install Hyprland and default configuration? (y/n) " enable_hyprland
-if [[ $enable_hyprland == [yY] ]]; then
+if gum confirm "Do you want to install Hyprland and default configuration?"; then
     source "$SCRIPT_DIR/install/hyprland/setup.sh"
 fi

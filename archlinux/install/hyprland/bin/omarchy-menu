@@ -253,8 +253,17 @@ show_theme_menu() {
   fi
 }
 
+show_style_menu(){
+  case $(dotarchy-display-menu "Style" "󰸌  Themes\n  Background\n  Hyprland") in
+    *Themes*) show_theme_menu ;;
+    *Background*) dotarchy-background next ;;
+    *Hyprland*) open_in_editor ~/.config/hypr/looknfeel.conf ;;
+    *) show_main_menu ;;
+  esac
+}
+
 show_main_menu() {
-  go_to_menu "$(dotarchy-display-menu "Go" "󰀻  Apps\n󰧑  Learn\n  Capture\n󰔎  Toggle\n󰸌  Themes\n  Setup\n󰉉  Install\n󰭌  Remove\n  About\n  System")"
+  go_to_menu "$(dotarchy-display-menu "Go" "󰀻  Apps\n󰧑  Learn\n  Capture\n󰔎  Toggle\n󰸌  Style\n  Setup\n󰉉  Install\n󰭌  Remove\n  About\n  System")"
 }
 
 go_to_menu() {
@@ -265,7 +274,7 @@ go_to_menu() {
   *screenshot*) show_screenshot_menu ;;
   *screenrecord*) show_screenrecord_menu ;;
   *toggle*) show_toggle_menu ;;
-  *themes*) show_theme_menu ;;
+  *style*) show_style_menu ;;
   *setup*) show_setup_menu ;;
   *install*) show_install_menu ;;
   *remove*) show_remove_menu ;;
