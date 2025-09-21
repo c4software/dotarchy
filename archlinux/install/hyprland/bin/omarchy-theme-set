@@ -115,5 +115,5 @@ omarchy-restart-swayosd
 makoctl reload
 hyprctl reload
 
-# Set new background
-dotarchy-random-bg
+# Set the background from the theme
+dotarchy-background set

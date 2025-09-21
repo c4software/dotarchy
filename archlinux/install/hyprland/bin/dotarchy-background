@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# Description: Cycle through background images in a specified folder.
+# Usage: ./dotarchy-random-bg.sh [set|next]
+# 'set' sets the current background to the one pointed by the symlink.
+# 'next' (default) sets the next image in the folder as the background.
+
+FOLDER="$HOME/.config/theme/backgrounds"
+SYMLINK="$FOLDER/current_background"
+
+get_images() {
+    IMAGES=($(find "$FOLDER" -type f | sort))
+}
+
+check_images() {
+    if [ ${#IMAGES[@]} -eq 0 ]; then
+        echo "No images found in $FOLDER"
+        exit 1
+    fi
+}
+
+set_background() {
+    pkill -x swaybg
+    setsid uwsm app -- swaybg -i "$SYMLINK" -m fill >/dev/null 2>&1 &
+}
+
+get_current_index() {
+    CURRENT_INDEX=-1
+    if [ -L "$SYMLINK" ]; then
+        CURRENT_TARGET=$(readlink "$SYMLINK")
+        for i in "${!IMAGES[@]}"; do
+            if [ "${IMAGES[$i]}" = "$CURRENT_TARGET" ]; then
+                CURRENT_INDEX=$i
+                break
+            fi
+        done
+    fi
+}
+
+set_next_background() {
+    get_current_index
+    NEXT_INDEX=$(( (CURRENT_INDEX + 1) % ${#IMAGES[@]} ))
+    ln -sf "${IMAGES[$NEXT_INDEX]}" "$SYMLINK"
+    set_background
+}
+
+set_background() {
+    if [ -L "$SYMLINK" ]; then
+        set_background
+    else
+        set_next_background
+    fi
+}
+
+# Main logic
+get_images
+check_images
+
+case "$1" in
+    set)
+        set_background
+        ;;
+    next|"")
+        set_next_background
+        ;;
+    *)
+        echo "Usage: $0 [set|next]"
+        exit 1
+        ;;
+esac
