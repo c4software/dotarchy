@@ -1,0 +1,37 @@
+# Gnome related packages
+gnome-calculator
+gnome-keyring
+gnome-themes-extra
+nautilus
+xournalpp
+qt5-wayland
+brightnessctl
+polkit-gnome
+
+# Hyprland and related packages
+hyprland
+hyprshot
+hyprpicker
+hyprlock
+hypridle
+polkit-gnome
+hyprland-qtutils
+libqalculate
+waybar
+mako
+swaybg
+swayosd
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+wiremix
+pamixer
+bluetui
+alacritty
+uwsm
+wl-clip-persist
+wl-clipboard
+iwd
+impala
+satty
+wf-recorder
+rofi
