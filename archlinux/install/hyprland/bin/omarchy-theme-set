@@ -14,7 +14,7 @@ update_browser_policy() {
   local policy_file="$policy_dir/color.json"
 
   if command -v "$browser" >/dev/null 2>&1; then
-    if [ -d "$policy_dir" ] && [ -w "$policy_dir" ]; then
+    if [ -d "$policy_dir" ] && [ -w "$policy_file" ]; then
       echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}" > "$policy_file"
     else
       pkexec bash -c "
