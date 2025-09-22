@@ -1,4 +1,4 @@
-# Dotfiles — Distributions
+# Dotarchy
 
 This folder contains installation and configuration scripts for multiple Linux distributions (currently: Arch Linux, Fedora and macOS). The goal is to automate the setup of applications, fonts, development tools, and user configurations.
 
