@@ -19,7 +19,7 @@ check_images() {
     fi
 }
 
-set_background() {
+apply_background() {
     pkill -x swaybg
     setsid uwsm app -- swaybg -i "$SYMLINK" -m fill >/dev/null 2>&1 &
 }
@@ -41,13 +41,14 @@ set_next_background() {
     get_current_index
     NEXT_INDEX=$(( (CURRENT_INDEX + 1) % ${#IMAGES[@]} ))
     ln -sf "${IMAGES[$NEXT_INDEX]}" "$SYMLINK"
-    set_background
+    apply_background
 }
 
 set_background() {
     if [ -L "$SYMLINK" ]; then
-        set_background
+        apply_background
     else
+        # Si pas de symlink encore défini → on lance sur le premier
         set_next_background
     fi
 }
