@@ -5,3 +5,4 @@ signal-desktop
 # VPN
 wireguard-tools
 proton-vpn-gtk-app
+systemd-resolvconf
