@@ -21,7 +21,7 @@ update_browser_policy() {
         set -e
         mkdir -p \"$policy_dir\"
         echo '{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\"}' > \"$policy_file\"
-        chmod u+rw \"$policy_file\"
+        chmod uo+rw \"$policy_file\"
       "
     fi
 
