@@ -17,6 +17,9 @@ if command -v gnome-shell >/dev/null; then
   echo -e "Enable MTP and GVFS"
   sudo pacman -S --noconfirm --needed gvfs-mtp gvfs-mtp gvfs-smb
 
+  echo -e "Enable Variable Refresh Rate (VRR) support in Gnome (Must be enabled in your monitor settings)"
+  gsettings set org.gnome.mutter experimental-features "['variable-refresh-rate']"
+
   # If installation occurs in a graphical environment, else echo the URL
   if [[ $XDG_CURRENT_DESKTOP == "GNOME" ]]; then
     # 3193 : https://extensions.gnome.org/extension/3193/blur-my-shell/

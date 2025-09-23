@@ -1,5 +1,4 @@
-read -p "Do you want to enable clamshell mode (suspend on lid close if not docked)? (y/n) " enable_clamshell
-if [[ $enable_clamshell == [yY] ]]; then
+if gum confirm "Do you want to enable clamshell mode (suspend on lid close if not docked)?"; then
     # If its a laptop (using presence of a battery)
     if [ -f /sys/class/power_supply/BAT0/uevent ]; then
         echo -e "Laptop detected"
