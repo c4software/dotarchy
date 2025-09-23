@@ -6,10 +6,10 @@ if [ "$1" != "--skip-packages" ]; then
     echo -e "Installing Hyprland"
 
     # Install with pacman the packages.txt
-    sudo pacman -S --noconfirm - <"$SCRIPT_DIR/packages.txt"
+    sudo pacman -S --noconfirm --needed - <"$SCRIPT_DIR/packages.txt"
 
     # Install with yay the packages.aur.txt
-    yay -S --noconfirm - <"$SCRIPT_DIR/packages.aur.txt"
+    yay -S --noconfirm --needed - <"$SCRIPT_DIR/packages.aur.txt"
 
     source "$SCRIPT_DIR/greetd.sh"
 fi
