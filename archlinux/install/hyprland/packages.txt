@@ -2,6 +2,7 @@
 gnome-calculator
 gnome-keyring
 gnome-themes-extra
+seahorse
 nautilus
 xournalpp
 qt5-wayland
