@@ -5,7 +5,7 @@ gnome-themes-extra
 seahorse
 nautilus
 xournalpp
-qt5-wayland
+qt6-wayland
 brightnessctl
 polkit-gnome
 
