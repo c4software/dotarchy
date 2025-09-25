@@ -281,6 +281,7 @@ go_to_menu() {
   *system*) show_system_menu ;;
   *about*) terminal bash -c 'fastfetch; read -n 1 -s' ;;
   *power*) show_setup_power_menu ;;
+  *) omarchy-launch-or-focus-webapp "search" "https://www.google.com/search?q=$1" ;;
   esac
 }
 
