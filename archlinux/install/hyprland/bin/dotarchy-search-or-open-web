@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [[ $# -eq 0 ]]; then
+    echo "Usage: $0 <query or URL>"
+    exit 1
+fi
+
+# Check if the input looks like a URL or domain (with or without protocol)
+if [[ $1 =~ ^(https?://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.* ]]; then
+    # If no protocol, prepend https://
+    if [[ $1 =~ ^https?:// ]]; then
+        url="$1"
+    else
+        url="https://$1"
+    fi
+    omarchy-launch-webapp "$url"
+else
+    # URL-encode the query for Google search
+    encoded_query=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$1'))")
+    omarchy-launch-webapp "https://www.google.com/search?q=$encoded_query"
+fi
