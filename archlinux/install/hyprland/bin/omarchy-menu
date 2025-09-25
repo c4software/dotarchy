@@ -234,7 +234,7 @@ show_remove_menu() {
 
 show_system_menu() {
   case $(dotarchy-display-menu "System" "  Lock\n󱄄  Screensaver\n󰤄  Suspend\n  Relaunch\n󰜉  Restart\n󰐥  Shutdown") in
-  *Lock*) omarchy-lock-screen ;;
+  *Lock*) dotarchy-lock-screen ;;
   *Screensaver*) omarchy-launch-screensaver force ;;
   *Suspend*) systemctl suspend ;;
   *Relaunch*) uwsm stop ;;
