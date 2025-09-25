@@ -36,6 +36,10 @@ The look and feel of Hyprland, including colors and styles for other application
 
 A collection of useful scripts is available in `archlinux/install/hyprland/bin`. These scripts handle tasks like taking screenshots, managing power profiles, launching menus, and controlling system settings.
 
+### Global menu
+
+You can trigger the global menu with `SUPER + Space`. This menu allows you to quickly access applications, settings, and other functionalities. In this menu, if the entry doesn't match any application or setting, it will perform a web search using your default browser.
+
 ### Keybindings
 
 Keybindings are defined in the `bindings.conf` file. This file includes shortcuts for launching applications, managing windows, and controlling system functions. The configuration uses a combination of modifier keys (like `SUPER`, `ALT`, and `CTRL`) and other keys to create a comprehensive set of shortcuts.
