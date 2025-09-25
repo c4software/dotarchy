@@ -5,6 +5,11 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
+# If empty do nothing
+if [[ -z "$1" ]]; then
+    exit 0
+fi
+
 # Check if the input looks like a URL or domain (with or without protocol)
 if [[ $1 =~ ^(https?://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.* ]]; then
     # If no protocol, prepend https://
