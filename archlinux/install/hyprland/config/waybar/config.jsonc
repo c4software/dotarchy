@@ -5,7 +5,7 @@
   "spacing": 0,
   "height": 26,
   "modules-left": ["hyprland/workspaces"],
-  "modules-center": [],
+  "modules-center": ["privacy"],
   "modules-right": [
     "tray",
     "bluetooth",
@@ -114,5 +114,9 @@
   "tray": {
     "icon-size": 12,
     "spacing": 12
+  },
+  "privacy": {
+    "icon-spacing": 12,
+    "icon-size": 12
   }
 }
