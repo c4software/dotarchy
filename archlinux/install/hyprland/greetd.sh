@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Skip if greetd is already installed
+if command -v greetd >/dev/null 2>&1; then
+    echo "greetd is already installed. Skipping installation."
+    exit 0
+fi
+
 read -p "Do you want to install greetd and greetd-tuigreet? (y/n): " choice
 
 if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
