@@ -4,11 +4,13 @@ gnome-keyring
 gnome-themes-extra
 seahorse
 nautilus
+polkit-gnome
+
+# Hyprland dependencies
 xournalpp
 qt5-wayland
 qt6-wayland
 brightnessctl
-polkit-gnome
 
 # Hyprland and related packages
 hyprland
