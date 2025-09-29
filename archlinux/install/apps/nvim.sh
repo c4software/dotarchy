@@ -1,13 +1,29 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Install Neovim + LazyVim (https://lazyvim.org/)
-echo -e "Configuring Neovim + LazyVim"
-rm -rf ~/.config/nvim
-git clone https://github.com/LazyVim/starter ~/.config/nvim
-cp -R "$SCRIPT_DIR/../../../common/config/nvim/"* ~/.config/nvim/
-rm -rf ~/.config/nvim/.git
-echo "vim.opt.relativenumber = false" >>~/.config/nvim/lua/config/options.lua
+function setup() {
+    # Install Neovim + LazyVim (https://lazyvim.org/)
+    echo -e "Configuring Neovim + LazyVim"
+    rm -rf ~/.config/nvim
+    git clone https://github.com/LazyVim/starter ~/.config/nvim
+    cp -R "$SCRIPT_DIR/../../../common/config/nvim/"* ~/.config/nvim/
+    rm -rf ~/.config/nvim/.git
+    echo "vim.opt.relativenumber = false" >>~/.config/nvim/lua/config/options.lua
 
-# Ajout des keymaps dans ~/.config/nvim/lua/config/keymaps.lua
-# vim.keymap.set("n", "gb", "<C-^>", { desc = "Go to previous buffer" })
-echo 'vim.keymap.set("n", "gb", "<C-^>", { desc = "Go to previous buffer" })' >>~/.config/nvim/lua/config/keymaps.lua
+    # Ajout des keymaps dans ~/.config/nvim/lua/config/keymaps.lua
+    # vim.keymap.set("n", "gb", "<C-^>", { desc = "Go to previous buffer" })
+    echo 'vim.keymap.set("n", "gb", "<C-^>", { desc = "Go to previous buffer" })' >>~/.config/nvim/lua/config/keymaps.lua
+}
+
+function check() {
+    if command -v nvim &>/dev/null; then
+        show_success "Neovim"
+    else
+        show_error "Neovim" "Neovim is not installed."
+    fi
+
+    if [ -d ~/.config/nvim ]; then
+        show_success "LazyVim"
+    else
+        show_error "LazyVim" "LazyVim configuration is not set up."
+    fi
+}

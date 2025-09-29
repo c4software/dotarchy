@@ -1,22 +1,42 @@
 #!/bin/bash
-echo "Configuring Docker..."
 
-# Limit log size to avoid running out of disk
-sudo mkdir -p /etc/docker
-echo '{"log-driver":"json-file","log-opts":{"max-size":"10m","max-file":"5"}}' | sudo tee /etc/docker/daemon.json
+function setup(){
+    echo "Configuring Docker..."
 
-# Start Docker automatically
-sudo systemctl enable docker
+    # Limit log size to avoid running out of disk
+    sudo mkdir -p /etc/docker
+    echo '{"log-driver":"json-file","log-opts":{"max-size":"10m","max-file":"5"}}' | sudo tee /etc/docker/daemon.json
 
-# Give this user privileged Docker access
-sudo usermod -aG docker ${USER}
+    # Start Docker automatically
+    sudo systemctl enable docker
 
-# Prevent Docker from preventing boot for network-online.target
-sudo mkdir -p /etc/systemd/system/docker.service.d
-# Apply if not exist
-sudo tee /etc/systemd/system/docker.service.d/no-block-boot.conf <<'EOF'
+    # Give this user privileged Docker access
+    sudo usermod -aG docker ${USER}
+
+    # Prevent Docker from preventing boot for network-online.target
+    sudo mkdir -p /etc/systemd/system/docker.service.d
+    # Apply if not exist
+    sudo tee /etc/systemd/system/docker.service.d/no-block-boot.conf <<'EOF'
 [Unit]
 DefaultDependencies=no
 EOF
 
-sudo systemctl daemon-reload
+    sudo systemctl daemon-reload
+}
+
+function check(){
+    local has_error=0
+    if ! docker info &> /dev/null; then
+        show_error "Docker" "Docker is not running or not installed"
+        has_error=1
+    fi
+
+    if ! groups ${USER} | grep -q '\bdocker\b'; then
+        show_error "Docker" "User ${USER} is not in the docker group"
+        has_error=1
+    fi
+
+    [ $has_error -eq 1 ] && return
+    
+    show_success "Docker"
+}

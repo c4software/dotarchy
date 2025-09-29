@@ -43,7 +43,7 @@ If you want to install only specific parts of Dotarchy, such as the Hyprland set
 
 ```bash
 cd ~/dotarchy/
-./install/hyprland/setup.sh
+(source /install/hyprland/setup.sh && setup)
 ```
 
 ## Only update Hyprland configuration
@@ -51,7 +51,7 @@ cd ~/dotarchy/
 To update only the Hyprland configuration files without installing packages, you can run the Hyprland setup script with the `--skip-packages` flag:
 
 ```bash
-./install/hyprland/setup.sh --skip-packages
+./update-configs-only.sh
 ```
 
 ## Archlinux Only : Dotfiles and Hyprland update
@@ -59,5 +59,9 @@ To update only the Hyprland configuration files without installing packages, you
 To update the dotfiles and Hyprland setup, run:
 
 ```bash
-./update-arch-hypr.sh
+./update-arch-hypr.sh --all
 ```
+
+## Check your setup
+
+You can run `./dotarchy-doctor.sh` to check if your current setup is correct and if all necessary components are installed.

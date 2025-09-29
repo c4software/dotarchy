@@ -21,8 +21,11 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Source all script under install/system with confirmation
 if gum confirm "Do you want to run system setup scripts?"; then
-  for script in "$SCRIPT_DIR/install/system/"*.sh; do
+  for script in "$SCRIPT_DIR/install/system/"*.sh; do 
+  (
     source "$script"
+    setup
+  )
   done
 fi
 
@@ -30,7 +33,10 @@ fi
 if gum confirm "Do you want to run apps setup scripts?"; then
   clear
   for script in "$SCRIPT_DIR/install/apps/"*.sh; do
+  (
     source "$script"
+    setup
+  )
   done
 fi
 
@@ -38,7 +44,10 @@ fi
 if gum confirm "Do you want to run desktop setup scripts?"; then
   clear
   for script in "$SCRIPT_DIR/install/desktop/"*.sh; do
+  (
     source "$script"
+    setup
+  )
   done
 fi
 
@@ -46,12 +55,18 @@ fi
 if gum confirm "Do you want to run config setup scripts?"; then
   clear
   for script in "$SCRIPT_DIR/install/config/"*.sh; do
+  (
     source "$script"
+    setup
+  )
   done
 fi
 
 # Asking for user confirmation before enable hyprland
 if gum confirm "Do you want to install Hyprland and default configuration?"; then
-  clear
-  source "$SCRIPT_DIR/install/hyprland/setup.sh"
+  (
+    clear
+    source "$SCRIPT_DIR/install/hyprland/setup.sh"
+    setup
+  )
 fi

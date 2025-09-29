@@ -25,7 +25,6 @@ The configuration is split into multiple files for better organization:
   - `hyprlock.conf`: Configuration for the screen locker.
   - `input.conf`: General input settings.
   - `looknfeel.conf`: Visual settings like gaps, borders, and animations.
-  - `sidepad.conf`: Configuration for side panels or special devices.
   - `windows.conf`: General window management rules.
 
 ### Themes
