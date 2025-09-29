@@ -1,10 +1,10 @@
 # Dotarchy
 
-This folder contains installation and configuration scripts for multiple Linux distributions (currently: Arch Linux and macOS). The goal is to automate the setup of applications, fonts, development tools, and user configurations.
+This repository contains installation and configuration scripts for Arch Linux and macOS. The goal is to automate the setup of applications, fonts, development tools, and user configurations.
 
 ![Screenshot](./docs/static/screenshot.jpg)
 
-⚠️ The Hyprland setup is extracted (with some cleanup and adjustments) from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
+⚠️ The Hyprland setup is massively extracted/inspired from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
 [Hyprland Keybindings reference](./archlinux/install/hyprland/README.md)
 
 [Documentation](https://c4software.github.io/dotarchy/)

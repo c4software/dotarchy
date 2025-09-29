@@ -10,11 +10,11 @@ Welcome to the Dotarchy manual. This documentation provides a guide to understan
 
 [Source code](https://github.com/c4software/dotarchy)
 
-Dotarchy is a set of dotfiles and configurations to create a consistent and powerful development environment across different operating systems like Arch Linux, Fedora, and macOS.
+This repository contains installation and configuration scripts for Arch Linux and macOS. The goal is to automate the setup of applications, fonts, development tools, and user configurations.
 
 The main goal is to have a modular and easy-to-maintain system that can be quickly set up on a new machine.
 
-⚠️ The Hyprland setup is extracted (with some cleanup and adjustments) from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
+⚠️ The Hyprland setup is massively extracted/inspired from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
 
 [Hyprland Keybindings reference](./docs/keybindings/)
 
