@@ -5,7 +5,10 @@ clear
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Install de base
-source "$SCRIPT_DIR/install/init.sh"
+(
+  source "$SCRIPT_DIR/install/init.sh"
+  setup
+)
 
 # Download all packages using pacman for install/**/packages.txt
 find "$SCRIPT_DIR/install/" -name "packages.txt" -exec sh -c 'grep -v "^#" "$1" | sudo pacman -S --noconfirm --needed -' _ {} \;
