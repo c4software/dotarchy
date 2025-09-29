@@ -89,4 +89,15 @@ function check() {
         done
         show_error "Hyprland Bin Scripts" "$error_msg" 
     fi
+
+    # Greetd check
+    if command -v greetd &> /dev/null; then
+        if systemctl is-active --quiet greetd.service; then
+            show_success "greetd Service"
+        else
+            show_error "greetd Service" "greetd service is not running."
+        fi
+    else
+        show_warning "greetd" "greetd is not installed. You can install it by running ./install/hyprland/greetd.sh"
+    fi
 }
