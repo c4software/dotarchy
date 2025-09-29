@@ -30,14 +30,14 @@ This script detects your distribution (`pacman` → Arch, `$OSTYPE == darwin` �
 
 ### Update configuration files only
 
-To update only the configuration files without installing packages, you can run `update-configs-only.sh`:
+To update only the configuration files without installing packages, you can run `update.sh`:
 
 ```bash
-./update-configs-only.sh
+./update.sh
 ```
 
 ⚠️ This will overwrite your existing configuration files. Make sure to back up any important configurations before running this command.
-⚠️ This will not update all [common configuration](./common/) files, only those related to Hyprland. To **update all configuration files**, please use `update-configs-only.sh --all`.
+⚠️ This will not update all [common configuration](./common/) files, only those related to Hyprland. To **update all configuration files**, please use `update.sh --all`.
 
 ### Dotarchy doctor
 

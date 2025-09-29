@@ -48,18 +48,18 @@ cd ~/dotarchy/
 
 ## Only update Hyprland configuration
 
-To update only the Hyprland configuration files without installing packages, you can run the Hyprland setup script with the `--skip-packages` flag:
+To update only the Hyprland configuration files without installing packages, you can run:
 
 ```bash
-./update-configs-only.sh
+./update.sh
 ```
 
-## Archlinux Only : Dotfiles and Hyprland update
+## Dotfiles and Hyprland update
 
 To update the dotfiles and Hyprland setup, run:
 
 ```bash
-./update-arch-hypr.sh --all
+./update.sh --all
 ```
 
 ## Check your setup
