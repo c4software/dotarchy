@@ -1,2 +1,17 @@
+# Wireless
 iw
 wireless-regdb
+
+# Printer
+cups
+cups-pdf
+cups-filters
+cups-browsed
+gutenprint
+system-config-printer
+avahi
+nss-mdns
+
+# Bluetooth
+bluez
+bluez-utils

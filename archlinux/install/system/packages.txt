@@ -1,10 +1,6 @@
 # AppImage
 fuse
 
-# Bluetooth
-bluez
-bluez-utils
-
 # FWUPD
 fwupd
 
@@ -15,15 +11,6 @@ ntfs-3g
 # Power
 power-profiles-daemon
 python-gobject
-
-# Printer
-cups
-cups-pdf
-cups-filters
-cups-browsed
-system-config-printer
-avahi
-nss-mdns
 
 # Security
 fprintd
