@@ -4,6 +4,7 @@
 # Usage: ./dotarchy-random-bg.sh [set|next]
 # 'set' sets the current background to the one pointed by the symlink.
 # 'next' (default) sets the next image in the folder as the background.
+# 'force <path-to-image>' sets the background to the specified image immediately.
 
 FOLDER="$HOME/.config/theme/backgrounds"
 SYMLINK="$FOLDER/current_background"
@@ -21,7 +22,12 @@ check_images() {
 
 apply_background() {
     pkill -x swaybg
-    setsid uwsm app -- swaybg -i "$SYMLINK" -m fill >/dev/null 2>&1 &
+
+    if [ -n "$1" ] && [ -f "$1" ]; then
+        setsid uwsm app -- swaybg -i "$1" -m fill >/dev/null 2>&1 &
+    else
+        setsid uwsm app -- swaybg -i "$SYMLINK" -m fill >/dev/null 2>&1 &
+    fi
 }
 
 get_current_index() {
@@ -61,11 +67,19 @@ case "$1" in
     set)
         set_background
         ;;
+    force)
+        if [ -n "$2" ] && [ -f "$2" ]; then
+            apply_background "$2"
+        else
+            echo "Usage: $0 force <path-to-image>"
+            exit 1
+        fi
+        ;;
     next|"")
         set_next_background
         ;;
     *)
-        echo "Usage: $0 [set|next]"
+        echo "Usage: $0 [set|next|force <path-to-image>]"
         exit 1
         ;;
 esac

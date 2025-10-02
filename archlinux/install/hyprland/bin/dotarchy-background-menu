@@ -70,5 +70,6 @@ for file in ~/.config/theme_templates/*; do
     sed "${sed_args[@]}" "$file" > "$theme_dir/$filename"
 done
 
-# Apply the dynamic theme using omarchy_theme_set
-omarchy_theme_set dynamic
+
+# Apply the dynamic theme using omarchy-theme-set
+omarchy-theme-set dynamic $selected_file

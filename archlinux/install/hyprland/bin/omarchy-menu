@@ -256,7 +256,8 @@ show_theme_menu() {
 show_style_menu(){
   case $(dotarchy-display-menu "Style" "󰸌  Themes\n  Background\n  Hyprland") in
     *Themes*) show_theme_menu ;;
-    *Background*) dotarchy-background next ;;
+    # *Background*) dotarchy-background next ;;
+    *Background*) dotarchy-background-menu ;;
     *Hyprland*) open_in_editor ~/.config/hypr/looknfeel.conf ;;
     *) show_main_menu ;;
   esac

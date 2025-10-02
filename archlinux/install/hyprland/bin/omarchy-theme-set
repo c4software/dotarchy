@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # omarchy-theme-set: Set a theme, specified by its name.
-# Usage: omarchy-theme-set <theme-name>
+# Expects themes to be in ~/.config/themes/<theme-name>/
+# Background-path is optional, if provided it will be set as the background.
+# Usage: omarchy-theme-set <theme-name> [background-path]
 
 cmd_present() {
   command -v "$1" >/dev/null 2>&1
@@ -112,5 +114,10 @@ omarchy-restart-swayosd
 makoctl reload
 hyprctl reload
 
-# Set the background from the theme
-dotarchy-background set
+if [[ -n "$2" ]]; then
+  # Set the background to the one provided as argument
+  dotarchy-background force "$2"
+else
+  # Set the background to the one defined in the theme
+  dotarchy-background set
+fi
