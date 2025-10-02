@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+# Search for png files in all the ~/.config/themes/*/backgrounds/ directories
+
+# Set a variable to the selected file
+selected_file=$(find ~/.config/themes/*/backgrounds/ -name "*.png" | while read a; do echo -en "$a\0icon\x1f$a\n" ; done | rofi -dmenu)
+
+# Extract the color palette from the selected file using pywal
+wal -i "$selected_file"
+
+# Read the colors from the generated colors file
+colors_file="$HOME/.cache/wal/colors.sh"
+if [ -f "$colors_file" ]; then
+    source "$colors_file"
+else
+    echo "Colors file not found!"
+    exit 1
+fi
+
+# The dynamic theme will be created in ~/.config/themes/dynamic/
+theme_dir="$HOME/.config/themes/dynamic"
+mkdir -p "$theme_dir"
+
+# Function to convert hex color to RGB
+hex_to_rgb() {
+    local hex=${1#\#}
+    local r=$((16#${hex:0:2}))
+    local g=$((16#${hex:2:2}))
+    local b=$((16#${hex:4:2}))
+    echo "$r, $g, $b"
+}
+
+# Create associative array with color variables
+declare -A color_vars
+
+# Define the list of base color variable names
+color_names=(
+    "color0" "color1" "color2" "color3" "color4" "color5" "color6" "color7"
+    "color8" "color9" "color10" "color11" "color12" "color13" "color14" "color15"
+    "background" "foreground" "cursor"
+)
+
+# Populate the associative array dynamically
+for name in "${color_names[@]}"; do
+    # Get the value of the variable named 'name'
+    hex_val="${!name}"
+
+    # Standard {key} format
+    color_vars["{${name}}"]="$hex_val"
+
+    # {key.strip} format (hex without #)
+    color_vars["{${name}.strip}"]="${hex_val#\#}"
+
+    # {key.rgb} format (comma-separated rgb values)
+    color_vars["{${name}.rgb}"]="$(hex_to_rgb "$hex_val")"
+done
+
+# Build sed arguments dynamically
+sed_args=()
+for placeholder in "${!color_vars[@]}"; do
+    sed_args+=("-e" "s|${placeholder}|${color_vars[$placeholder]}|g")
+done
+
+# Loop over ~/.config/theme_templates/ and replace the color variables with the new colors
+for file in ~/.config/theme_templates/*; do
+    # Get the filename without the path
+    filename=$(basename "$file")
+
+    # Replace all color variables in one sed command
+    sed "${sed_args[@]}" "$file" > "$theme_dir/$filename"
+done
+
+# Apply the dynamic theme using omarchy_theme_set
+omarchy_theme_set dynamic
