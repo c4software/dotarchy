@@ -70,6 +70,8 @@ for file in ~/.config/theme_templates/*; do
     sed "${sed_args[@]}" "$file" > "$theme_dir/$filename"
 done
 
+# Symlink the selected background to the current_background in the dynamic theme
+ln -sf "$selected_file" "$theme_dir/backgrounds/current_background"
 
 # Apply the dynamic theme using omarchy-theme-set
-omarchy-theme-set dynamic $selected_file
+omarchy-theme-set dynamic
