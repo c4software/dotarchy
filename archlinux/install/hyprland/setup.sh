@@ -31,8 +31,10 @@ function setup() {
         fi
     fi
 
-    # Apply the default theme
-    omarchy-theme-set "osaka-jade"
+    # Apply the default theme if not already set
+    if [ ! -L ~/.config/theme ]; then
+        omarchy-theme-set "osaka-jade"
+    fi
 
     # Check if iwd is enabled
     if ! systemctl is-enabled iwd.service >/dev/null 2>&1; then
