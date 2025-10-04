@@ -10,7 +10,7 @@ if [ ! -d ~/wallpapers ]; then
 fi
 
 # Set a variable to the selected file
-selected_file=$(find ~/.config/themes/*/backgrounds/ ~/wallpapers -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) | while read a; do echo -en "$a\0icon\x1f$a\n" ; done | rofi -dmenu)
+selected_file=$(find ~/.config/themes/*/backgrounds/ ~/wallpapers -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) | while read a; do echo -en "$a\0icon\x1f$a\n" ; done | rofi -dmenu --theme ~/.config/rofi/wall-select.rasi -p "Select a background")
 
 # If no file was selected, exit
 if [ -z "$selected_file" ]; then
