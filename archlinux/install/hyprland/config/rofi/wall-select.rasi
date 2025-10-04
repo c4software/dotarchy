@@ -1,21 +1,18 @@
+@import "base-theme.rasi"
+
 configuration {
     modi:                        "drun";
     show-icons:                  true;
     drun-display-format:         "{name}";
-    font:                        "JetBrainsMono NF Bold 11";
-    
-    //hover-select:				 true;
-	//me-select-entry:			 "";
-	//me-accept-entry:			 "MousePrimary";
 }
 
 //----- Global Properties -----//
 
 * {
-main-bg: #282828E6;
-main-fg: #fbf1c7;
-select-bg: #d79921;
-select-fg: #282828;
+main-bg: @window-background;
+main-fg: @foreground;
+select-bg: @selected-text;
+select-fg: @window-background;
 }
 
 //----- Main Window -----//
@@ -23,15 +20,15 @@ select-fg: #282828;
 window {
     enabled:                     true;
     fullscreen:                  false;
-    width:                       100%;
+    width:                       50%;
     transparency:                "real";
     cursor:                      "default";
     spacing:                     0px;
-    padding:                     0px;
-    border:                      0px;
+    padding:                     20px;
+    border:                      2px;
     border-radius:               0px;
-    border-color:                transparent;
-    background-color:            transparent;
+    border-color:                @border-color;
+    background-color:            @main-bg;
 }
 
 //----- Main Box -----//
@@ -39,7 +36,7 @@ window {
 mainbox {
     enabled:                     true;
     children:                    [ "listview" ];
-    background-color:            @main-bg;
+    background-color:            transparent;
 }
 
 //----- Listview -----//
@@ -81,9 +78,9 @@ element {
     }
 }
 
-element selected.normal {
-    background-color:            @select-bg;
-    text-color:                  @select-fg;
+element selected {
+    background-color:            transparent;
+    text-color:                  @select-bg;
 }
 
 element-icon {
