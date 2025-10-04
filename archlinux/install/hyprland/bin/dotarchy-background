@@ -13,8 +13,8 @@ get_images() {
 }
 
 check_images() {
-    if [ ${#IMAGES[@]} -eq 0 ]; then
-        echo "No images found in $FOLDER"
+    if [ ${#IMAGES[@]} -eq 0 ] && [ ! -L "$SYMLINK" ]; then
+        echo "No images found in $FOLDER and no current background is set."
         exit 1
     fi
 }
