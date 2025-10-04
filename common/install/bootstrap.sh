@@ -70,7 +70,7 @@ function check(){
   for dir in "$SCRIPT_DIR/../config/"*; do
       local dirname
       dirname=$(basename "$dir")
-      if [ "$dirname" != "theme" ] && [ ! -d "$HOME/.config/$dirname" ]; then
+      if [ "$dirname" != "theme" ] && [ ! -e "$HOME/.config/$dirname" ]; then
           show_error "Configuration" "$dirname is not installed in ~/.config/"
           all_matched=false
       fi
