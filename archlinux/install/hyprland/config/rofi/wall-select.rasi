@@ -35,9 +35,9 @@ mainbox {
 listview {
     enabled:                     true;
     columns:                     3;
-    lines:                       3;
+    lines:                       2;
     spacing:                     50px;
-    padding:                     20px 30px;
+    padding:                     20px;
     cycle:                       true;
     dynamic:                     false;
     scrollbar:                   false;
