@@ -2,6 +2,10 @@
 
 # Search for png files in all the ~/.config/themes/*/backgrounds/ directories and in ~/wallpapers
 
+titles=("Nice choice!" "Great pick!" "Awesome selection!" "Perfect choice!" "Excellent taste!")
+random_title=${titles[$RANDOM % ${#titles[@]}]}
+
+
 # Create the wallpapers directory if it doesn't exist
 if [ ! -d ~/wallpapers ]; then
     mkdir -p ~/wallpapers
@@ -26,7 +30,10 @@ if [[ "$selected_file" =~ ^$HOME/.config/themes/([^/]+)/backgrounds/ ]]; then
     ln -sf "$selected_file" "$HOME/.config/themes/$theme_name/backgrounds/current_background"
 
     # Notify the user
-    notify-send "Applying theme" "Applying theme: $theme_name" -i info
+    random_title=${titles[$RANDOM % ${#titles[@]}]}
+    
+    # Notify the user with random title
+    notify-send "$random_title" "Applying theme: $theme_name" -i info
 
     # Apply the theme using omarchy-theme-set
     omarchy-theme-set "$theme_name"
@@ -35,7 +42,7 @@ if [[ "$selected_file" =~ ^$HOME/.config/themes/([^/]+)/backgrounds/ ]]; then
 fi
 
 # Notify the user that a custom background was selected
-notify-send "Custom background selected" "Applying custom background and generating dynamic theme." -i info
+notify-send "$random_title" "Applying custom background and generating dynamic theme." -i info
 
 # Extract the color palette from the selected file using pywal
 wal -i "$selected_file"
