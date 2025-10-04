@@ -1,19 +1,28 @@
 #!/usr/bin/env bash
 
 # Search for png files in all the ~/.config/themes/*/backgrounds/ directories and in ~/wallpapers
+# Usage: dotarchy-background-menu
 
 titles=("Nice choice!" "Great pick!" "Awesome selection!" "Perfect choice!" "Excellent taste!")
 random_title=${titles[$RANDOM % ${#titles[@]}]}
+
+hex_to_rgb() {
+    local hex=${1#\#}
+    local r=$((16#${hex:0:2}))
+    local g=$((16#${hex:2:2}))
+    local b=$((16#${hex:4:2}))
+    echo "$r, $g, $b"
+}
 
 
 # Create the wallpapers directory if it doesn't exist
 if [ ! -d ~/wallpapers ]; then
     mkdir -p ~/wallpapers
+
     # Notify the user that the ~/wallpapers can be populated with images
     notify-send "Wallpapers directory created" "You can add your wallpapers to the ~/wallpapers directory." -i info
 fi
 
-# Set a variable to the selected file
 selected_file=$(find ~/.config/themes/*/backgrounds/ ~/wallpapers -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) | while read a; do echo -en "$a\0icon\x1f$a\n" ; done | rofi -dmenu -theme ~/.config/rofi/wall-select.rasi -p "Select a background")
 
 # If no file was selected, exit
@@ -29,28 +38,21 @@ if [[ "$selected_file" =~ ^$HOME/.config/themes/([^/]+)/backgrounds/ ]]; then
     # Symlink the selected background to the current_background in the theme
     ln -sf "$selected_file" "$HOME/.config/themes/$theme_name/backgrounds/current_background"
 
-    # Notify the user
     random_title=${titles[$RANDOM % ${#titles[@]}]}
-    
-    # Notify the user with random title
     notify-send "$random_title" "Applying theme: $theme_name" -i info
 
-    # Apply the theme using omarchy-theme-set
     omarchy-theme-set "$theme_name"
 
     exit 0
 fi
 
-# Notify the user that a custom background was selected
 notify-send "$random_title" "Applying custom background and generating dynamic theme." -i info
 
 # Extract the color palette from the selected file using pywal
 wal -i "$selected_file"
 
-# Notify the user that the colors have been generated
 notify-send "It's a match!" "Generating dynamic theme based on the selected background." -i info
 
-# Read the colors from the generated colors file
 colors_file="$HOME/.cache/wal/colors.sh"
 if [ -f "$colors_file" ]; then
     source "$colors_file"
@@ -59,18 +61,9 @@ else
     exit 1
 fi
 
-# The dynamic theme will be created in ~/.config/themes/dynamic/
 theme_dir="$HOME/.config/themes/dynamic"
 mkdir -p "$theme_dir"
 
-# Function to convert hex color to RGB
-hex_to_rgb() {
-    local hex=${1#\#}
-    local r=$((16#${hex:0:2}))
-    local g=$((16#${hex:2:2}))
-    local b=$((16#${hex:4:2}))
-    echo "$r, $g, $b"
-}
 
 # Create associative array with color variables
 declare -A color_vars
@@ -84,7 +77,6 @@ color_names=(
 
 # Populate the associative array dynamically
 for name in "${color_names[@]}"; do
-    # Get the value of the variable named 'name'
     hex_val="${!name}"
 
     # Standard {key} format
@@ -97,7 +89,6 @@ for name in "${color_names[@]}"; do
     color_vars["{${name}.rgb}"]="$(hex_to_rgb "$hex_val")"
 done
 
-# Build sed arguments dynamically
 sed_args=()
 for placeholder in "${!color_vars[@]}"; do
     sed_args+=("-e" "s|${placeholder}|${color_vars[$placeholder]}|g")
@@ -105,17 +96,14 @@ done
 
 # Loop over ~/.config/theme_templates/ and replace the color variables with the new colors
 for file in ~/.config/theme_templates/*; do
-    # Get the filename without the path
     filename=$(basename "$file")
-
-    # Replace all color variables in one sed command
     sed "${sed_args[@]}" "$file" > "$theme_dir/$filename"
 done
 
+# Ensure the backgrounds directory exists in the dynamic theme
 mkdir -p "$theme_dir/backgrounds"
 
 # Symlink the selected background to the current_background in the dynamic theme
 ln -sf "$selected_file" "$theme_dir/backgrounds/current_background"
 
-# Apply the dynamic theme using omarchy-theme-set
 omarchy-theme-set dynamic
