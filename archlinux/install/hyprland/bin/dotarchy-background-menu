@@ -47,6 +47,9 @@ notify-send "$random_title" "Applying custom background and generating dynamic t
 # Extract the color palette from the selected file using pywal
 wal -i "$selected_file"
 
+# Notify the user that the colors have been generated
+notify-send "It's a match!" "Generating dynamic theme based on the selected background." -i info
+
 # Read the colors from the generated colors file
 colors_file="$HOME/.cache/wal/colors.sh"
 if [ -f "$colors_file" ]; then
