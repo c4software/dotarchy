@@ -14,7 +14,17 @@ configuration {
 //----- Main Window -----//
 
 window {
+    enabled:                     true;
+    fullscreen:                  false;
     width:                       80%;
+    transparency:                "real";
+    cursor:                      "default";
+    spacing:                     0px;
+    padding:                     0px;
+    border:                      0px;
+    border-radius:               0px;
+    border-color:                transparent;
+    background-color:            transparent;
 }
 
 //----- Main Box -----//
@@ -36,7 +46,7 @@ listview {
     cycle:                       true;
     dynamic:                     false;
     scrollbar:                   false;
-    layout:                      horizontal;
+    layout:                      vertical;
     reverse:                     true;
     fixed-height:                true;
     fixed-columns:               true;
