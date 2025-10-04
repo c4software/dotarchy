@@ -108,10 +108,10 @@ fi
 
 
 # Restart components to apply new theme
-pkill -SIGUSR2 btop
-omarchy-restart-waybar
-omarchy-restart-swayosd
-makoctl reload
-hyprctl reload
+pkill -SIGUSR2 btop >/dev/null 2>&1 || true
+omarchy-restart-waybar >/dev/null 2>&1 || true
+omarchy-restart-swayosd >/dev/null 2>&1 || true
+makoctl reload >/dev/null 2>&1 || true
+hyprctl reload >/dev/null 2>&1 || true
 
 dotarchy-background set
