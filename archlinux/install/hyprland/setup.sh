@@ -101,3 +101,8 @@ function check() {
         show_warning "greetd" "greetd is not installed. You can install it by running ./install/hyprland/greetd.sh"
     fi
 }
+
+# If exectued and not sourced
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    setup "$@"
+fi

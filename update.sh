@@ -23,6 +23,4 @@ if [ "$1" == "--all" ]; then
 fi
 
 # Update Hyprland (without reinstalling packages)
-(
-    source ./archlinux/install/hyprland/setup.sh --skip-packages
-)
+./archlinux/install/hyprland/setup.sh --skip-packages
