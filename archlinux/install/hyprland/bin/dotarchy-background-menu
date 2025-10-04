@@ -3,7 +3,26 @@
 # Search for png files in all the ~/.config/themes/*/backgrounds/ directories
 
 # Set a variable to the selected file
-selected_file=$(find ~/.config/themes/*/backgrounds/ -name "*.png" | while read a; do echo -en "$a\0icon\x1f$a\n" ; done | rofi -dmenu)
+selected_file=$(find ~/.config/themes/*/backgrounds/ ~/wallpapers -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) | while read a; do echo -en "$a\0icon\x1f$a\n" ; done | rofi -dmenu)
+
+# If no file was selected, exit
+if [ -z "$selected_file" ]; then
+    echo "No file selected!"
+    exit 1
+fi
+
+# If the file is in the ~/.config/themes/*/backgrounds/ directories, extract the theme name
+if [[ "$selected_file" =~ ^$HOME/.config/themes/([^/]+)/backgrounds/ ]]; then
+    theme_name="${BASH_REMATCH[1]}"
+
+    # Symlink the selected background to the current_background in the theme
+    ln -sf "$selected_file" "$HOME/.config/themes/$theme_name/backgrounds/current_background"
+
+    # Apply the theme using omarchy-theme-set
+    omarchy-theme-set "$theme_name"
+
+    exit 0
+fi
 
 # Extract the color palette from the selected file using pywal
 wal -i "$selected_file"
