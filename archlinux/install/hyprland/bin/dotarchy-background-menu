@@ -96,6 +96,8 @@ for file in ~/.config/theme_templates/*; do
     sed "${sed_args[@]}" "$file" > "$theme_dir/$filename"
 done
 
+mkdir -p "$theme_dir/backgrounds"
+
 # Symlink the selected background to the current_background in the dynamic theme
 ln -sf "$selected_file" "$theme_dir/backgrounds/current_background"
 

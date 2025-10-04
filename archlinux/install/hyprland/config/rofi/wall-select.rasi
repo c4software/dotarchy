@@ -33,13 +33,13 @@ listview {
     enabled:                     true;
     columns:                     3;
     lines:                       2;
-    spacing:                     50px;
+    spacing:                     40px;
     padding:                     20px;
     cycle:                       true;
-    dynamic:                     false;
+    dynamic:                     true;
     scrollbar:                   false;
     layout:                      vertical;
-    reverse:                     true;
+    reverse:                     false;
     fixed-height:                true;
     fixed-columns:               true;
     cursor:                      "default";
@@ -60,12 +60,6 @@ element {
     text-color:                  @foreground;
 }
 
-@media(max-aspect-ratio: 1.8) {
-    element {
-        orientation:             vertical;
-    }
-}
-
 element selected.normal {
     background-color:            @selected-text;
     text-color:                  @selected-text;
@@ -80,6 +74,7 @@ element-icon {
 }
 
 element-text {
+    enabled:                     false;
     vertical-align:              0.5;
     horizontal-align:            0.5;
     padding:                     20px;
