@@ -46,7 +46,7 @@ function check(){
       if [ "$CURRENT_REGDOM" == "$WIRELESS_REGDOM" ]; then
         show_success "WiFi" "Wireless regulatory domain is set correctly."
       else
-        show_error "WiFi" "Wireless regulatory domain is not set correctly."
+        show_error "WiFi" "Wireless regulatory domain is not set correctly. Expected: $WIRELESS_REGDOM, Current: $CURRENT_REGDOM"
       fi
     fi
   fi
