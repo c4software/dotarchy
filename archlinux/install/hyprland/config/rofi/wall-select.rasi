@@ -1,4 +1,4 @@
-@import "~/.config/theme/rofi.rasi
+@import "~/.config/theme/rofi.rasi"
 
 configuration {
     modi:                        "drun";
