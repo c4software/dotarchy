@@ -1,4 +1,4 @@
-@import "base-theme.rasi"
+@import "~/.config/theme/rofi.rasi
 
 configuration {
     modi:                        "drun";
@@ -6,21 +6,12 @@ configuration {
     drun-display-format:         "{name}";
 }
 
-//----- Global Properties -----//
-
-* {
-main-bg: @window-background;
-main-fg: @foreground;
-select-bg: @selected-text;
-select-fg: @window-background;
-}
-
 //----- Main Window -----//
 
 window {
     enabled:                     true;
     fullscreen:                  false;
-    width:                       100%;
+    width:                       80%;
     transparency:                "real";
     cursor:                      "default";
     spacing:                     0px;
@@ -36,7 +27,7 @@ window {
 mainbox {
     enabled:                     true;
     children:                    [ "listview" ];
-    background-color:            @main-bg;
+    background-color:            @window-background;
 }
 
 //----- Listview -----//
@@ -56,7 +47,7 @@ listview {
     fixed-columns:               true;
     cursor:                      "default";
     background-color:            transparent;
-    text-color:                  @main-fg;
+    text-color:                  @foreground;
 }
 
 //----- Elements -----//
@@ -69,7 +60,7 @@ element {
     border-radius:               20px;
     cursor:                      pointer;
     background-color:            transparent;
-    text-color:                  @main-fg;
+    text-color:                  @foreground;
 }
 
 @media(max-aspect-ratio: 1.8) {
@@ -79,8 +70,8 @@ element {
 }
 
 element selected.normal {
-    background-color:            @select-bg;
-    text-color:                  @select-fg;
+    background-color:            @selected-text;
+    text-color:                  @selected-text;
 }
 
 element-icon {
