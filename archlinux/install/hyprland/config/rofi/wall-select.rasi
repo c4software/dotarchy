@@ -51,7 +51,7 @@ listview {
 
 element {
     enabled:                     true;
-    orientation:                 horizontal;
+    orientation:                 vertical;
     spacing:                     0px;
     padding:                     0px;
     border-radius:               20px;
