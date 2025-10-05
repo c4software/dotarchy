@@ -14,7 +14,8 @@
     "cpu",
     "battery",
     "clock",
-    "custom/screenrecording-indicator"
+    "custom/screenrecording-indicator",
+    "custom/do-not-disturb-indicator"
   ],
   "hyprland/workspaces": {
     "on-click": "activate",
@@ -118,5 +119,11 @@
   "privacy": {
     "icon-spacing": 12,
     "icon-size": 12
+  },
+  "custom/do-not-disturb-indicator": {
+    "on-click": "makoctl mode -t do-not-disturb && notify-send 'Enabled notifications'",
+    "exec": "~/.config/waybar/indicators/do-not-disturb.sh",
+    "signal": 9,
+    "return-type": "json"
   }
 }
