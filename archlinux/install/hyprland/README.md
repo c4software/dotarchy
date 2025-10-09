@@ -11,6 +11,7 @@
 | `SUPER + J` | Toggle "split" (division) |
 | `SUPER + P` | "Pseudo" window |
 | `SUPER + V` | Toggle floating mode |
+| `SUPER + T` | Toggle centerered floating mode |
 | `SHIFT + F11` | Force fullscreen |
 | `SUPER + ALT +  ↑/↓` | Toggle monocle mode (fullscreen with background window management) |
 | `SUPER + ←/→/↑/↓` | Move focus |
@@ -85,4 +86,3 @@
 | `XF86AudioNext` | Next track |
 | `XF86AudioPause` / `XF86AudioPlay` | Play/pause |
 | `XF86AudioPrev` | Previous track |
-
