@@ -11,9 +11,8 @@ weight: 7
 | :--- | :--- |
 | `SUPER + W` | Close the active window |
 | `SUPER + J` | Toggle "split" (division) |
-| `SUPER + P` | "Pseudo" window |
 | `SUPER + V` | Toggle floating mode |
-| `SUPER + T` | Toggle centerered floating mode |
+| `SUPER + P` | Toggle centerered floating mode |
 | `SHIFT + F11` | Force fullscreen |
 | `SUPER + ALT + ↑/↓` | Toggle monocle mode (fullscreen with background window management) |
 | `SUPER + ←/→/↑/↓` | Move focus |
