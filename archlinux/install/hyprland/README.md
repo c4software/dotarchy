@@ -9,7 +9,6 @@
 | :--- | :--- |
 | `SUPER + W` | Close the active window |
 | `SUPER + J` | Toggle "split" (division) |
-| `SUPER + V` | Toggle floating mode |
 | `SUPER + P` | Toggle centerered floating mode |
 | `SHIFT + F11` | Force fullscreen |
 | `SUPER + ALT +  ↑/↓` | Toggle monocle mode (fullscreen with background window management) |
@@ -27,6 +26,15 @@
 | `SUPER + Mouse wheel` | Scroll through workspaces |
 | `SUPER + Left click` | Move window |
 | `SUPER + Right click` | Resize window |
+
+---
+
+### Clipboard
+
+| Shortcut | Description |
+| :--- | :--- |
+| `SUPER + C` | Copy |
+| `SUPER + V` | Paste |
 
 ---
 

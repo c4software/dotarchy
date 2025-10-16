@@ -98,7 +98,7 @@ show_setup_menu() {
   local options="  Audio\n  Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰍹  Resolution\n󰍹  Monitors"
   [ -f ~/.config/hypr/bindings.conf ] && options="$options\n  Keybindings"
   [ -f ~/.config/hypr/input.conf ] && options="$options\n  Input"
-  options="$options\n  Config\n󰈷  Fingerprint"
+  options="$options\n  Config\n󰈷  Fingerprint\n  Firmware"
 
   case $(dotarchy-display-menu "Setup" "$options") in
   *Audio*) alacritty --class=Wiremix -e wiremix ;;
@@ -117,6 +117,7 @@ show_setup_menu() {
   *Input*) edit_in_nvim ~/.config/hypr/input.conf ;;
   *Config*) show_setup_config_menu ;;
   *Fingerprint*) present_terminal omarchy-setup-fingerprint ;;
+  *Firmware*) present_terminal omarchy-update-firmware ;;
   *) show_main_menu ;;
   esac
 }
@@ -125,7 +126,7 @@ show_setup_power_menu() {
   profile=$(dotarchy-display-menu "Power Profile" "$(omarchy-powerprofiles-list)" "" "$(powerprofilesctl get)")
 
   if [[ "$profile" == "CNCLD" || -z "$profile" ]]; then
-      back_to show_main_menu
+    back_to show_main_menu
   else
     powerprofilesctl set "$profile"
   fi
@@ -166,8 +167,9 @@ show_install_service_menu() {
 }
 
 show_install_ai_menu() {
-  case $(dotarchy-display-menu "Install" "󱚤  Claude Code\n󱚤  Gemini\n󱚤  LM Studio\n󱚤  Ollama\n󱚤  Crush\n󱚤  opencode") in
+  case $(dotarchy-display-menu "Install" "󱚤  Claude Code\n󱚤  Cursor CLI\n󱚤  Gemini\n󱚤  LM Studio\n󱚤  Ollama\n󱚤  Crush\n󱚤  opencode") in
   *Claude*) install "Claude Code" "claude-code" ;;
+  *Cursor*) install "Cursor CLI" "cursor-cli" ;;
   *Gemini*) install "Gemini" "gemini-cli-bin" ;;
   *Studio*) install "LM Studio" "lmstudio" ;;
   *Ollama*) install "Ollama" "ollama" ;;
@@ -238,8 +240,8 @@ show_system_menu() {
   *Screensaver*) omarchy-launch-screensaver force ;;
   *Suspend*) systemctl suspend ;;
   *Logout*) uwsm stop ;;
-  *Restart*) systemctl reboot ;;
-  *Shutdown*) systemctl poweroff ;;
+  *Restart*) systemctl reboot --no-wall ;;
+  *Shutdown*) systemctl poweroff --no-wall ;;
   *) back_to show_main_menu ;;
   esac
 }
@@ -253,13 +255,13 @@ show_theme_menu() {
   fi
 }
 
-show_style_menu(){
+show_style_menu() {
   case $(dotarchy-display-menu "Style" "󰸌  Themes\n  Background\n  Hyprland") in
-    *Themes*) show_theme_menu ;;
-    # *Background*) dotarchy-background next ;;
-    *Background*) dotarchy-background-menu ;;
-    *Hyprland*) open_in_editor ~/.config/hypr/looknfeel.conf ;;
-    *) show_main_menu ;;
+  *Themes*) show_theme_menu ;;
+  # *Background*) dotarchy-background next ;;
+  *Background*) dotarchy-background-menu ;;
+  *Hyprland*) open_in_editor ~/.config/hypr/looknfeel.conf ;;
+  *) show_main_menu ;;
   esac
 }
 

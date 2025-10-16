@@ -22,7 +22,7 @@ check_images() {
 apply_background() {
     pkill -x swaybg
 
-    setsid uwsm app -- swaybg -i "$SYMLINK" -m fill >/dev/null 2>&1 &
+    setsid uwsm-app -- swaybg -i "$SYMLINK" -m fill >/dev/null 2>&1 &
 }
 
 get_current_index() {
