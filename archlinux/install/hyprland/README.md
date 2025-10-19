@@ -30,7 +30,6 @@
 | `SUPER + ALT + TAB` | Next window in group |
 | `SUPER + ALT + SHIFT + TAB` | Previous window in group |
 
-
 ---
 
 ### Clipboard
@@ -52,7 +51,7 @@
 | `SUPER + N` | Launch Neovim |
 | `SUPER + T` | Launch `btop` (activity monitor) |
 | `SUPER + D` | Launch `lazydocker` |
-| `SUPER + C` | Launch AI menu |
+| `SUPER + A` | Launch AI menu |
 | `SUPER + SHIFT + G` | Launch WhatsApp |
 | `SUPER + ALT + G` | Launch Google Messages |
 

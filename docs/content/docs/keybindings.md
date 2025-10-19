@@ -55,7 +55,7 @@ weight: 7
 | `SUPER + N` | Launch Neovim |
 | `SUPER + T` | Launch `btop` (activity monitor) |
 | `SUPER + D` | Launch `lazydocker` |
-| `SUPER + C` | Launch AI menu |
+| `SUPER + A` | Launch AI menu |
 | `SUPER + SHIFT + G` | Launch WhatsApp |
 | `SUPER + ALT + G` | Launch Google Messages |
 
