@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Toggle grouping of windows in the current workspace.
+# If no windows are grouped, group all visible windows except the active one.
+# If there are grouped windows, ungroup them.
+# Usage: dotarchy-toggle-group
+
+
+current_workspace=$(hyprctl activeworkspace -j | jq .id)
+active_window=$(hyprctl activewindow -j | jq .address)
+group_exists=$(hyprctl clients -j | jq "[.[] | select(.workspace.id == $current_workspace and .grouped != [])] | length")
+
+if [ "$group_exists" -eq 0 ]; then
+    hyprctl dispatch togglegroup
+    visible_windows=$(hyprctl clients -j | jq -r ".[] | select(.workspace.id == $current_workspace and .address != \"$active_window\") | .address")
+
+    for window in $visible_windows; do
+        hyprctl dispatch moveintogroup $window
+    done
+else
+    hyprctl dispatch togglegroup
+fi
