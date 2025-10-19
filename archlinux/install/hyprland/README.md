@@ -2,7 +2,6 @@
 
 ![Screenshot](../../../docs/static/screenshot.jpg)
 
-
 ### Window Management
 
 | Shortcut | Description |
@@ -26,6 +25,11 @@
 | `SUPER + Mouse wheel` | Scroll through workspaces |
 | `SUPER + Left click` | Move window |
 | `SUPER + Right click` | Resize window |
+| `SUPER + G` | Toggle grouped windows |
+| `SUPER + ALT + G` | Move window out of group |
+| `SUPER + ALT + TAB` | Next window in group |
+| `SUPER + ALT + SHIFT + TAB` | Previous window in group |
+
 
 ---
 
