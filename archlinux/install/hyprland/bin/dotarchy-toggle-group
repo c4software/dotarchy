@@ -5,35 +5,46 @@
 # If there are grouped windows, ungroup them.
 # Usage: dotarchy-toggle-group
 
-current_workspace=$(hyprctl activeworkspace -j | jq .id)
-active_window=$(hyprctl activewindow -j | jq .address)
-
+current_workspace=$(hyprctl activeworkspace -j | jq '.id')
 group_exists=$(hyprctl clients -j | jq "[.[] | select(.workspace.id == $current_workspace and (.grouped | length > 0))] | length")
 
 if [ "$group_exists" -gt 0 ]; then
+    # There are grouped windows, ungroup them
     hyprctl dispatch togglegroup
 else
-    windows=$(hyprctl clients -j | jq -r ".[] | select(.workspace.id == $current_workspace and .hidden == false and .floating == false) | .address")
-    
-    window_count=$(echo "$windows" | wc -l)
-    
-    if [ "$window_count" -le 1 ]; then
-        hyprctl dispatch togglegroup
+    WS="$current_workspace"
+
+    mapfile -t CLIENTS < <(
+        hyprctl clients -j | jq -r --argjson ws "$WS" '.[] 
+            | select(.workspace.id == $ws) 
+            | "\(.address) \(.at[0]) \(.at[1])"' | sort -k2n -k3n
+    )
+
+    if ((${#CLIENTS[@]} == 0)); then
         exit 0
     fi
-    
-    hyprctl dispatch focuswindow address:$active_window
+
+    read FIRST FX FY <<<"${CLIENTS[0]}"
+
+    hyprctl dispatch focuswindow address:"$FIRST"
     hyprctl dispatch togglegroup
-    sleep 0.1
-    
-    for window in $windows; do
-        if [ "$window" != "$active_window" ]; then
-            hyprctl dispatch focuswindow address:$window
-            sleep 0.1
-            hyprctl dispatch moveintogroup r
-            sleep 0.1
+
+    for c in "${CLIENTS[@]:1}"; do
+        read CLIENT CX CY <<<"$c"
+
+        if ((CX > FX)); then
+            DIR="l"
+        elif ((CX < FX)); then
+            DIR="r"
+        elif ((CY > FY)); then
+            DIR="d"
+        else
+            DIR="u"
         fi
+
+        echo "client: $CLIENT cx:$CX cy:$CY dir:$DIR, first:$FIRST fx:$FX fy:$FY"
+
+        hyprctl dispatch focuswindow address:"$CLIENT"
+        hyprctl dispatch moveintogroup "$DIR"
     done
-    
-    hyprctl dispatch focuswindow address:$active_window
 fi
