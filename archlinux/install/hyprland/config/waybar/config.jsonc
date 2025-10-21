@@ -76,7 +76,8 @@
     },
     "events": {
 		  "on-discharging-warning": "notify-send -u normal 'Low Battery'",
-		  "on-discharging-critical": "notify-send -u critical 'Very Low Battery'"
+		  "on-discharging-critical": "notify-send -u critical 'Very Low Battery'",
+      "on-charging-100": "notify-send -u normal 'Battery Full!'"
 	  },
     "format-full": "󰂅",
     "tooltip-format-discharging": "{power:>1.0f}W↓ {capacity}%",
