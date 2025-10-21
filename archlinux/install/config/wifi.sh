@@ -42,7 +42,8 @@ function check(){
 
   if [ -n "${WIRELESS_REGDOM}" ]; then
     if command -v iw &> /dev/null; then
-      CURRENT_REGDOM=$(iw reg get | awk '/country/{print $2}')
+      # iw reg get returns output like: country XX: DFS-UNSET, extract XX without :
+      CURRENT_REGDOM=$(iw reg get | awk '/country/{print $2}' | cut -d: -f1)
       if [ "$CURRENT_REGDOM" == "$WIRELESS_REGDOM" ]; then
         show_success "WiFi" "Wireless regulatory domain is set correctly."
       else
