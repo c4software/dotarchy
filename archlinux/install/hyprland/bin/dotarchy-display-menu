@@ -11,8 +11,8 @@ preselect="$4"
 width="${5:-250}"
 
 options_count=$(echo -e "$options" | wc -l)
-if (( options_count > 10 )); then
-  options_count=10
+if (( options_count > 15 )); then
+  options_count=15
 fi
 
 read -r -a args <<<"$extra"
