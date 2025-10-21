@@ -2,6 +2,7 @@
 
 # Usage: ./update.sh [--all]
 # If --all is provided, it will also update common configuration files.
+# Shortcut to install WebApps shortcuts and TUI shortcuts.
 
 set -eE
 
