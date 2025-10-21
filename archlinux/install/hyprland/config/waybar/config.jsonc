@@ -44,7 +44,7 @@
   "cpu": {
     "interval": 10,
     "format": "󰍛",
-    "on-click": "alacritty -e btop"
+    "on-click": "alacritty --class=TUI.float -e btop"
   },
   "clock": {
     "format": "{:%H:%M}",
