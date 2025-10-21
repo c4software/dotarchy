@@ -5,6 +5,11 @@
 
 set -eE
 
+# If current directory is a git repository, pull the latest changes
+if [ -d .git ]; then
+    git pull
+fi
+
 # Add a confirmation prompt with gum since this will overwrite existing configuration files
 if ! gum confirm "This will overwrite your existing configuration files. Do you want to continue?"; then
     echo "Aborting."
