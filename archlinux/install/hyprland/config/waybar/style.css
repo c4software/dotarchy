@@ -5,16 +5,17 @@
     color: @foreground;
     border: none;
     border-radius: 0;
-    min-height: 0;
     font-family: CaskaydiaMono Nerd Font;
     font-size: 11px;
+    min-height: 0;
 }
 
 window#waybar {
     all: unset;
 }
 
-.modules-right, .modules-left {
+.modules-right,
+.modules-left {
     padding: 4px 6px;
     margin: 4px 6px 0;
     border-radius: 6px;
@@ -27,7 +28,6 @@ window#waybar {
 }
 
 #workspaces button {
-    all: unset;
     padding: 0 4px;
     margin: 0 1px;
     min-width: 8px;
@@ -47,17 +47,11 @@ window#waybar {
 
 #workspaces button.empty {
     color: rgba(0, 0, 0, 0.2);
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
 #workspaces button.empty:hover {
-    color: rgba(0, 0, 0, 0);
+    color: transparent;
     text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
-}
-
-#workspaces button.empty.active {
-    color: @foreground;
-    text-shadow: 0 0 1.5px rgba(0, 0, 0, 0.5);
 }
 
 #tray,
@@ -71,8 +65,8 @@ window#waybar {
 #custom-screenrecording-indicator,
 #custom-do-not-disturb-indicator,
 #custom-update {
-    min-width: 10px;
     margin: 0 3px;
+    min-width: 10px;
     color: @foreground;
     transition: color 0.2s ease;
 }
@@ -94,25 +88,23 @@ tooltip {
     padding: 2px 4px;
 }
 
-#custom-update {
+#custom-update,
+#custom-screenrecording-indicator {
     font-size: 9px;
     padding: 0 6px;
+}
+
+#custom-screenrecording-indicator {
+    margin-left: 6px;
 }
 
 #clock {
     margin-left: 2px;
     padding: 0 4px;
-    color: @foreground;
 }
 
 .hidden {
     opacity: 0;
-}
-
-#custom-screenrecording-indicator {
-    min-width: 10px;
-    margin-left: 6px;
-    font-size: 9px;
 }
 
 #custom-screenrecording-indicator.active {
