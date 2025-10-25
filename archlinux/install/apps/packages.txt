@@ -41,7 +41,7 @@ curl
 wget
 unrar
 eza
-ndu
+ncdu
 gum
 bash-completion
 btop
