@@ -9,11 +9,13 @@ set -eE
     setup
 )
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
 if command -v pacman &> /dev/null; then
-    source "./archlinux/setup.sh"
-    source "./common/install/webapp.sh"
+    source "$SCRIPT_DIR/archlinux/setup.sh"
+    source "$SCRIPT_DIR/common/install/webapp.sh"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    source "./macos/setup.sh"
+    source "$SCRIPT_DIR/macos/setup.sh"
 else
     echo "Unsupported distribution."
     exit 1
