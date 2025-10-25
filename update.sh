@@ -26,6 +26,7 @@ fi
 if [ "$1" == "--all" ]; then
     # Update common configuration files
     source ./common/install/bootstrap.sh
+    setup
 fi
 
 # Update Hyprland (without reinstalling packages)
