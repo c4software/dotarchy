@@ -8,4 +8,5 @@ function setup(){
 }
 
 function check(){
+    echo ""
 }
