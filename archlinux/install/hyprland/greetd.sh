@@ -17,6 +17,18 @@ if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
         sudo systemctl disable gdm.service
     fi
 
+    # Test if ssdm is installed and disable it
+    if systemctl list-unit-files | grep -q sddm.service; then
+        echo "Disabling SDDM..."
+        sudo systemctl disable sddm.service
+    fi
+
+    # Test if lightdm is installed and disable it
+    if systemctl list-unit-files | grep -q lightdm.service; then
+        echo "Disabling LightDM..."
+        sudo systemctl disable lightdm.service
+    fi
+
     echo "Enabling greetd..."
     sudo systemctl enable greetd.service
     
