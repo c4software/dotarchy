@@ -27,3 +27,6 @@ else
     echo "Unsupported distribution."
     exit 1
 fi
+
+echo "Setup completed successfully."
+echo "Please restart your computer to apply all changes."
