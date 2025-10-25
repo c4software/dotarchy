@@ -3,24 +3,24 @@ timeshift
 
 # Development
 k9s
-neovim 
-luarocks 
+neovim
+luarocks
 tree-sitter-cli
-mise 
-mariadb-libs 
+mise
+mariadb-libs
 postgresql-libs
 
 # Docker
-docker 
-docker-compose 
+docker
+docker-compose
 docker-buildx
 lazydocker
 
 # Video
 ffmpeg
-gst-plugins-good 
-gst-plugins-bad 
-gst-plugins-ugly 
+gst-plugins-good
+gst-plugins-bad
+gst-plugins-ugly
 vlc
 
 # Git
