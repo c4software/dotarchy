@@ -42,6 +42,8 @@ function setup() {
         sudo systemctl enable iwd.service --now
     fi
 
+    # do not fail if hyprctl fails
+    set +eE
     hyprctl reload # Reload Hyprland to apply changes
 }
 
