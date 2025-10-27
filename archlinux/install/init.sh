@@ -2,6 +2,7 @@ function setup() {
   # Installation de YAY
   if ! command -v yay &>/dev/null; then
       echo -e "Installing Yay (AUR helper)"
+      rm -rf /tmp/yay # Clean previous install if any
       sudo pacman -S --needed git base-devel --noconfirm
       git clone https://aur.archlinux.org/yay.git /tmp/yay
       cd /tmp/yay

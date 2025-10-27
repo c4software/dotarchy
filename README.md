@@ -21,7 +21,8 @@ This repository contains installation and configuration scripts for Arch Linux a
 ```bash
 clear
 echo -e "\nCloning dotarchy repository..."
-git clone https://github.com/c4software/dotarchy.git /tmp/dotfiles
+git clone https://github.com/c4software/dotarchy.git ~/dotarchy
+cd ~/dotarchy
 
 ./setup.sh
 ```
