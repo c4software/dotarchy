@@ -44,7 +44,11 @@ function setup(){
   if [[ "$OSTYPE" != "darwin"* ]]; then
     # Installation du layout de clavier Bépo Dev
     echo "Installing Bépo Dev keyboard layout (Système)..."
-    sudo wget -nc https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/bepoDev -O /usr/share/X11/xkb/symbols/bepoDev || true
+
+    if [ -d /usr/share/X11/xkb/symbols/ ]; then
+      sudo wget -nc https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/bepoDev -O /usr/share/X11/xkb/symbols/bepoDev || true
+      return
+    fi
 
     # Installation bepoDev pour l'utilisateur
     echo "Installing Bépo Dev keyboard layout (Utilisateur)..."
