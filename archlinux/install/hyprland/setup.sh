@@ -44,6 +44,12 @@ function setup() {
 
     # do not fail if hyprctl fails
     set +eE
+
+    # Check if HYPRLAND_INSTANCE_SIGNATURE is set
+    if [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
+        return
+    fi
+
     hyprctl reload # Reload Hyprland to apply changes
 }
 
