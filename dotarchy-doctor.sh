@@ -42,7 +42,7 @@ source ./archlinux/doctor.sh
 if gum confirm "Do you want to reinstall missing packages?"; then
     echo ""
     gum style --border double --align center --width 40 "Updating package database"
-    pacman -Syu
+    sudo pacman -Syu
 
     gum style --border double --align center --width 40 "Reinstalling missing packages"
     echo ""
