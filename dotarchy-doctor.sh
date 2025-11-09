@@ -37,3 +37,25 @@ echo ""
 
 # Check all Arch Linux configuration files
 source ./archlinux/doctor.sh
+
+# Ask to reinstall missing packages
+if gum confirm "Do you want to reinstall missing packages?"; then
+    gum style --border double --align center --width 40 "Reinstalling missing packages"
+    echo ""
+
+    # Find for every packages.txt and packages.aur.txt files and reinstall missing packages. Confirm for each file.
+    find . -type f \( -name "packages.txt" -o -name "packages.aur.txt" \) | while read -r file; do
+        dir=$(dirname "$file")
+        if gum confirm "Do you want to reinstall missing packages from $dir?"; then
+            (
+                if [ "$(basename "$file")" == "packages.txt" ]; then
+                    echo -e "Reinstalling missing packages from $file with pacman"
+                    grep -v "^#" "$file" | sudo pacman -S --noconfirm --needed -
+                else
+                    echo -e "Reinstalling missing packages from $file with yay"
+                    grep -v "^#" "$file" | yay -S --noconfirm --needed -
+                fi
+            ) 
+        fi
+    done
+fi
