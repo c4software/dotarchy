@@ -53,10 +53,10 @@ if gum confirm "Do you want to reinstall missing packages?"; then
         if gum confirm "Reinstall packages from $file located in $dir?"; then
             if [ "$(basename "$file")" == "packages.txt" ]; then
                 echo "Reinstalling missing packages from $file with pacman"
-                grep -v "^#" "$file" | sudo pacman -S --noconfirm --needed -
+                grep -Ev '^(#|$)' "$file"  | sudo pacman -S --noconfirm --needed -
             else
                 echo "Reinstalling missing packages from $file with yay"
-                grep -v "^#" "$file" | yay -S --noconfirm --needed -
+                grep -Ev '^(#|$)' "$file" | yay -S --noconfirm --needed -
             fi
         fi
     done < <(find . -type f \( -name "packages.txt" -o -name "packages.aur.txt" \))
