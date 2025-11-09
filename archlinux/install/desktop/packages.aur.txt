@@ -1,7 +1,6 @@
 # Applications
 visual-studio-code-bin
 google-chrome
-jetbrains-toolbox
 spotify
 # Fonts
 woff2-font-awesome
