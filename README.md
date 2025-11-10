@@ -97,7 +97,6 @@ You can run `./dotarchy-doctor.sh` to check if your current setup is correct and
 - **Google Chrome**: A cross-platform web browser.
 - **k9s**: A terminal-based UI to manage Kubernetes clusters.
 - **ProtonVPN**: A VPN service.
-- **Jetbrains Toolbox**: A control panel for JetBrains tools.
 - **Signal**: A cross-platform centralized encrypted messaging service.
 - **Ghostty**: A terminal-based UI.
 - **Snapper**: A tool for managing Btrfs snapshots.

@@ -19,7 +19,7 @@ A set of applications is installed by default to provide a complete development 
 - **`git`**, **`lazygit`**: Version control.
 - **`docker`**, **`docker-compose`**, **`lazydocker`**: Containerization.
 - **`mise`**: A tool for managing development environments.
-- **`visual-studio-code-bin`**, **`jetbrains-toolbox`**: Alternative IDEs.
+- **`visual-studio-code-bin`**: Source-code editor.
 
 ### Terminal & Shell
 
