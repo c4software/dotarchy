@@ -5,6 +5,11 @@ gnome-themes-extra
 seahorse
 nautilus
 polkit-gnome
+evince
+
+# Tools
+mpv
+imv
 
 # Hyprland dependencies
 xournalpp

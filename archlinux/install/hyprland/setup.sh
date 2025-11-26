@@ -15,6 +15,8 @@ function setup() {
         source "$SCRIPT_DIR/greetd.sh"
     fi
 
+    source "$SCRIPT_DIR/mimetypes.sh"
+
     echo -e "Moving configuration files (replace if exists)"
     rm -rf ~/.config/hypr
     cp -r "$SCRIPT_DIR/config/"* ~/.config/
