@@ -9,7 +9,7 @@ function setup(){
 function check() {
     # Check if TUI shortcuts exist ($HOME/.local/share/applications/*.desktop)
     local missing_shortcuts=()
-    local tui_apps=("docker" "k9s" "nvim")
+    local tui_apps=("Docker" "K9s" "Nvim")
     for app in "${tui_apps[@]}"; do
         if [ ! -f "$HOME/.local/share/applications/$app.desktop" ]; then
             missing_shortcuts+=("$app")
@@ -25,6 +25,4 @@ function check() {
         done
         show_error "TUI Shortcuts" "$error_msg"
     fi
-
-    return
 }
