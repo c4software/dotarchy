@@ -50,14 +50,17 @@ if gum confirm "Do you want to reinstall missing packages?"; then
     # Find for every packages.txt and packages.aur.txt files and reinstall missing packages. Confirm for each file.
     while IFS= read -r file; do
         dir=$(dirname "$file")
-        if gum confirm "Reinstall packages from $file located in $dir?"; then
-            if [ "$(basename "$file")" == "packages.txt" ]; then
+
+        # gum doit lire sur le vrai terminal
+        if gum confirm "Reinstall packages from $file located in $dir?" < /dev/tty; then
+            if [ "$(basename "$file")" = "packages.txt" ]; then
                 echo "Reinstalling missing packages from $file with pacman"
-                grep -Ev '^(#|$)' "$file"  | sudo pacman -S --noconfirm --needed -
+                grep -Ev '^(#|$)' "$file" | sudo pacman -S --noconfirm --needed -
             else
                 echo "Reinstalling missing packages from $file with yay"
                 grep -Ev '^(#|$)' "$file" | yay -S --noconfirm --needed -
             fi
         fi
     done < <(find . -type f \( -name "packages.txt" -o -name "packages.aur.txt" \))
+
 fi
