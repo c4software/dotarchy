@@ -51,7 +51,6 @@ if gum confirm "Do you want to reinstall missing packages?"; then
     while IFS= read -r file; do
         dir=$(dirname "$file")
 
-        # gum doit lire sur le vrai terminal
         if gum confirm "Reinstall packages from $file located in $dir?" < /dev/tty; then
             if [ "$(basename "$file")" = "packages.txt" ]; then
                 echo "Reinstalling missing packages from $file with pacman"
