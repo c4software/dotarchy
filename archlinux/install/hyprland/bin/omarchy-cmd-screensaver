@@ -14,7 +14,7 @@ framerate=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | (.refr
 framerate=${framerate:-60}
 
 while true; do
-  effect=$(tte 2>&1 | grep -oP '{\K[^}]+' | tr ',' ' ' | tr ' ' '\n' | sed -n '/^beams$/,$p' | sort -u | shuf -n1)
+  effect=$(tte 2>&1 | grep -oP '{\K[^}]+' | tr ',' ' ' | tr ' ' '\n' | sed -n '/^beams$/,$p' | grep -Ev '^(dev_worm)$' | sort -u | shuf -n1)
   tte -i ~/.config/logo.txt \
     --frame-rate "$framerate" --canvas-width 0 --canvas-height $(($(tput lines) - 2)) --anchor-canvas c --anchor-text c \
     "$effect" &

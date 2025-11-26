@@ -1,6 +1,7 @@
 # Applications
 ghostty
 signal-desktop
+evince
 
 # VPN
 wireguard-tools
