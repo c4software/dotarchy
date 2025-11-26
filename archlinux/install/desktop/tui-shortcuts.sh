@@ -3,13 +3,12 @@
 function setup(){
     omarchy-tui-install "Docker" "lazydocker" "tile" "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/docker.png"
     omarchy-tui-install "K9s" "k9s" "tile" "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/kubernetes-dashboard.png"
-    omarchy-tui-install "Nvim" "nvim" "tile" "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/synology-text-editor.png"
 }
 
 function check() {
     # Check if TUI shortcuts exist ($HOME/.local/share/applications/*.desktop)
     local missing_shortcuts=()
-    local tui_apps=("Docker" "K9s" "Nvim")
+    local tui_apps=("Docker" "K9s")
     for app in "${tui_apps[@]}"; do
         if [ ! -f "$HOME/.local/share/applications/$app.desktop" ]; then
             missing_shortcuts+=("$app")
