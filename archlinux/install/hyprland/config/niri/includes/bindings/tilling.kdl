@@ -14,8 +14,8 @@ binds {
     // Move focus with Mod + arrow keys
     Mod+Left { focus-column-left; }
     Mod+Right { focus-column-right; }
-    Mod+Up { focus-window-up; }
-    Mod+Down { focus-window-down; }
+    Mod+Up { focus-workspace-up; }
+    Mod+Down { focus-workspace-down; }
 
     // Switch workspaces with Mod + [1-9,0]
     Mod+1 { focus-workspace 1; }
