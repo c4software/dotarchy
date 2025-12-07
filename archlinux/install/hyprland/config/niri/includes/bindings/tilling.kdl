@@ -6,7 +6,7 @@ binds {
     // Control tiling and window modes
     Shift+F11 { maximize-column; }
     Mod+Alt+Up { maximize-column; }
-    Mod+Alt+Down { minimize-column; }
+    Mod+Alt+Down { maximize-column; }
 
     // Center floating window (Niri handles floating differently)
     Mod+P { center-column; }
