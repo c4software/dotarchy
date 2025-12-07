@@ -1,0 +1,3 @@
+   Mod+C { spawn "wtype" "-M" "ctrl" "-P" "Insert" "-m" "ctrl"; }
+   Mod+V { spawn "wtype" "-M" "shift" "-P" "Insert" "-m" "shift"; }
+   Mod+X { spawn "wtype" "-M" "ctrl" "-P" "x" "-m" "ctrl"; }
