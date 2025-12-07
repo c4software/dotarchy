@@ -4,7 +4,6 @@ binds {
     Mod+Q { close-window; }
 
     // Control tiling and window modes
-    Mod+J { toggle-split; }
     Shift+F11 { maximize-column; }
     Mod+Alt+Up { maximize-column; }
     Mod+Alt+Down { minimize-column; }
