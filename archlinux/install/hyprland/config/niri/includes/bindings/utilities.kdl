@@ -1,6 +1,6 @@
 binds {
     // Apps
-    Mod+Enter { spawn "alacritty"; }
+    Mod+Return { spawn "alacritty"; }
     Mod+F { spawn "nautilus --new-window"; }
     Mod+B { spawn "google-chrome-stable"; }
     Mod+N { spawn "alacritty -e nvim"; }
