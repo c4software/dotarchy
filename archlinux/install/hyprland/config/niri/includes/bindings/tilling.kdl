@@ -5,9 +5,9 @@ binds {
 
     // Control tiling and window modes
     Mod+J { toggle-split; }
-    Shift+F11 { fullscreen-window; }
-    Mod+Alt+Up { fullscreen-window; }
-    Mod+Alt+Down { fullscreen-window; }
+    Shift+F11 { maximize-column; }
+    Mod+Alt+Up { maximize-column; }
+    Mod+Alt+Down { minimize-column; }
 
     // Center floating window (Niri handles floating differently)
     Mod+P { center-column; }
@@ -47,10 +47,6 @@ binds {
     Mod+Shift+Right { move-column-right; }
     Mod+Shift+Up { move-window-up; }
     Mod+Shift+Down { move-window-down; }
-
-    // Cycle through windows (Alt+Tab)
-    Alt+Tab { focus-window-down-or-right; }
-    Alt+Shift+Tab { focus-window-up-or-left; }
 
     // Navigate between workspaces
     // Mod+Tab { focus-workspace-down; }
