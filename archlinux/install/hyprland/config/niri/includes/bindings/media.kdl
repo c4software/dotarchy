@@ -1,19 +1,21 @@
-// Laptop multimedia keys for volume and LCD brightness (with OSD)
-XF86AudioRaiseVolume allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume raise"; }
-XF86AudioLowerVolume allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume lower"; }
-XF86AudioMute allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume mute-toggle"; }
-XF86AudioMicMute allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --input-volume mute-toggle"; }
-XF86MonBrightnessUp allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --brightness raise"; }
-XF86MonBrightnessDown allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --brightness lower"; }
+binds {
+    // Laptop multimedia keys for volume and LCD brightness (with OSD)
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume raise"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume lower"; }
+    XF86AudioMute allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume mute-toggle"; }
+    XF86AudioMicMute allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --input-volume mute-toggle"; }
+    XF86MonBrightnessUp allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --brightness raise"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --brightness lower"; }
 
-// Precise 1% multimedia adjustments with Alt modifier
-Alt+XF86AudioRaiseVolume allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume +1"; }
-Alt+XF86AudioLowerVolume allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume -1"; }
-Alt+XF86MonBrightnessUp allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --brightness +1"; }
-Alt+XF86MonBrightnessDown allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --brightness -1"; }
+    // Precise 1% multimedia adjustments with Alt modifier
+    Alt+XF86AudioRaiseVolume allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume +1"; }
+    Alt+XF86AudioLowerVolume allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --output-volume -1"; }
+    Alt+XF86MonBrightnessUp allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --brightness +1"; }
+    Alt+XF86MonBrightnessDown allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --brightness -1"; }
 
-// Media controls (requires playerctl)
-XF86AudioNext allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --playerctl next"; }
-XF86AudioPause allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --playerctl play-pause"; }
-XF86AudioPlay allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --playerctl play-pause"; }
-XF86AudioPrev allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --playerctl previous"; }
+    // Media controls (requires playerctl)
+    XF86AudioNext allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --playerctl next"; }
+    XF86AudioPause allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --playerctl play-pause"; }
+    XF86AudioPlay allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --playerctl play-pause"; }
+    XF86AudioPrev allow-when-locked=true { spawn "sh" "-c" "swayosd-client --monitor \"$(niri msg -j outputs | jq -r '.[] | select(.focused == true).name')\" --playerctl previous"; }
+}

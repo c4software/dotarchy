@@ -1,78 +1,80 @@
-// Close windows
-Mod+W { close-window; }
-Mod+Q { close-window; }
+binds {
+    // Close windows
+    Mod+W { close-window; }
+    Mod+Q { close-window; }
 
-// Control tiling and window modes
-Mod+J { toggle-split; }
-Shift+F11 { fullscreen-window; }
-Mod+Alt+Up { fullscreen-window; }
-Mod+Alt+Down { fullscreen-window; }
+    // Control tiling and window modes
+    Mod+J { toggle-split; }
+    Shift+F11 { fullscreen-window; }
+    Mod+Alt+Up { fullscreen-window; }
+    Mod+Alt+Down { fullscreen-window; }
 
-// Center floating window (Niri handles floating differently)
-Mod+P { center-column; }
+    // Center floating window (Niri handles floating differently)
+    Mod+P { center-column; }
 
-// Move focus with Mod + arrow keys
-Mod+Left { focus-column-left; }
-Mod+Right { focus-column-right; }
-Mod+Up { focus-window-up; }
-Mod+Down { focus-window-down; }
+    // Move focus with Mod + arrow keys
+    Mod+Left { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+Up { focus-window-up; }
+    Mod+Down { focus-window-down; }
 
-// Switch workspaces with Mod + [1-9,0]
-Mod+1 { focus-workspace 1; }
-Mod+2 { focus-workspace 2; }
-Mod+3 { focus-workspace 3; }
-Mod+4 { focus-workspace 4; }
-Mod+5 { focus-workspace 5; }
-Mod+6 { focus-workspace 6; }
-Mod+7 { focus-workspace 7; }
-Mod+8 { focus-workspace 8; }
-Mod+9 { focus-workspace 9; }
-Mod+0 { focus-workspace 10; }
+    // Switch workspaces with Mod + [1-9,0]
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+0 { focus-workspace 10; }
 
-// Move active window to workspace with Mod + Shift + [1-9,0]
-Mod+Shift+1 { move-column-to-workspace 1; }
-Mod+Shift+2 { move-column-to-workspace 2; }
-Mod+Shift+3 { move-column-to-workspace 3; }
-Mod+Shift+4 { move-column-to-workspace 4; }
-Mod+Shift+5 { move-column-to-workspace 5; }
-Mod+Shift+6 { move-column-to-workspace 6; }
-Mod+Shift+7 { move-column-to-workspace 7; }
-Mod+Shift+8 { move-column-to-workspace 8; }
-Mod+Shift+9 { move-column-to-workspace 9; }
-Mod+Shift+0 { move-column-to-workspace 10; }
+    // Move active window to workspace with Mod + Shift + [1-9,0]
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+    Mod+Shift+6 { move-column-to-workspace 6; }
+    Mod+Shift+7 { move-column-to-workspace 7; }
+    Mod+Shift+8 { move-column-to-workspace 8; }
+    Mod+Shift+9 { move-column-to-workspace 9; }
+    Mod+Shift+0 { move-column-to-workspace 10; }
 
-// Swap windows with Mod + Shift + arrow keys
-Mod+Shift+Left { move-column-left; }
-Mod+Shift+Right { move-column-right; }
-Mod+Shift+Up { move-window-up; }
-Mod+Shift+Down { move-window-down; }
+    // Swap windows with Mod + Shift + arrow keys
+    Mod+Shift+Left { move-column-left; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+Up { move-window-up; }
+    Mod+Shift+Down { move-window-down; }
 
-// Cycle through windows (Alt+Tab)
-Alt+Tab { focus-window-down-or-right; }
-Alt+Shift+Tab { focus-window-up-or-left; }
+    // Cycle through windows (Alt+Tab)
+    Alt+Tab { focus-window-down-or-right; }
+    Alt+Shift+Tab { focus-window-up-or-left; }
 
-// Navigate between workspaces
-// Mod+Tab { focus-workspace-down; }
-Mod+Shift+Tab { focus-workspace-up; }
-Mod+Ctrl+Tab { focus-workspace-previous; }
+    // Navigate between workspaces
+    // Mod+Tab { focus-workspace-down; }
+    Mod+Shift+Tab { focus-workspace-up; }
+    Mod+Ctrl+Tab { focus-workspace-previous; }
 
-// Search for applications/windows
-Mod+Tab { spawn "rofi" "-show" "window"; }
+    // Search for applications/windows
+    Mod+Tab { spawn "rofi" "-show" "window"; }
 
-// Resize active window
-Mod+Minus { set-column-width "-10%"; }
-Mod+Equal { set-column-width "+10%"; }
-Mod+Shift+Minus { set-window-height "-10%"; }
-Mod+Shift+Equal { set-window-height "+10%"; }
-Alt+Left { set-column-width "-10%"; }
-Alt+Right { set-column-width "+10%"; }
-Alt+Up { set-window-height "-10%"; }
-Alt+Down { set-window-height "+10%"; }
+    // Resize active window
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+    Alt+Left { set-column-width "-10%"; }
+    Alt+Right { set-column-width "+10%"; }
+    Alt+Up { set-window-height "-10%"; }
+    Alt+Down { set-window-height "+10%"; }
 
-// Scroll through workspaces with Mod + scroll
-Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
-Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
+    // Scroll through workspaces with Mod + scroll
+    Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
 
-// Move workspaces to other monitors
-Mod+Shift+Alt+Left { move-workspace-to-monitor-left; }
-Mod+Shift+Alt+Right { move-workspace-to-monitor-right; }
+    // Move workspaces to other monitors
+    Mod+Shift+Alt+Left { move-workspace-to-monitor-left; }
+    Mod+Shift+Alt+Right { move-workspace-to-monitor-right; }
+}

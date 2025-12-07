@@ -1,6 +1,4 @@
-binds {
-    include "bindings/clipboard.kdl"
-    include "bindings/media.kdl"
-    include "bindings/tilling.kdl"
-    include "bindings/utilities.kdl"
-}
+include "bindings/clipboard.kdl"
+include "bindings/media.kdl"
+include "bindings/tilling.kdl"
+include "bindings/utilities.kdl"

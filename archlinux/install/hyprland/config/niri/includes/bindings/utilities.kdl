@@ -1,29 +1,30 @@
+binds {
+    // Menus
+    Mod+Space { spawn "rofi" "-show" "drun"; }
+    Mod+Ctrl+E { spawn "dotarchy-emoji-menu"; }
+    Mod+Alt+Space { spawn "omarchy-menu"; }
+    XF86AudioMedia { spawn "omarchy-menu"; }
+    Mod+Escape { spawn "omarchy-menu" "system"; }
+    XF86PowerOff { spawn "omarchy-menu" "system"; }
+    Mod+K { spawn "omarchy-menu-keybindings"; }
 
-// Menus
-Mod+Space { spawn "rofi" "-show" "drun"; }
-Mod+Ctrl+E { spawn "dotarchy-emoji-menu"; }
-Mod+Alt+Space { spawn "omarchy-menu"; }
-XF86AudioMedia { spawn "omarchy-menu"; }
-Mod+Escape { spawn "omarchy-menu" "system"; }
-XF86PowerOff { spawn "omarchy-menu" "system"; }
-Mod+K { spawn "omarchy-menu-keybindings"; }
+    // Aesthetics
+    Mod+Shift+Space { spawn "omarchy-toggle-waybar"; }
+    Mod+Ctrl+Space { spawn "dotarchy-background" "next"; }
+    Mod+Shift+Ctrl+Space { spawn "omarchy-menu" "theme"; }
 
-// Aesthetics
-Mod+Shift+Space { spawn "omarchy-toggle-waybar"; }
-Mod+Ctrl+Space { spawn "dotarchy-background" "next"; }
-Mod+Shift+Ctrl+Space { spawn "omarchy-menu" "theme"; }
+    // Notifications
+    Mod+Comma { spawn "makoctl" "dismiss"; }
+    Mod+Shift+Comma { spawn "makoctl" "dismiss" "--all"; }
+    Mod+Ctrl+Comma { spawn "sh" "-c" "makoctl mode -t do-not-disturb && makoctl mode | grep -q 'do-not-disturb' && notify-send 'Silenced notifications' || notify-send 'Enabled notifications' && pkill -RTMIN+9 waybar"; }
 
-// Notifications
-Mod+Comma { spawn "makoctl" "dismiss"; }
-Mod+Shift+Comma { spawn "makoctl" "dismiss" "--all"; }
-Mod+Ctrl+Comma { spawn "sh" "-c" "makoctl mode -t do-not-disturb && makoctl mode | grep -q 'do-not-disturb' && notify-send 'Silenced notifications' || notify-send 'Enabled notifications' && pkill -RTMIN+9 waybar"; }
+    // Toggle idling
+    Mod+Ctrl+I { spawn "omarchy-toggle-idle"; }
 
-// Toggle idling
-Mod+Ctrl+I { spawn "omarchy-toggle-idle"; }
+    // Screenshots
+    Print { spawn "omarchy-menu" "capture"; }
+    Alt+Shift+4 { spawn "omarchy-menu" "capture"; }
 
-// Screenshots
-Print { spawn "omarchy-menu" "capture"; }
-Alt+Shift+4 { spawn "omarchy-menu" "capture"; }
-
-// Color picker
-Mod+Print { spawn "sh" "-c" "pkill hyprpicker || hyprpicker -a"; }
+    // Color picker
+    Mod+Print { spawn "sh" "-c" "pkill hyprpicker || hyprpicker -a"; }
+}
