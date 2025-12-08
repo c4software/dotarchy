@@ -17,7 +17,6 @@ window-rule {
     open-floating true
 }
 
-# Calculator
 window-rule {
     match app-id="org.gnome.Calculator"
     open-floating true
