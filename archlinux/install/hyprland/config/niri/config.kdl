@@ -3,6 +3,7 @@
 // Check the wiki for a full description of the configuration:
 // https://yalter.github.io/niri/Configuration:-Introduction
 
+include "includes/environment.kdl"
 include "includes/autostart.kdl"
 include "includes/animations.kdl"
 include "includes/binds.kdl"
