@@ -1,12 +1,11 @@
 binds {
     // Apps
     Mod+Return { spawn "alacritty"; }
-    Mod+F { spawn "nautilus --new-window"; }
+    Mod+F { spawn "nautilus" "--new-window"; }
     Mod+B { spawn "google-chrome-stable"; }
-    Mod+N { spawn "alacritty -e nvim"; }
-    Mod+T { spawn "alacritty --class TUI.float -e btop"; }
-    Mod+D { spawn "alacritty --class TUI.float -e lazydocker"; }
-
+    Mod+N { spawn "alacritty" "-e" "nvim"; }
+    Mod+T { spawn "alacritty" "--class" "TUI.float" "-e" "btop"; }
+    Mod+D { spawn "alacritty" "--class" "TUI.float" "-e" "lazydocker"; }
     Mod+A { spawn "dotarchy-menu-ai"; }
 
     // Menus
