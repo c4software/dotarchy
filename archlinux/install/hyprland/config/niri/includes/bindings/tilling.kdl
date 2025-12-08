@@ -7,6 +7,8 @@ binds {
     Shift+F11 { maximize-column; }
     Mod+Alt+Up { maximize-column; }
     Mod+Alt+Down { maximize-column; }
+    Mod+Alt+Left { expand-column-to-available-width; }
+    Mod+Alt+Right { expand-column-to-available-width; }
 
     // Center floating window (Niri handles floating differently)
     Mod+P { center-column; }
