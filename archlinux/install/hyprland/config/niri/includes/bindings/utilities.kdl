@@ -13,8 +13,8 @@ binds {
     Mod+Ctrl+E { spawn-sh "dotarchy-emoji-menu"; }
     Mod+Alt+Space { spawn-sh "omarchy-menu"; }
     XF86AudioMedia { spawn-sh "omarchy-menu"; }
-    Mod+Escape { spawn-sh "omarchy-menu" "system"; }
-    XF86PowerOff { spawn-sh "omarchy-menu" "system"; }
+    Mod+Escape { spawn-sh "omarchy-menu system"; }
+    XF86PowerOff { spawn-sh "omarchy-menu system"; }
     Mod+K { spawn-sh "omarchy-menu-keybindings"; }
 
     // Aesthetics
@@ -31,8 +31,8 @@ binds {
     Mod+Ctrl+I { spawn-sh "omarchy-toggle-idle"; }
 
     // Screenshots
-    Print { spawn "omarchy-menu" "capture"; }
-    Alt+Shift+4 { spawn-sh "omarchy-menu" "capture"; }
+    Print { spawn-sh "omarchy-menu capture"; }
+    Alt+Shift+4 { spawn-sh "omarchy-menu capture"; }
 
     // Color picker
     Mod+Print { spawn "sh" "-c" "pkill hyprpicker || hyprpicker -a"; }
