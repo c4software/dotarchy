@@ -1,7 +1,8 @@
 #!/bin/bash
 
 function is_niri {
-  return $XDG_CURRENT_DESKTOP == "Niri"
+  // return true if $XDG_CURRENT_DESKTOP is set to "Niri"
+  [[ "$XDG_CURRENT_DESKTOP" == "Niri" ]]
 }
 
 function exit_screensaver {
