@@ -51,7 +51,7 @@ layout {
         // off
 
         // How many logical pixels the ring extends out from the windows.
-        width 2
+        width 1
 
         // Colors can be set in a variety of ways:
         // - CSS named colors: "red"
@@ -153,3 +153,5 @@ layout {
         bottom 8
     }
 }
+
+prefer-no-csd
