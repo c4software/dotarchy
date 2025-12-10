@@ -294,7 +294,7 @@ show_style_menu() {
 
   case $(dotarchy-display-menu "Style" "$options") in
   *Themes*) show_theme_menu ;;
-  *Next Background*) dotarchy-background next ;;
+  # *Background*) dotarchy-background next ;;
   *Background*) dotarchy-background-menu ;;
   *Hyprland*) open_in_editor ~/.config/hypr/looknfeel.conf ;;
   *Niri*) open_in_editor ~/.config/niri/layout.kdl ;;
