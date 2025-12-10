@@ -15,12 +15,14 @@ back_to() {
   fi
 }
 
-is_niri(){
-  return $XDG_CURRENT_DESKTOP=="Niri"
+is_niri() {
+  [[ "$XDG_CURRENT_DESKTOP" == "Niri" ]]
+  return $?
 }
 
 is_hyprland(){
-  return $XDG_CURRENT_DESKTOP=="Hyprland"
+  [[ "$XDG_CURRENT_DESKTOP" == "Hyprland" ]]
+  return $?
 }
 
 terminal() {
