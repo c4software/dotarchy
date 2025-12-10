@@ -1,7 +1,13 @@
 #!/bin/bash
 
+function is_niri {
+  return $XDG_CURRENT_DESKTOP == "Niri"
+}
+
 function exit_screensaver {
-  hyprctl keyword cursor:invisible false
+  if is_niri; then
+    hyprctl keyword cursor:invisible false &>/dev/null
+  fi  
   pkill -x tte 2>/dev/null
   pkill -f "alacritty --class Screensaver" 2>/dev/null
   exit 0
@@ -9,7 +15,10 @@ function exit_screensaver {
 
 trap exit_screensaver SIGINT SIGTERM SIGHUP SIGQUIT
 
-hyprctl keyword cursor:invisible true &>/dev/null
+if is_niri; then
+  hyprctl keyword cursor:invisible true &>/dev/null
+fi
+
 printf '\033]11;rgb:00/00/00\007'  # Set background color to black
 
 while true; do
