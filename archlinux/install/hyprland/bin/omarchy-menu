@@ -51,8 +51,8 @@ aur_install_and_launch() {
 show_learn_menu() {
   case $(dotarchy-display-menu "Learn" "  Keybindings\n  Omarchy\n  Hyprland\n󰣇  Arch\n  Neovim\n󱆃  Bash") in
   *Keybindings*) omarchy-menu-keybindings ;;
-  *Omarchy*) xdg-open "https://learn.omacom.io/2/the-omarchy-manual" ;;
   *Hyprland*) xdg-open "https://wiki.hypr.land/" ;;
+  *Niriv*) xdg-open "https://yalter.github.io/niri/Configuration%3A-Introduction.html" ;;
   *Arch*) xdg-open "https://wiki.archlinux.org/title/Main_page" ;;
   *Bash*) xdg-open "https://devhints.io/bash" ;;
   *Neovim*) xdg-open "https://www.lazyvim.org/keymaps" ;;
@@ -95,7 +95,7 @@ show_toggle_menu() {
 }
 
 show_setup_menu() {
-  local options="  Audio\n  Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰍹  Resolution\n󰍹  Monitors"
+  local options="  Audio\n  Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰍹  Monitors"
   [ -f ~/.config/hypr/bindings.conf ] && options="$options\n  Keybindings"
   [ -f ~/.config/hypr/input.conf ] && options="$options\n  Input"
   options="$options\n  Config\n󰈷  Fingerprint\n  Firmware"
@@ -111,7 +111,6 @@ show_setup_menu() {
     alacritty --class=Bluetui -e bluetui
     ;;
   *Power*) show_setup_power_menu ;;
-  *Resolution*) dotarchy-monitor-resolution-picker ;;
   *Monitors*) terminal "hyprmon" ;;
   *Keybindings*) edit_in_nvim ~/.config/hypr/bindings.conf ;;
   *Input*) edit_in_nvim ~/.config/hypr/input.conf ;;
@@ -239,7 +238,7 @@ show_system_menu() {
   *Lock*) dotarchy-lock-screen ;;
   *Screensaver*) omarchy-launch-screensaver force ;;
   *Suspend*) systemctl suspend ;;
-  *Logout*) uwsm stop ;;
+  *Logout*) systemctl restart greetd ;;
   *Restart*) systemctl reboot --no-wall ;;
   *Shutdown*) systemctl poweroff --no-wall ;;
   *) back_to show_main_menu ;;
@@ -258,7 +257,7 @@ show_theme_menu() {
 show_style_menu() {
   case $(dotarchy-display-menu "Style" "󰸌  Themes\n  Background\n  Hyprland") in
   *Themes*) show_theme_menu ;;
-  # *Background*) dotarchy-background next ;;
+  *Next Background*) dotarchy-background next ;;
   *Background*) dotarchy-background-menu ;;
   *Hyprland*) open_in_editor ~/.config/hypr/looknfeel.conf ;;
   *) show_main_menu ;;
