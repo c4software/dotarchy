@@ -4,7 +4,7 @@ if pgrep -x waybar >/dev/null; then
   pkill -x waybar
 else
   if [[ "$XDG_CURRENT_DESKTOP" == "Niri" ]]; then
-    waybar >/dev/null 2>&1 &
+    waybar --config ~/.config/waybar/niri.jsonc >/dev/null 2>&1 &
   else
     uwsm-app -- waybar >/dev/null 2>&1 &
   fi
