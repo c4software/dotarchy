@@ -39,9 +39,9 @@ binds {
     Mod+Shift+5 hotkey-overlay-title="Move to workspace 5" { move-column-to-workspace 5; }
     Mod+Shift+6 hotkey-overlay-title="Move to workspace 6" { move-column-to-workspace 6; }
     Mod+Shift+7 hotkey-overlay-title="Move to workspace 7" { move-column-to-workspace 7; }
-    // Mod+Shift+minus hotkey-overlay-title="Move to workspace 8" { move-column-to-workspace 8; }
-    // Mod+Shift+slash hotkey-overlay-title="Move to workspace 9" { move-column-to-workspace 9; }
-    // Mod+Shift+asterisk hotkey-overlay-title="Move to workspace 10" { move-column-to-workspace 10; }
+    // Mod+Shift+8 hotkey-overlay-title="Move to workspace 8" { move-column-to-workspace 8; }
+    // Mod+Shift+9 hotkey-overlay-title="Move to workspace 9" { move-column-to-workspace 9; }
+    // Mod+Shift+10 hotkey-overlay-title="Move to workspace 10" { move-column-to-workspace 10; }
 
     // Swap windows with Mod + Shift + arrow keys
     Mod+Shift+Left hotkey-overlay-title="Move column left" { move-column-left; }
@@ -74,4 +74,7 @@ binds {
     // Move workspaces to other monitors
     Mod+Shift+Alt+Left hotkey-overlay-title="Move workspace left" { move-workspace-to-monitor-left; }
     Mod+Shift+Alt+Right hotkey-overlay-title="Move workspace right" { move-workspace-to-monitor-right; }
+
+    // Group/ungroup windows
+    Mod+G hotkey-overlay-title="Group/Ungroup window" { toggle-column-tabbed-display; }
 }
