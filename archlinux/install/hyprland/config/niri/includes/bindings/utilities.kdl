@@ -1,39 +1,39 @@
 binds {
     // Apps
-    Mod+Return { spawn "alacritty"; }
-    Mod+F { spawn "nautilus" "--new-window"; }
-    Mod+B { spawn "google-chrome-stable"; }
-    Mod+N { spawn "alacritty" "-e" "nvim"; }
-    Mod+T { spawn "alacritty" "--class" "TUI.float" "-e" "btop"; }
-    Mod+D { spawn "alacritty" "--class" "TUI.float" "-e" "lazydocker"; }
-    Mod+A { spawn "dotarchy-menu-ai"; }
+    Mod+Return hotkey-overlay-title="Terminal" { spawn "alacritty"; }
+    Mod+F hotkey-overlay-title="File manager" { spawn "nautilus" "--new-window"; }
+    Mod+B hotkey-overlay-title="Browser" { spawn "google-chrome-stable"; }
+    Mod+N hotkey-overlay-title="Neovim" { spawn "alacritty" "-e" "nvim"; }
+    Mod+T hotkey-overlay-title="System monitor" { spawn "alacritty" "--class" "TUI.float" "-e" "btop"; }
+    Mod+D hotkey-overlay-title="Docker UI" { spawn "alacritty" "--class" "TUI.float" "-e" "lazydocker"; }
+    Mod+A hotkey-overlay-title="AI menu" { spawn "dotarchy-menu-ai"; }
 
     // Menus
-    Mod+Space { spawn "rofi" "-show" "drun"; }
-    Mod+Ctrl+E { spawn "dotarchy-emoji-menu"; }
-    Mod+Alt+Space { spawn "omarchy-menu"; }
-    XF86AudioMedia { spawn "omarchy-menu"; }
-    Mod+Escape { spawn "omarchy-menu system"; }
-    XF86PowerOff { spawn "omarchy-menu system"; }
-    Mod+K { spawn "omarchy-menu-keybindings"; }
+    Mod+Space hotkey-overlay-title="Launch apps" { spawn "rofi" "-show" "drun"; }
+    Mod+Ctrl+E hotkey-overlay-title="Emoji menu" { spawn "dotarchy-emoji-menu"; }
+    Mod+Alt+Space hotkey-overlay-title="Omarchy menu" { spawn "omarchy-menu"; }
+    XF86AudioMedia hotkey-overlay-title="Omarchy menu" { spawn "omarchy-menu"; }
+    Mod+Escape hotkey-overlay-title="Power menu" { spawn "omarchy-menu system"; }
+    XF86PowerOff hotkey-overlay-title="Power menu" { spawn "omarchy-menu system"; }
+    Mod+K hotkey-overlay-title="Keybindings" { spawn "omarchy-menu-keybindings"; }
 
     // Aesthetics
-    Mod+Shift+Space { spawn "omarchy-toggle-waybar"; }
-    Mod+Ctrl+Space { spawn "dotarchy-background" "next"; }
-    Mod+Shift+Ctrl+Space { spawn "omarchy-menu" "theme"; }
+    Mod+Shift+Space hotkey-overlay-title="Toggle top bar" { spawn "omarchy-toggle-waybar"; }
+    Mod+Ctrl+Space hotkey-overlay-title="Next background" { spawn "dotarchy-background" "next"; }
+    Mod+Shift+Ctrl+Space hotkey-overlay-title="Theme picker" { spawn "omarchy-menu" "theme"; }
 
     // Notifications
-    Mod+Comma { spawn "makoctl" "dismiss"; }
-    Mod+Shift+Comma { spawn "makoctl" "dismiss" "--all"; }
-    Mod+Ctrl+Comma { spawn "sh" "-c" "makoctl mode -t do-not-disturb && makoctl mode | grep -q 'do-not-disturb' && notify-send 'Silenced notifications' || notify-send 'Enabled notifications' && pkill -RTMIN+9 waybar"; }
+    Mod+Comma hotkey-overlay-title="Dismiss notification" { spawn "makoctl" "dismiss"; }
+    Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "makoctl" "dismiss" "--all"; }
+    Mod+Ctrl+Comma hotkey-overlay-title="Toggle DND" { spawn "sh" "-c" "makoctl mode -t do-not-disturb && makoctl mode | grep -q 'do-not-disturb' && notify-send 'Silenced notifications' || notify-send 'Enabled notifications' && pkill -RTMIN+9 waybar"; }
 
     // Toggle idling
-    Mod+Ctrl+I { spawn "omarchy-toggle-idle"; }
+    Mod+Ctrl+I hotkey-overlay-title="Toggle idle lock" { spawn "omarchy-toggle-idle"; }
 
     // Screenshots
-    Print { spawn "omarchy-menu" "capture"; }
-    Alt+Shift+4 { spawn "omarchy-menu" "capture"; }
+    Print hotkey-overlay-title="Capture menu" { spawn "omarchy-menu" "capture"; }
+    Alt+Shift+4 hotkey-overlay-title="Capture menu" { spawn "omarchy-menu" "capture"; }
 
     // Color picker
-    Mod+Print { spawn "sh" "-c" "pkill hyprpicker || hyprpicker -a"; }
+    Mod+Print hotkey-overlay-title="Color picker" { spawn "sh" "-c" "pkill hyprpicker || hyprpicker -a"; }
 }

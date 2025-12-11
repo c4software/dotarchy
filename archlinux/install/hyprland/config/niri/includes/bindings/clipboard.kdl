@@ -1,5 +1,5 @@
 binds {
-   Mod+C { spawn "wtype" "-M" "ctrl" "-P" "Insert" "-m" "ctrl"; }
-   Mod+V { spawn "wtype" "-M" "shift" "-P" "Insert" "-m" "shift"; }
-   Mod+X { spawn "wtype" "-M" "ctrl" "-P" "x" "-m" "ctrl"; }
+   Mod+C hotkey-overlay-title="Copy" { spawn "wtype" "-M" "ctrl" "-P" "Insert" "-m" "ctrl"; }
+   Mod+V hotkey-overlay-title="Paste" { spawn "wtype" "-M" "shift" "-P" "Insert" "-m" "shift"; }
+   Mod+X hotkey-overlay-title="Cut" { spawn "wtype" "-M" "ctrl" "-P" "x" "-m" "ctrl"; }
 }
