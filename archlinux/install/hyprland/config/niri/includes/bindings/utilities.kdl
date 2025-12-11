@@ -8,6 +8,9 @@ binds {
     Mod+D hotkey-overlay-title="Docker UI" { spawn "alacritty" "--class" "TUI.float" "-e" "lazydocker"; }
     Mod+A hotkey-overlay-title="AI menu" { spawn "dotarchy-menu-ai"; }
 
+    // Lock screen
+    Mod+L hotkey-overlay-title="Lock screen" { spawn "swaylock" "--screenshot" "--effect-blur" "7x5" "--effect-vignette" "0.5:0.5"; }
+
     // Menus
     Mod+Space hotkey-overlay-title="Launch apps" { spawn "rofi" "-show" "drun"; }
     Mod+Ctrl+E hotkey-overlay-title="Emoji menu" { spawn "dotarchy-emoji-menu"; }
