@@ -1,8 +1,18 @@
 #!/bin/bash
 
+is_niri() {
+  [[ "$XDG_CURRENT_DESKTOP" == "Niri" ]]
+  return $?
+}
+
 echo "Installing all dependencies..."
 sudo pacman -S --noconfirm --needed dropbox dropbox-cli libappindicator-gtk3 python-gpgme nautilus-dropbox
 
 echo "Starting Dropbox..."
-uwsm-app -- dropbox-cli start &>/dev/null &
+if is_niri; then
+    dropbox start &>/dev/null &
+else
+    uwsm-app -- dropbox start &>/dev/null &
+fi
+
 echo "See Dropbox icon behind   hover tray in top right and right-click for setup."

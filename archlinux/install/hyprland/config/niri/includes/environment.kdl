@@ -2,6 +2,9 @@ environment {
     XCURSOR_SIZE "24"
     HYPRCURSOR_SIZE "24"
 
+    TERMINAL "alacritty"
+    EDITOR "nvim"
+
     GDK_BACKEND "wayland,x11,*"
     QT_QPA_PLATFORM "wayland;xcb"
     QT_STYLE_OVERRIDE "kvantum"

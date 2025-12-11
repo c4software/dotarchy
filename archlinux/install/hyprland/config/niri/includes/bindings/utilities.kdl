@@ -30,9 +30,6 @@ binds {
     Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "makoctl" "dismiss" "--all"; }
     Mod+Ctrl+Comma hotkey-overlay-title="Toggle DND" { spawn "sh" "-c" "makoctl mode -t do-not-disturb && makoctl mode | grep -q 'do-not-disturb' && notify-send 'Silenced notifications' || notify-send 'Enabled notifications' && pkill -RTMIN+9 waybar"; }
 
-    // Toggle idling
-    Mod+Ctrl+I hotkey-overlay-title="Toggle idle lock" { spawn "omarchy-toggle-idle"; }
-
     // Screenshots
     Print hotkey-overlay-title="Capture menu" { spawn "omarchy-menu" "capture"; }
     Alt+Shift+4 hotkey-overlay-title="Capture menu" { spawn "omarchy-menu" "capture"; }

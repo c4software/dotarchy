@@ -162,7 +162,7 @@ show_setup_power_menu() {
 show_setup_config_menu() {
   local options="Setup" "  Hyprland\n  Hypridle\n  Hyprlock\n  Swayosd\n󰍜  Waybar"
   if is_niri; then
-    options="Setup" "  Niri\n  Hypridle\n  Hyprlock\n  Swayosd\n󰍜  Waybar"
+    options="Setup" "  Niri\n  Hyprlock\n  Swayosd\n󰍜  Waybar"
   fi
 
   case $(dotarchy-display-menu "Setup" "$options") in
