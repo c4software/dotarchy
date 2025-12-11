@@ -32,13 +32,13 @@ binds {
     // Mod+asterisk hotkey-overlay-title="Workspace 10" { focus-workspace 10; }
 
     // Move active window to workspace with Mod + Shift + [1-9,0]
-    Mod+Shift+quotedbl hotkey-overlay-title="Move to workspace 1" { move-column-to-workspace 1; }
-    Mod+Shift+less hotkey-overlay-title="Move to workspace 2" { move-column-to-workspace 2; }
-    Mod+Shift+greater hotkey-overlay-title="Move to workspace 3" { move-column-to-workspace 3; }
-    Mod+Shift+parenleft hotkey-overlay-title="Move to workspace 4" { move-column-to-workspace 4; }
-    Mod+Shift+parenright hotkey-overlay-title="Move to workspace 5" { move-column-to-workspace 5; }
-    Mod+Shift+at hotkey-overlay-title="Move to workspace 6" { move-column-to-workspace 6; }
-    Mod+Shift+plus hotkey-overlay-title="Move to workspace 7" { move-column-to-workspace 7; }
+    Mod+Shift+1 hotkey-overlay-title="Move to workspace 1" { move-column-to-workspace 1; }
+    Mod+Shift+2 hotkey-overlay-title="Move to workspace 2" { move-column-to-workspace 2; }
+    Mod+Shift+3 hotkey-overlay-title="Move to workspace 3" { move-column-to-workspace 3; }
+    Mod+Shift+4 hotkey-overlay-title="Move to workspace 4" { move-column-to-workspace 4; }
+    Mod+Shift+5 hotkey-overlay-title="Move to workspace 5" { move-column-to-workspace 5; }
+    Mod+Shift+6 hotkey-overlay-title="Move to workspace 6" { move-column-to-workspace 6; }
+    Mod+Shift+7 hotkey-overlay-title="Move to workspace 7" { move-column-to-workspace 7; }
     // Mod+Shift+minus hotkey-overlay-title="Move to workspace 8" { move-column-to-workspace 8; }
     // Mod+Shift+slash hotkey-overlay-title="Move to workspace 9" { move-column-to-workspace 9; }
     // Mod+Shift+asterisk hotkey-overlay-title="Move to workspace 10" { move-column-to-workspace 10; }
