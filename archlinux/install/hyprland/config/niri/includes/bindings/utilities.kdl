@@ -15,7 +15,7 @@ binds {
     XF86AudioMedia hotkey-overlay-title="Omarchy menu" { spawn "omarchy-menu"; }
     Mod+Escape hotkey-overlay-title="Power menu" { spawn "omarchy-menu system"; }
     XF86PowerOff hotkey-overlay-title="Power menu" { spawn "omarchy-menu system"; }
-    Mod+K hotkey-overlay-title="Keybindings" { spawn "omarchy-menu-keybindings"; }
+    Mod+K hotkey-overlay-title="Keybindings" { spawn "dotarchy-menu-keybindings-niri"; }
 
     // Aesthetics
     Mod+Shift+Space hotkey-overlay-title="Toggle top bar" { spawn "omarchy-toggle-waybar"; }
