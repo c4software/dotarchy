@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# A script to display niri keybindings defined in your configuration
+# using rofi for an interactive search menu.
+
+# Fetch keybindings from niri config
+#
+# Parse all KDL config files and extract keybinds
+dynamic_bindings() {
+  # Find niri config directory
+  config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/niri"
+  
+  if [[ ! -d "$config_dir" ]]; then
+    echo "Error: niri config directory not found at $config_dir" >&2
+    return 1
+  fi
+  
+  # Find all .kdl files in the config directory and subdirectories
+  find "$config_dir" -type f -name "*.kdl" -print0 | while IFS= read -r -d '' config_file; do
+    # Parse keybinds from each KDL config file
+    # Look for lines in binds {} blocks
+    awk '
+      BEGIN { in_binds = 0; }
+      
+      # Detect binds block
+      /^[[:space:]]*binds[[:space:]]*{/ { in_binds = 1; next; }
+      
+      # Exit binds block
+      /^[[:space:]]*}/ { 
+        if (in_binds == 1) in_binds = 0;
+        next;
+      }
+      
+      # Process lines within binds block
+      in_binds == 1 {
+        # Skip comments and empty lines
+        if ($0 ~ /^[[:space:]]*\/\// || $0 ~ /^[[:space:]]*$/) next;
+        
+        line = $0;
+        
+        # Extract hotkey-overlay-title if present
+        description = "";
+        if (match(line, /hotkey-overlay-title="([^"]*)"/, arr)) {
+          description = arr[1];
+        }
+        
+        # Only process if we have a description
+        if (description == "") next;
+        
+        # Extract the key combination (everything before properties or {)
+        if (match(line, /^[[:space:]]*([^{]+)/, arr)) {
+          keybind = arr[1];
+          
+          # Clean up: remove all properties (hotkey-overlay-title, allow-when-locked, etc.)
+          gsub(/[[:space:]]*hotkey-overlay-title="[^"]*"/, "", keybind);
+          gsub(/[[:space:]]*allow-when-locked=[^[:space:]]*/, "", keybind);
+          gsub(/[[:space:]]*allow-inhibiting=[^[:space:]]*/, "", keybind);
+          gsub(/^[[:space:]]+|[[:space:]]+$/, "", keybind);
+          
+          # Normalize modifier names
+          gsub(/Mod\+/, "SUPER+", keybind);
+          gsub(/Shift\+/, "SHIFT+", keybind);
+          gsub(/Ctrl\+/, "CTRL+", keybind);
+          gsub(/Alt\+/, "ALT+", keybind);
+          
+          # Output in CSV format
+          print keybind "," description;
+        }
+      }
+    ' "$config_file"
+  done | \
+    sort -u
+}
+
+# Parse and format keybindings
+parse_bindings() {
+  awk -F, '
+{
+    # Get key combination
+    key_combo = $1;
+    
+    # Clean up key combo
+    gsub(/^[ \t]+|[ \t]+$/, "", key_combo);
+    gsub(/\+/, " + ", key_combo);
+    gsub(/[ \t]+/, " ", key_combo);
+    
+    # Get description
+    description = $2;
+    gsub(/^[ \t]+|[ \t]+$/, "", description);
+    
+    if (description != "") {
+        printf "%-35s → %s\n", key_combo, description;
+    }
+}'
+}
+
+dynamic_bindings | parse_bindings | \
+  rofi -i -dmenu -theme-str "window { padding: 10px; } listview { lines: 10; }" "${args[@]}"
