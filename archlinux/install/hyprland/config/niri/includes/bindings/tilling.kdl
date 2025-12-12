@@ -9,6 +9,9 @@ binds {
     Mod+Alt+Left hotkey-overlay-title="Expand to width" { expand-column-to-available-width; }
     Mod+Alt+Right hotkey-overlay-title="Expand to width" { expand-column-to-available-width; }
 
+    // Detached fullscreen windows
+    Mod+F11 hotkey-overlay-title="Toggle windowed fullscreen" { toggle-windowed-fullscreen; }
+
     // Center floating window (Niri handles floating differently)
     Mod+P hotkey-overlay-title="Center column" { center-column; }
 
@@ -18,7 +21,7 @@ binds {
     Mod+Up hotkey-overlay-title="Focus workspace up" { focus-workspace-up; }
     Mod+Down hotkey-overlay-title="Focus workspace down" { focus-workspace-down; }
 
-    // Switch workspaces with Mod + [1-9,0]
+    // Switch workspaces with Mod + [1-9,0] (in bépo)
     Mod+quotedbl hotkey-overlay-title="Workspace 1" { focus-workspace 1; }
     Mod+less hotkey-overlay-title="Workspace 2" { focus-workspace 2; }
     Mod+greater hotkey-overlay-title="Workspace 3" { focus-workspace 3; }
