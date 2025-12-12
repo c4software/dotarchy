@@ -1,7 +1,6 @@
 binds {
     // Close windows
     Mod+W hotkey-overlay-title="Close window" { close-window; }
-    Mod+Q hotkey-overlay-title="Close window" { close-window; }
 
     // Control tiling and window modes
     F11 hotkey-overlay-title="Maximize column" { fullscreen-window; }
@@ -76,5 +75,7 @@ binds {
     Mod+Shift+Alt+Right hotkey-overlay-title="Move workspace right" { move-workspace-to-monitor-right; }
 
     // Group/ungroup windows
-    Mod+G hotkey-overlay-title="Group/Ungroup window" { toggle-column-tabbed-display; }
+    Mod+G hotkey-overlay-title="Group/Ungroup window into tabbed display" { toggle-column-tabbed-display; }
+    Mod+Q hotkey-overlay-title="Comsume window into the group" { consume-window-into-column; }
+    Mod+H hotkey-overlay-title="Expel window from the group" { expel-window-from-column; }
 }
