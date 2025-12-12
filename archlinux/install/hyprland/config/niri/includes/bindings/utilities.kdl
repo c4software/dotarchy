@@ -10,6 +10,7 @@ binds {
 
     // Lock screen
     Mod+L hotkey-overlay-title="Lock screen" { spawn "swaylock" "--screenshot" "--effect-blur" "7x5" "--effect-vignette" "0.5:0.5"; }
+    Mod+Shift+L hotkey-overlay-title="Start Screensaver" { spawn "omarchy-launch-screensaver"; }
 
     // Menus
     Mod+Space hotkey-overlay-title="Launch apps" { spawn "rofi" "-show" "drun"; }
