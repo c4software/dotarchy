@@ -10,6 +10,8 @@ window-rule {
     match app-id="^Screensaver$"
     open-maximized true
     open-maximized-to-edges true
+    open-fullscreen true
+    
     focus-ring {
       off
     }

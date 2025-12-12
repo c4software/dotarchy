@@ -4,7 +4,7 @@ binds {
     Mod+Q hotkey-overlay-title="Close window" { close-window; }
 
     // Control tiling and window modes
-    Shift+F11 hotkey-overlay-title="Maximize column" { maximize-column; }
+    F11 hotkey-overlay-title="Maximize column" { fullscreen-window; }
     Mod+Alt+Up hotkey-overlay-title="Maximize column" { maximize-column; }
     Mod+Alt+Down hotkey-overlay-title="Restore column" { maximize-column; }
     Mod+Alt+Left hotkey-overlay-title="Expand to width" { expand-column-to-available-width; }
