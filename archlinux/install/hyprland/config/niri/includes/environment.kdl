@@ -5,7 +5,6 @@ environment {
     TERMINAL "alacritty"
     EDITOR "nvim"
 
-    GDK_BACKEND "wayland,x11,*"
     QT_QPA_PLATFORM "wayland;xcb"
     QT_STYLE_OVERRIDE "kvantum"
     SDL_VIDEODRIVER "wayland"

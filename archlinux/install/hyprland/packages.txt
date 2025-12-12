@@ -32,6 +32,7 @@ swaybg
 swayosd
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
+xdg-desktop-portal-gnome
 wiremix
 pamixer
 bluetui
