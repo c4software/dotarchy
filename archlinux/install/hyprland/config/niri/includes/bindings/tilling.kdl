@@ -26,9 +26,6 @@ binds {
     Mod+parenright hotkey-overlay-title="Workspace 5" { focus-workspace 5; }
     Mod+at hotkey-overlay-title="Workspace 6" { focus-workspace 6; }
     Mod+plus hotkey-overlay-title="Workspace 7" { focus-workspace 7; }
-    // Mod+minus hotkey-overlay-title="Workspace 8" { focus-workspace 8; }
-    // Mod+slash hotkey-overlay-title="Workspace 9" { focus-workspace 9; }
-    // Mod+asterisk hotkey-overlay-title="Workspace 10" { focus-workspace 10; }
 
     // Move active window to workspace with Mod + Shift + [1-9,0]
     Mod+Shift+1 hotkey-overlay-title="Move to workspace 1" { move-column-to-workspace 1; }
@@ -38,9 +35,6 @@ binds {
     Mod+Shift+5 hotkey-overlay-title="Move to workspace 5" { move-column-to-workspace 5; }
     Mod+Shift+6 hotkey-overlay-title="Move to workspace 6" { move-column-to-workspace 6; }
     Mod+Shift+7 hotkey-overlay-title="Move to workspace 7" { move-column-to-workspace 7; }
-    // Mod+Shift+8 hotkey-overlay-title="Move to workspace 8" { move-column-to-workspace 8; }
-    // Mod+Shift+9 hotkey-overlay-title="Move to workspace 9" { move-column-to-workspace 9; }
-    // Mod+Shift+10 hotkey-overlay-title="Move to workspace 10" { move-column-to-workspace 10; }
 
     // Swap windows with Mod + Shift + arrow keys
     Mod+Shift+Left hotkey-overlay-title="Move column left" { move-column-left; }
@@ -48,19 +42,10 @@ binds {
     Mod+Shift+Up hotkey-overlay-title="Move window up" { move-window-up; }
     Mod+Shift+Down hotkey-overlay-title="Move window down" { move-window-down; }
 
-    // Navigate between workspaces
-    // Mod+Tab { focus-workspace-down; }
-    Mod+Shift+Tab hotkey-overlay-title="Previous workspace" { focus-workspace-up; }
-    Mod+Ctrl+Tab hotkey-overlay-title="Last workspace" { focus-workspace-previous; }
-
     // Search for applications/windows
     Mod+Tab hotkey-overlay-title="Search windows" { spawn "rofi" "-show" "window"; }
 
     // Resize active window
-    Mod+Minus hotkey-overlay-title="Shrink width" { set-column-width "-10%"; }
-    Mod+Equal hotkey-overlay-title="Expand width" { set-column-width "+10%"; }
-    Mod+Shift+Minus hotkey-overlay-title="Shrink height" { set-window-height "-10%"; }
-    Mod+Shift+Equal hotkey-overlay-title="Expand height" { set-window-height "+10%"; }
     Alt+Left hotkey-overlay-title="Shrink width" { set-column-width "-10%"; }
     Alt+Right hotkey-overlay-title="Expand width" { set-column-width "+10%"; }
     Alt+Up hotkey-overlay-title="Shrink height" { set-window-height "-10%"; }
