@@ -45,3 +45,6 @@ impala
 satty
 wf-recorder
 rofi
+
+# Niri related packages
+niri
