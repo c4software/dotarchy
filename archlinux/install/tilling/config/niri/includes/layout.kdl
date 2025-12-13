@@ -152,6 +152,11 @@ layout {
         top 8
         bottom 8
     }
+
+    // Tab indicator settings.
+    tab-indicator {
+        position "top"
+    }
 }
 
 prefer-no-csd

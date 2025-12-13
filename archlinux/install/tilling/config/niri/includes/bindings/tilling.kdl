@@ -45,8 +45,8 @@ binds {
     Mod+Shift+Up hotkey-overlay-title="Move window up" { move-window-up; }
     Mod+Shift+Down hotkey-overlay-title="Move window down" { move-window-down; }
 
-    // Search for applications/windows
-    Mod+Tab hotkey-overlay-title="Search windows" { spawn "rofi" "-show" "window"; }
+    // Overview mode
+    Mod+Tab hotkey-overlay-title="Toggle overview" { toggle-overview; }
 
     // Resize active window
     Alt+Left hotkey-overlay-title="Shrink width" { set-column-width "-10%"; }
