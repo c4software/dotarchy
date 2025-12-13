@@ -33,7 +33,7 @@ binds {
 
     // Screenshots
     Print hotkey-overlay-title="Capture menu" { spawn "omarchy-menu" "capture"; }
-    Alt+Shift+4 hotkey-overlay-title="Capture menu" { spawn "omarchy-menu" "capture"; }
+    Alt+Shift+4 hotkey-overlay-title="Capture menu" { screenshot }
 
     // Color picker
     Mod+Print hotkey-overlay-title="Color picker" { spawn "sh" "-c" "pkill hyprpicker || hyprpicker -a"; }
