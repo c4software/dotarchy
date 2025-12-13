@@ -5,7 +5,7 @@ weight: 6
 
 ## Hyprland Configuration
 
-Hyprland is a dynamic tiling Wayland compositor based on wlroots that doesn't sacrifice on its looks. The configuration for Hyprland is located in `archlinux/install/hyprland/config/hypr`.
+Hyprland is a dynamic tiling Wayland compositor based on wlroots that doesn't sacrifice on its looks. The configuration for Hyprland is located in `archlinux/install/tilling/config/hypr`.
 
 ### Structure
 
@@ -33,7 +33,7 @@ The look and feel of Hyprland, including colors and styles for other application
 
 ### Scripts
 
-A collection of useful scripts is available in `archlinux/install/hyprland/bin`. These scripts handle tasks like taking screenshots, managing power profiles, launching menus, and controlling system settings.
+A collection of useful scripts is available in `archlinux/install/tilling/bin`. These scripts handle tasks like taking screenshots, managing power profiles, launching menus, and controlling system settings.
 
 ### Global menu
 

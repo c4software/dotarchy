@@ -65,11 +65,11 @@ if gum confirm "Do you want to run config setup scripts?"; then
   done
 fi
 
-# Asking for user confirmation before enable hyprland
-if gum confirm "Do you want to install Hyprland and default configuration?"; then
+# Asking for user confirmation before enable tilling (hyprland and niri)
+if gum confirm "Do you want to install Tilling (Hyprland and Niri) and default configuration?"; then
   (
     clear
-    source "$SCRIPT_DIR/install/hyprland/setup.sh"
+    source "$SCRIPT_DIR/install/tilling/setup.sh"
     setup
   )
 fi

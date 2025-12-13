@@ -34,7 +34,7 @@ for script in "$SCRIPT_DIR/install/config/"*.sh; do
 done
 
 (
-    source "$SCRIPT_DIR/install/hyprland/setup.sh"
+    source "$SCRIPT_DIR/install/tilling/setup.sh"
     check
 )
 

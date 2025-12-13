@@ -4,7 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 function setup() {
     # Check for --skip-packages flag
     if [ "$1" != "--skip-packages" ]; then
-        echo -e "Installing Hyprland"
+        echo -e "Installing Hyprland and Niri packages"
 
         # Install with pacman the packages.txt
         grep -v "^#" "$SCRIPT_DIR/packages.txt" | sudo pacman -S --noconfirm --needed -
@@ -57,15 +57,21 @@ function setup() {
 
 function check() {
     if command -v hyprctl &>/dev/null; then
-        show_success "Hyprland"
+        show_success "Hyprland & Niri"
     else
-        show_error "Hyprland" "Hyprland is not installed."
+        show_error "Hyprland & Niri" "Hyprland and Niri are not installed."
     fi
 
     if [ -d ~/.config/hypr ]; then
         show_success "Hyprland Configuration"
     else
         show_error "Hyprland Configuration" "Hyprland configuration is not set up."
+    fi
+
+    if [ -d ~/.config/niri ]; then
+        show_success "Niri Configuration"
+    else
+        show_error "Niri Configuration" "Niri configuration is not set up."
     fi
 
     if command -v systemctl &> /dev/null; then
@@ -93,13 +99,13 @@ function check() {
     done
 
     if [ ${#missing_scripts[@]} -eq 0 ]; then
-        show_success "Hyprland Bin Scripts"
+        show_success "Hyprland & Niri Bin Scripts"
     else
         local error_msg="The following scripts are missing in ~/.local/bin:"
         for script in "${missing_scripts[@]}"; do
             error_msg+="\n\t- $script"
         done
-        show_error "Hyprland Bin Scripts" "$error_msg" 
+        show_error "Hyprland & Niri Bin Scripts" "$error_msg" 
     fi
 
     # Greetd check
@@ -110,7 +116,7 @@ function check() {
             show_error "greetd Service" "greetd service is not running."
         fi
     else
-        show_warning "greetd" "greetd is not installed. You can install it by running ./install/hyprland/greetd.sh"
+        show_warning "greetd" "greetd is not installed. You can install it by running ./install/tilling/greetd.sh"
     fi
 }
 

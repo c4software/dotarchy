@@ -29,5 +29,5 @@ if [ "$1" == "--all" ]; then
     setup
 fi
 
-# Update Hyprland (without reinstalling packages)
-./archlinux/install/hyprland/setup.sh --skip-packages
+# Update Tilling Hyprland and Niri (without reinstalling packages)
+./archlinux/install/tilling/setup.sh --skip-packages

@@ -5,7 +5,7 @@ This repository contains installation and configuration scripts for Arch Linux a
 ![Screenshot](./docs/static/screenshot.jpg)
 
 ⚠️ The Hyprland setup is massively extracted/inspired from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
-[Hyprland Keybindings reference](./archlinux/install/hyprland/README.md)
+[Hyprland Keybindings reference](./archlinux/install/tilling/README.md)
 
 [Documentation](https://c4software.github.io/dotarchy/)
 
@@ -46,7 +46,7 @@ You can run `./dotarchy-doctor.sh` to check if your current setup is correct and
 
 ### Keybindings reference
 
-[Keybindings reference](./install/hyprland/README.md)
+[Keybindings reference](./install/tilling/README.md)
 
 ## Main Structure
 
@@ -57,7 +57,7 @@ You can run `./dotarchy-doctor.sh` to check if your current setup is correct and
 - Each distribution contains an `install/` folder with:
   - `apps/`: CLI applications and tools installation.
   - `desktop/`: Desktop environment apps and fonts.
-  - `hyprland/`, `config/`, etc. depending on the distribution.
+  - `tilling/`, `config/`, etc. depending on the distribution.
 
 ## Customization
 
@@ -115,7 +115,6 @@ You can run `./dotarchy-doctor.sh` to check if your current setup is correct and
 - **iA Writer**
 - **Google Noto Fonts (Sans, Emoji, CJK, and Extra)**
 - **JetBrains Mono**
-
 
 ## Contributing
 

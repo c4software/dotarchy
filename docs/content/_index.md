@@ -43,20 +43,20 @@ If you want to install only specific parts of Dotarchy, such as the Hyprland set
 
 ```bash
 cd ~/dotarchy/
-(source /install/hyprland/setup.sh && setup)
+(source /install/tilling/setup.sh && setup)
 ```
 
-## Only update Hyprland configuration
+## Only update Hyprland & Niri configuration
 
-To update only the Hyprland configuration files without installing packages, you can run:
+To update only the Hyprland and Niri configuration files without installing packages, you can run:
 
 ```bash
 ./update.sh
 ```
 
-## Dotfiles and Hyprland update
+## Dotfiles and Hyprland & Niri update
 
-To update the dotfiles and Hyprland setup, run:
+To update the dotfiles and Hyprland & Niri setup, run:
 
 ```bash
 ./update.sh --all
