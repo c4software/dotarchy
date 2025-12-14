@@ -1,98 +1,38 @@
-# Hyprland - Keyboard Shortcuts
+# Tiling Window Managers
 
-![Screenshot](../../../docs/static/screenshot.jpg)
+Configuration et documentation pour les gestionnaires de fenêtres en mosaïque (tiling window managers).
 
-### Window Management
+## Gestionnaires disponibles
 
-| Shortcut | Description |
-| :--- | :--- |
-| `SUPER + W` | Close the active window |
-| `SUPER + J` | Toggle "split" (division) |
-| `SUPER + P` | Toggle centerered floating mode |
-| `SHIFT + F11` | Force fullscreen |
-| `SUPER + ALT +  ↑/↓` | Toggle monocle mode (fullscreen with background window management) |
-| `SUPER + ←/→/↑/↓` | Move focus |
-| `SUPER + [0-9]` | Switch to workspace |
-| `SUPER + SHIFT + [0-9]` | Move window to workspace |
-| `SUPER + TAB` | Next workspace |
-| `SUPER + SHIFT + TAB` | Previous workspace |
-| `SUPER + SHIFT + ←/→/↑/↓` | Swap active window with neighbor |
-| `ALT + Tab` | Next window in workspace |
-| `ALT + SHIFT + Tab` | Previous window in workspace |
-| `SUPER + -/=` | Resize window horizontally |
-| `SUPER + SHIFT + -/=` | Resize window vertically |
-| `ALT + ←/→/↑/↓` | Resize window horizontally/vertically |
-| `SUPER + Mouse wheel` | Scroll through workspaces |
-| `SUPER + Left click` | Move window |
-| `SUPER + Right click` | Resize window |
-| `SUPER + G` | Toggle grouped windows |
-| `SUPER + ALT + G` | Move window out of group |
-| `SUPER + ALT + TAB` | Next window in group |
-| `SUPER + ALT + SHIFT + TAB` | Previous window in group |
+### Niri
 
----
+Niri est un gestionnaire de fenêtres Wayland scrollable avec un modèle de fenêtrage unique basé sur des colonnes.
 
-### Clipboard
+**Documentation complète des raccourcis clavier :** [config/niri/README.md](config/niri/README.md)
 
-| Shortcut | Description |
-| :--- | :--- |
-| `SUPER + C` | Copy |
-| `SUPER + V` | Paste |
+### Hyprland
 
----
+Hyprland est un compositeur Wayland dynamique avec des animations fluides et une configuration flexible.
 
-### Applications
+**Documentation complète des raccourcis clavier :** [config/hypr/README.md](config/hypr/README.md)
 
-| Shortcut | Description |
-| :--- | :--- |
-| `SUPER + Enter` | Launch terminal |
-| `SUPER + F` | Launch file manager |
-| `SUPER + B` | Launch browser |
-| `SUPER + N` | Launch Neovim |
-| `SUPER + T` | Launch `btop` (activity monitor) |
-| `SUPER + D` | Launch `lazydocker` |
-| `SUPER + A` | Launch AI menu |
-| `SUPER + SHIFT + G` | Launch WhatsApp |
-| `SUPER + ALT + G` | Launch Google Messages |
+## Structure des fichiers
 
----
+```
+tilling/
+├── config/
+│   ├── hypr/          # Configuration Hyprland
+│   │   ├── README.md  # Raccourcis clavier Hyprland
+│   │   └── ...
+│   └── niri/          # Configuration Niri
+│       ├── README.md  # Raccourcis clavier Niri
+│       └── ...
+└── README.md          # Ce fichier
+```
 
-### Utilities
+## Notes
 
-| Shortcut | Description |
-| :--- | :--- |
-| `SUPER + Space` | Launch application menu (`rofi`) |
-| `SUPER + CTRL + E` | Show emoji menu |
-| `SUPER + ALT + Space` | Omarchy menu |
-| `SUPER + ESC` or `XF86PowerOff` | Power menu |
-| `SUPER + K` | Show keyboard shortcuts |
-| `SUPER + SHIFT + Space` | Show/hide top bar (`waybar`) |
-| `SUPER + CTRL + Space` | Next wallpaper in theme |
-| `SUPER + SHIFT + CTRL + Space` | Choose a new theme |
-| `SUPER + ,` | Dismiss last notification |
-| `SUPER + SHIFT + ,` | Dismiss all notifications |
-| `SUPER + CTRL + ,` | Toggle silent mode for notifications |
-| `SUPER + CTRL + I` | Toggle lock on inactivity |
-| `Print Screen` | Screenshot menu |
-| `SUPER + SHIFT + 4` | Screenshot menu |
-| `SUPER + Print Screen` | Color picker (`hyprpicker`) |
-
----
-
-### Media
-
-| Shortcut | Description |
-| :--- | :--- |
-| `XF86AudioRaiseVolume` | Increase volume |
-| `XF86AudioLowerVolume` | Decrease volume |
-| `XF86AudioMute` | Mute/unmute sound |
-| `XF86AudioMicMute` | Mute/unmute microphone |
-| `XF86MonBrightnessUp` | Increase brightness |
-| `XF86MonBrightnessDown` | Decrease brightness |
-| `ALT + XF86AudioRaiseVolume` | Increase volume (precise) |
-| `ALT + XF86AudioLowerVolume` | Decrease volume (precise) |
-| `ALT + XF86MonBrightnessUp` | Increase brightness (precise) |
-| `ALT + XF86MonBrightnessDown` | Decrease brightness (precise) |
-| `XF86AudioNext` | Next track |
-| `XF86AudioPause` / `XF86AudioPlay` | Play/pause |
-| `XF86AudioPrev` | Previous track |
+- Les deux gestionnaires utilisent des raccourcis similaires pour faciliter la transition
+- `Mod` / `SUPER` fait référence à la touche Super/Windows
+- La configuration Niri est optimisée pour le layout clavier bépo
+- Les deux configurations utilisent `swayosd-client` pour l'affichage OSD
