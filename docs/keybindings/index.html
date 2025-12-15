@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="
-  Hyprland - Keyboard Shortcuts
+  Niri - Keyboard Shortcuts
   
   #
   
@@ -25,96 +25,105 @@
   
   
       
-          SUPER &#43; W
+          Mod &#43; W
           Close the active window
       
       
-          SUPER &#43; J
-          Toggle &ldquo;split&rdquo; (division)
+          F11
+          Maximize column (fullscreen)
       
       
-          SUPER &#43; P
-          Toggle centered floating mode
+          Mod &#43; F11
+          Toggle windowed fullscreen
       
       
-          SHIFT &#43; F11
-          Force fullscreen
+          Mod &#43; P
+          Center column
       
       
-          SUPER &#43; ALT &#43; ↑/↓
-          Toggle monocle mode (fullscreen with background window management)
+          Mod &#43; Alt &#43; ↑
+          Maximize column
       
       
-          SUPER &#43; ←/→/↑/↓
-          Move focus
+          Mod &#43; Alt &#43; ↓
+          Restore column
       
       
-          SUPER &#43; [0-9]
-          Switch to workspace
+          Mod &#43; Alt &#43; ←/→
+          Expand column to available width
       
       
-          SUPER &#43; SHIFT &#43; [0-9]
-          Move window to workspace
+          Mod &#43; ←/→
+          Focus column left/right
       
       
-          SUPER &#43; TAB
-          Next workspace
+          Mod &#43; ↑/↓
+          Focus workspace up/down
       
       
-          SUPER &#43; SHIFT &#43; TAB
-          Previous workspace
+          Mod &#43; [1-7]
+          Switch to workspace (bépo layout)
       
       
-          SUPER &#43; SHIFT &#43; ←/→/↑/↓
-          Swap active window with neighbor
+          Mod &#43; Shift &#43; [1-7]
+          Move column to workspace
       
       
-          ALT &#43; Tab
-          Next window in workspace
+          Mod &#43; Tab
+          Toggle overview mode
       
       
-          ALT &#43; SHIFT &#43; Tab
-          Previous window in workspace
+          Mod &#43; Shift &#43; ←/→
+          Move column left/right
       
       
-          SUPER &#43; -/=
-          Resize window horizontally
+          Mod &#43; Shift &#43; ↑/↓
+          Move window up/down in column
       
       
-          SUPER &#43; SHIFT &#43; -/=
-          Resize window vertically
+          Alt &#43; ←/→
+          Resize column width (±10%)
       
       
-          ALT &#43; ←/→/↑/↓
-          Resize window horizontally/vertically
+          Alt &#43; ↑/↓
+          Resize window height (±10%)
       
       
-          SUPER &#43; Mouse wheel
+          Mod &#43; Mouse wheel
           Scroll through workspaces
       
       
-          SUPER &#43; Left click
-          Move window
+          Mod &#43; Shift &#43; Alt &#43; ←/→
+          Move workspace to other monitor
+      
+  
+
+
+
+  Grouping (Tabbed Windows)
+  
+  #
+  
+
+
+  
+      
+          Shortcut
+          Description
+      
+  
+  
+      
+          Mod &#43; G
+          Toggle tabbed display for column
       
       
-          SUPER &#43; Right click
-          Resize window
+          Mod &#43; Q
+          Consume window into column/group
       
       
-          SUPER &#43; G
-          Toggle grouped windows
-      
-      
-          SUPER &#43; ALT &#43; G
-          Move window out of group
-      
-      
-          SUPER &#43; ALT &#43; TAB
-          Next window in group
-      
-      
-          SUPER &#43; ALT &#43; SHIFT &#43; TAB
-          Previous window in group
+          Mod &#43; H
+          Expel window from column/group
       
   
 
@@ -134,12 +143,16 @@
   
   
       
-          SUPER &#43; C
+          Mod &#43; C
           Copy
       
       
-          SUPER &#43; V
+          Mod &#43; V
           Paste
+      
+      
+          Mod &#43; X
+          Cut
       
   
 
@@ -159,40 +172,32 @@
   
   
       
-          SUPER &#43; Enter
-          Launch terminal
+          Mod &#43; Enter
+          Launch terminal (alacritty)
       
       
-          SUPER &#43; F
-          Launch file manager
+          Mod &#43; F
+          Launch file manager (nautilus)
       
       
-          SUPER &#43; B
-          Launch browser
+          Mod &#43; B
+          Launch browser (Chrome)
       
       
-          SUPER &#43; N
+          Mod &#43; N
           Launch Neovim
       
       
-          SUPER &#43; T
-          Launch btop (activity monitor)
+          Mod &#43; T
+          Launch btop (system monitor)
       
       
-          SUPER &#43; D
+          Mod &#43; D
           Launch lazydocker
       
       
-          SUPER &#43; A
+          Mod &#43; A
           Launch AI menu
-      
-      
-          SUPER &#43; SHIFT &#43; G
-          Launch WhatsApp
-      
-      
-          SUPER &#43; ALT &#43; G
-          Launch Google Messages
       
   
 
@@ -212,63 +217,67 @@
   
   
       
-          SUPER &#43; Space
+          Mod &#43; Space
           Launch application menu (rofi)
       
       
-          SUPER &#43; CTRL &#43; E
-          Show emoji menu
+          Mod &#43; Ctrl &#43; E
+          Emoji menu
       
       
-          SUPER &#43; ALT &#43; Space
+          Mod &#43; Alt &#43; Space
           Omarchy menu
       
       
-          SUPER &#43; ESC or XF86PowerOff
+          Mod &#43; Escape or XF86PowerOff
           Power menu
       
       
-          SUPER &#43; K
+          Mod &#43; K
           Show keyboard shortcuts
       
       
-          SUPER &#43; SHIFT &#43; Space
-          Show/hide top bar (waybar)
+          Mod &#43; L
+          Lock screen
       
       
-          SUPER &#43; CTRL &#43; Space
-          Next wallpaper in theme
+          Mod &#43; Shift &#43; L
+          Start screensaver
       
       
-          SUPER &#43; SHIFT &#43; CTRL &#43; Space
-          Choose a new theme
+          Mod &#43; Shift &#43; Space
+          Toggle top bar (waybar)
       
       
-          SUPER &#43; ,
-          Dismiss last notification
+          Mod &#43; Ctrl &#43; Space
+          Next wallpaper
       
       
-          SUPER &#43; SHIFT &#43; ,
+          Mod &#43; Shift &#43; Ctrl &#43; Space
+          Theme picker
+      
+      
+          Mod &#43; ,
+          Dismiss notification
+      
+      
+          Mod &#43; Shift &#43; ,
           Dismiss all notifications
       
       
-          SUPER &#43; CTRL &#43; ,
-          Toggle silent mode for notifications
+          Mod &#43; Ctrl &#43; ,
+          Toggle Do Not Disturb mode
       
       
-          SUPER &#43; CTRL &#43; I
-          Toggle lock on inactivity
+          Print
+          Capture menu
       
       
-          Print Screen
-          Screenshot menu
+          Alt &#43; Shift &#43; 4
+          Screenshot
       
       
-          SUPER &#43; SHIFT &#43; 4
-          Screenshot menu
-      
-      
-          SUPER &#43; Print Screen
+          Mod &#43; Print
           Color picker (hyprpicker)
       
   
@@ -313,20 +322,20 @@
           Decrease brightness
       
       
-          ALT &#43; XF86AudioRaiseVolume
-          Increase volume (precise)
+          Alt &#43; XF86AudioRaiseVolume
+          Increase volume (&#43;1%)
       
       
-          ALT &#43; XF86AudioLowerVolume
-          Decrease volume (precise)
+          Alt &#43; XF86AudioLowerVolume
+          Decrease volume (-1%)
       
       
-          ALT &#43; XF86MonBrightnessUp
-          Increase brightness (precise)
+          Alt &#43; XF86MonBrightnessUp
+          Increase brightness (&#43;1%)
       
       
-          ALT &#43; XF86MonBrightnessDown
-          Decrease brightness (precise)
+          Alt &#43; XF86MonBrightnessDown
+          Decrease brightness (-1%)
       
       
           XF86AudioNext
@@ -347,7 +356,7 @@
 <meta name="color-scheme" content="light dark"><meta property="og:url" content="https://c4software.github.io/dotarchy/docs/keybindings/">
   <meta property="og:site_name" content="Dotarchy">
   <meta property="og:title" content="Keybindings">
-  <meta property="og:description" content="Hyprland - Keyboard Shortcuts # Window Management # Shortcut Description SUPER &#43; W Close the active window SUPER &#43; J Toggle “split” (division) SUPER &#43; P Toggle centered floating mode SHIFT &#43; F11 Force fullscreen SUPER &#43; ALT &#43; ↑/↓ Toggle monocle mode (fullscreen with background window management) SUPER &#43; ←/→/↑/↓ Move focus SUPER &#43; [0-9] Switch to workspace SUPER &#43; SHIFT &#43; [0-9] Move window to workspace SUPER &#43; TAB Next workspace SUPER &#43; SHIFT &#43; TAB Previous workspace SUPER &#43; SHIFT &#43; ←/→/↑/↓ Swap active window with neighbor ALT &#43; Tab Next window in workspace ALT &#43; SHIFT &#43; Tab Previous window in workspace SUPER &#43; -/= Resize window horizontally SUPER &#43; SHIFT &#43; -/= Resize window vertically ALT &#43; ←/→/↑/↓ Resize window horizontally/vertically SUPER &#43; Mouse wheel Scroll through workspaces SUPER &#43; Left click Move window SUPER &#43; Right click Resize window SUPER &#43; G Toggle grouped windows SUPER &#43; ALT &#43; G Move window out of group SUPER &#43; ALT &#43; TAB Next window in group SUPER &#43; ALT &#43; SHIFT &#43; TAB Previous window in group Clipboard # Shortcut Description SUPER &#43; C Copy SUPER &#43; V Paste Applications # Shortcut Description SUPER &#43; Enter Launch terminal SUPER &#43; F Launch file manager SUPER &#43; B Launch browser SUPER &#43; N Launch Neovim SUPER &#43; T Launch btop (activity monitor) SUPER &#43; D Launch lazydocker SUPER &#43; A Launch AI menu SUPER &#43; SHIFT &#43; G Launch WhatsApp SUPER &#43; ALT &#43; G Launch Google Messages Utilities # Shortcut Description SUPER &#43; Space Launch application menu (rofi) SUPER &#43; CTRL &#43; E Show emoji menu SUPER &#43; ALT &#43; Space Omarchy menu SUPER &#43; ESC or XF86PowerOff Power menu SUPER &#43; K Show keyboard shortcuts SUPER &#43; SHIFT &#43; Space Show/hide top bar (waybar) SUPER &#43; CTRL &#43; Space Next wallpaper in theme SUPER &#43; SHIFT &#43; CTRL &#43; Space Choose a new theme SUPER &#43; , Dismiss last notification SUPER &#43; SHIFT &#43; , Dismiss all notifications SUPER &#43; CTRL &#43; , Toggle silent mode for notifications SUPER &#43; CTRL &#43; I Toggle lock on inactivity Print Screen Screenshot menu SUPER &#43; SHIFT &#43; 4 Screenshot menu SUPER &#43; Print Screen Color picker (hyprpicker) Media # Shortcut Description XF86AudioRaiseVolume Increase volume XF86AudioLowerVolume Decrease volume XF86AudioMute Mute/unmute sound XF86AudioMicMute Mute/unmute microphone XF86MonBrightnessUp Increase brightness XF86MonBrightnessDown Decrease brightness ALT &#43; XF86AudioRaiseVolume Increase volume (precise) ALT &#43; XF86AudioLowerVolume Decrease volume (precise) ALT &#43; XF86MonBrightnessUp Increase brightness (precise) ALT &#43; XF86MonBrightnessDown Decrease brightness (precise) XF86AudioNext Next track XF86AudioPause / XF86AudioPlay Play/pause XF86AudioPrev Previous track">
+  <meta property="og:description" content="Niri - Keyboard Shortcuts # Window Management # Shortcut Description Mod &#43; W Close the active window F11 Maximize column (fullscreen) Mod &#43; F11 Toggle windowed fullscreen Mod &#43; P Center column Mod &#43; Alt &#43; ↑ Maximize column Mod &#43; Alt &#43; ↓ Restore column Mod &#43; Alt &#43; ←/→ Expand column to available width Mod &#43; ←/→ Focus column left/right Mod &#43; ↑/↓ Focus workspace up/down Mod &#43; [1-7] Switch to workspace (bépo layout) Mod &#43; Shift &#43; [1-7] Move column to workspace Mod &#43; Tab Toggle overview mode Mod &#43; Shift &#43; ←/→ Move column left/right Mod &#43; Shift &#43; ↑/↓ Move window up/down in column Alt &#43; ←/→ Resize column width (±10%) Alt &#43; ↑/↓ Resize window height (±10%) Mod &#43; Mouse wheel Scroll through workspaces Mod &#43; Shift &#43; Alt &#43; ←/→ Move workspace to other monitor Grouping (Tabbed Windows) # Shortcut Description Mod &#43; G Toggle tabbed display for column Mod &#43; Q Consume window into column/group Mod &#43; H Expel window from column/group Clipboard # Shortcut Description Mod &#43; C Copy Mod &#43; V Paste Mod &#43; X Cut Applications # Shortcut Description Mod &#43; Enter Launch terminal (alacritty) Mod &#43; F Launch file manager (nautilus) Mod &#43; B Launch browser (Chrome) Mod &#43; N Launch Neovim Mod &#43; T Launch btop (system monitor) Mod &#43; D Launch lazydocker Mod &#43; A Launch AI menu Utilities # Shortcut Description Mod &#43; Space Launch application menu (rofi) Mod &#43; Ctrl &#43; E Emoji menu Mod &#43; Alt &#43; Space Omarchy menu Mod &#43; Escape or XF86PowerOff Power menu Mod &#43; K Show keyboard shortcuts Mod &#43; L Lock screen Mod &#43; Shift &#43; L Start screensaver Mod &#43; Shift &#43; Space Toggle top bar (waybar) Mod &#43; Ctrl &#43; Space Next wallpaper Mod &#43; Shift &#43; Ctrl &#43; Space Theme picker Mod &#43; , Dismiss notification Mod &#43; Shift &#43; , Dismiss all notifications Mod &#43; Ctrl &#43; , Toggle Do Not Disturb mode Print Capture menu Alt &#43; Shift &#43; 4 Screenshot Mod &#43; Print Color picker (hyprpicker) Media # Shortcut Description XF86AudioRaiseVolume Increase volume XF86AudioLowerVolume Decrease volume XF86AudioMute Mute/unmute sound XF86AudioMicMute Mute/unmute microphone XF86MonBrightnessUp Increase brightness XF86MonBrightnessDown Decrease brightness Alt &#43; XF86AudioRaiseVolume Increase volume (&#43;1%) Alt &#43; XF86AudioLowerVolume Decrease volume (-1%) Alt &#43; XF86MonBrightnessUp Increase brightness (&#43;1%) Alt &#43; XF86MonBrightnessDown Decrease brightness (-1%) XF86AudioNext Next track XF86AudioPause / XF86AudioPlay Play/pause XF86AudioPrev Previous track">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
@@ -357,7 +366,7 @@
 <link rel="canonical" href="https://c4software.github.io/dotarchy/docs/keybindings/">
 <link rel="stylesheet" href="/dotarchy/book.min.8cccde2f1e7e4a5ea6c3869ce8a1df6c4204e7f83a0a84f40fdcf0f11db2c78c.css" integrity="sha256-jMzeLx5&#43;Sl6mw4ac6KHfbEIE5/g6CoT0D9zw8R2yx4w=" crossorigin="anonymous">
   <script defer src="/dotarchy/fuse.min.js"></script>
-  <script defer src="/dotarchy/en.search.min.b92209e8a57326e2fea2c3a775cf6eb99a146c9e14035d1fcc83d997b201833a.js" integrity="sha256-uSIJ6KVzJuL&#43;osOndc9uuZoUbJ4UA10fzIPZl7IBgzo=" crossorigin="anonymous"></script>
+  <script defer src="/dotarchy/en.search.min.4685c8a6aedc9db8afb0c07c61e70719c0ca1880e4a2cf2c913f3977cf10f87d.js" integrity="sha256-RoXIpq7cnbivsMB8YecHGcDKGIDkos8skT85d88Q&#43;H0=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -468,7 +477,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="/dotarchy/docs/hyprland/" class="">Hyprland</a>
+    <a href="/dotarchy/docs/niri/" class="">Niri</a>
   
 
         </li>
@@ -539,9 +548,10 @@ https://github.com/alex-shpak/hugo-book
 
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#hyprland---keyboard-shortcuts">Hyprland - Keyboard Shortcuts</a>
+    <li><a href="#niri---keyboard-shortcuts">Niri - Keyboard Shortcuts</a>
       <ul>
         <li><a href="#window-management">Window Management</a></li>
+        <li><a href="#grouping-tabbed-windows">Grouping (Tabbed Windows)</a></li>
         <li><a href="#clipboard">Clipboard</a></li>
         <li><a href="#applications">Applications</a></li>
         <li><a href="#utilities">Utilities</a></li>
@@ -560,10 +570,10 @@ https://github.com/alex-shpak/hugo-book
 
       
       
-<article class="markdown book-article"><h2 id="hyprland---keyboard-shortcuts">
-  Hyprland - Keyboard Shortcuts
+<article class="markdown book-article"><h2 id="niri---keyboard-shortcuts">
+  Niri - Keyboard Shortcuts
   
-  <a class="anchor" href="#hyprland---keyboard-shortcuts">#</a>
+  <a class="anchor" href="#niri---keyboard-shortcuts">#</a>
   
 </h2>
 <h3 id="window-management">
@@ -581,96 +591,105 @@ https://github.com/alex-shpak/hugo-book
   </thead>
   <tbody>
       <tr>
-          <td style="text-align: left"><code>SUPER + W</code></td>
+          <td style="text-align: left"><code>Mod + W</code></td>
           <td style="text-align: left">Close the active window</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + J</code></td>
-          <td style="text-align: left">Toggle &ldquo;split&rdquo; (division)</td>
+          <td style="text-align: left"><code>F11</code></td>
+          <td style="text-align: left">Maximize column (fullscreen)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + P</code></td>
-          <td style="text-align: left">Toggle centered floating mode</td>
+          <td style="text-align: left"><code>Mod + F11</code></td>
+          <td style="text-align: left">Toggle windowed fullscreen</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SHIFT + F11</code></td>
-          <td style="text-align: left">Force fullscreen</td>
+          <td style="text-align: left"><code>Mod + P</code></td>
+          <td style="text-align: left">Center column</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + ALT + ↑/↓</code></td>
-          <td style="text-align: left">Toggle monocle mode (fullscreen with background window management)</td>
+          <td style="text-align: left"><code>Mod + Alt + ↑</code></td>
+          <td style="text-align: left">Maximize column</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + ←/→/↑/↓</code></td>
-          <td style="text-align: left">Move focus</td>
+          <td style="text-align: left"><code>Mod + Alt + ↓</code></td>
+          <td style="text-align: left">Restore column</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + [0-9]</code></td>
-          <td style="text-align: left">Switch to workspace</td>
+          <td style="text-align: left"><code>Mod + Alt + ←/→</code></td>
+          <td style="text-align: left">Expand column to available width</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + SHIFT + [0-9]</code></td>
-          <td style="text-align: left">Move window to workspace</td>
+          <td style="text-align: left"><code>Mod + ←/→</code></td>
+          <td style="text-align: left">Focus column left/right</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + TAB</code></td>
-          <td style="text-align: left">Next workspace</td>
+          <td style="text-align: left"><code>Mod + ↑/↓</code></td>
+          <td style="text-align: left">Focus workspace up/down</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + SHIFT + TAB</code></td>
-          <td style="text-align: left">Previous workspace</td>
+          <td style="text-align: left"><code>Mod + [1-7]</code></td>
+          <td style="text-align: left">Switch to workspace (bépo layout)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + SHIFT + ←/→/↑/↓</code></td>
-          <td style="text-align: left">Swap active window with neighbor</td>
+          <td style="text-align: left"><code>Mod + Shift + [1-7]</code></td>
+          <td style="text-align: left">Move column to workspace</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>ALT + Tab</code></td>
-          <td style="text-align: left">Next window in workspace</td>
+          <td style="text-align: left"><code>Mod + Tab</code></td>
+          <td style="text-align: left">Toggle overview mode</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>ALT + SHIFT + Tab</code></td>
-          <td style="text-align: left">Previous window in workspace</td>
+          <td style="text-align: left"><code>Mod + Shift + ←/→</code></td>
+          <td style="text-align: left">Move column left/right</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + -/=</code></td>
-          <td style="text-align: left">Resize window horizontally</td>
+          <td style="text-align: left"><code>Mod + Shift + ↑/↓</code></td>
+          <td style="text-align: left">Move window up/down in column</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + SHIFT + -/=</code></td>
-          <td style="text-align: left">Resize window vertically</td>
+          <td style="text-align: left"><code>Alt + ←/→</code></td>
+          <td style="text-align: left">Resize column width (±10%)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>ALT + ←/→/↑/↓</code></td>
-          <td style="text-align: left">Resize window horizontally/vertically</td>
+          <td style="text-align: left"><code>Alt + ↑/↓</code></td>
+          <td style="text-align: left">Resize window height (±10%)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + Mouse wheel</code></td>
+          <td style="text-align: left"><code>Mod + Mouse wheel</code></td>
           <td style="text-align: left">Scroll through workspaces</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + Left click</code></td>
-          <td style="text-align: left">Move window</td>
+          <td style="text-align: left"><code>Mod + Shift + Alt + ←/→</code></td>
+          <td style="text-align: left">Move workspace to other monitor</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="grouping-tabbed-windows">
+  Grouping (Tabbed Windows)
+  
+  <a class="anchor" href="#grouping-tabbed-windows">#</a>
+  
+</h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Shortcut</th>
+          <th style="text-align: left">Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><code>Mod + G</code></td>
+          <td style="text-align: left">Toggle tabbed display for column</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + Right click</code></td>
-          <td style="text-align: left">Resize window</td>
+          <td style="text-align: left"><code>Mod + Q</code></td>
+          <td style="text-align: left">Consume window into column/group</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + G</code></td>
-          <td style="text-align: left">Toggle grouped windows</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>SUPER + ALT + G</code></td>
-          <td style="text-align: left">Move window out of group</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>SUPER + ALT + TAB</code></td>
-          <td style="text-align: left">Next window in group</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>SUPER + ALT + SHIFT + TAB</code></td>
-          <td style="text-align: left">Previous window in group</td>
+          <td style="text-align: left"><code>Mod + H</code></td>
+          <td style="text-align: left">Expel window from column/group</td>
       </tr>
   </tbody>
 </table>
@@ -690,12 +709,16 @@ https://github.com/alex-shpak/hugo-book
   </thead>
   <tbody>
       <tr>
-          <td style="text-align: left"><code>SUPER + C</code></td>
+          <td style="text-align: left"><code>Mod + C</code></td>
           <td style="text-align: left">Copy</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + V</code></td>
+          <td style="text-align: left"><code>Mod + V</code></td>
           <td style="text-align: left">Paste</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>Mod + X</code></td>
+          <td style="text-align: left">Cut</td>
       </tr>
   </tbody>
 </table>
@@ -715,40 +738,32 @@ https://github.com/alex-shpak/hugo-book
   </thead>
   <tbody>
       <tr>
-          <td style="text-align: left"><code>SUPER + Enter</code></td>
-          <td style="text-align: left">Launch terminal</td>
+          <td style="text-align: left"><code>Mod + Enter</code></td>
+          <td style="text-align: left">Launch terminal (alacritty)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + F</code></td>
-          <td style="text-align: left">Launch file manager</td>
+          <td style="text-align: left"><code>Mod + F</code></td>
+          <td style="text-align: left">Launch file manager (nautilus)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + B</code></td>
-          <td style="text-align: left">Launch browser</td>
+          <td style="text-align: left"><code>Mod + B</code></td>
+          <td style="text-align: left">Launch browser (Chrome)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + N</code></td>
+          <td style="text-align: left"><code>Mod + N</code></td>
           <td style="text-align: left">Launch Neovim</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + T</code></td>
-          <td style="text-align: left">Launch <code>btop</code> (activity monitor)</td>
+          <td style="text-align: left"><code>Mod + T</code></td>
+          <td style="text-align: left">Launch <code>btop</code> (system monitor)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + D</code></td>
+          <td style="text-align: left"><code>Mod + D</code></td>
           <td style="text-align: left">Launch <code>lazydocker</code></td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + A</code></td>
+          <td style="text-align: left"><code>Mod + A</code></td>
           <td style="text-align: left">Launch AI menu</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>SUPER + SHIFT + G</code></td>
-          <td style="text-align: left">Launch WhatsApp</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>SUPER + ALT + G</code></td>
-          <td style="text-align: left">Launch Google Messages</td>
       </tr>
   </tbody>
 </table>
@@ -768,64 +783,68 @@ https://github.com/alex-shpak/hugo-book
   </thead>
   <tbody>
       <tr>
-          <td style="text-align: left"><code>SUPER + Space</code></td>
-          <td style="text-align: left">Launch application menu (<code>rofi</code>)</td>
+          <td style="text-align: left"><code>Mod + Space</code></td>
+          <td style="text-align: left">Launch application menu (rofi)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + CTRL + E</code></td>
-          <td style="text-align: left">Show emoji menu</td>
+          <td style="text-align: left"><code>Mod + Ctrl + E</code></td>
+          <td style="text-align: left">Emoji menu</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + ALT + Space</code></td>
+          <td style="text-align: left"><code>Mod + Alt + Space</code></td>
           <td style="text-align: left">Omarchy menu</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + ESC</code> or <code>XF86PowerOff</code></td>
+          <td style="text-align: left"><code>Mod + Escape</code> or <code>XF86PowerOff</code></td>
           <td style="text-align: left">Power menu</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + K</code></td>
+          <td style="text-align: left"><code>Mod + K</code></td>
           <td style="text-align: left">Show keyboard shortcuts</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + SHIFT + Space</code></td>
-          <td style="text-align: left">Show/hide top bar (<code>waybar</code>)</td>
+          <td style="text-align: left"><code>Mod + L</code></td>
+          <td style="text-align: left">Lock screen</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + CTRL + Space</code></td>
-          <td style="text-align: left">Next wallpaper in theme</td>
+          <td style="text-align: left"><code>Mod + Shift + L</code></td>
+          <td style="text-align: left">Start screensaver</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + SHIFT + CTRL + Space</code></td>
-          <td style="text-align: left">Choose a new theme</td>
+          <td style="text-align: left"><code>Mod + Shift + Space</code></td>
+          <td style="text-align: left">Toggle top bar (waybar)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + ,</code></td>
-          <td style="text-align: left">Dismiss last notification</td>
+          <td style="text-align: left"><code>Mod + Ctrl + Space</code></td>
+          <td style="text-align: left">Next wallpaper</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + SHIFT + ,</code></td>
+          <td style="text-align: left"><code>Mod + Shift + Ctrl + Space</code></td>
+          <td style="text-align: left">Theme picker</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>Mod + ,</code></td>
+          <td style="text-align: left">Dismiss notification</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>Mod + Shift + ,</code></td>
           <td style="text-align: left">Dismiss all notifications</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + CTRL + ,</code></td>
-          <td style="text-align: left">Toggle silent mode for notifications</td>
+          <td style="text-align: left"><code>Mod + Ctrl + ,</code></td>
+          <td style="text-align: left">Toggle Do Not Disturb mode</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + CTRL + I</code></td>
-          <td style="text-align: left">Toggle lock on inactivity</td>
+          <td style="text-align: left"><code>Print</code></td>
+          <td style="text-align: left">Capture menu</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>Print Screen</code></td>
-          <td style="text-align: left">Screenshot menu</td>
+          <td style="text-align: left"><code>Alt + Shift + 4</code></td>
+          <td style="text-align: left">Screenshot</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>SUPER + SHIFT + 4</code></td>
-          <td style="text-align: left">Screenshot menu</td>
-      </tr>
-      <tr>
-          <td style="text-align: left"><code>SUPER + Print Screen</code></td>
-          <td style="text-align: left">Color picker (<code>hyprpicker</code>)</td>
+          <td style="text-align: left"><code>Mod + Print</code></td>
+          <td style="text-align: left">Color picker (hyprpicker)</td>
       </tr>
   </tbody>
 </table>
@@ -869,20 +888,20 @@ https://github.com/alex-shpak/hugo-book
           <td style="text-align: left">Decrease brightness</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>ALT + XF86AudioRaiseVolume</code></td>
-          <td style="text-align: left">Increase volume (precise)</td>
+          <td style="text-align: left"><code>Alt + XF86AudioRaiseVolume</code></td>
+          <td style="text-align: left">Increase volume (+1%)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>ALT + XF86AudioLowerVolume</code></td>
-          <td style="text-align: left">Decrease volume (precise)</td>
+          <td style="text-align: left"><code>Alt + XF86AudioLowerVolume</code></td>
+          <td style="text-align: left">Decrease volume (-1%)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>ALT + XF86MonBrightnessUp</code></td>
-          <td style="text-align: left">Increase brightness (precise)</td>
+          <td style="text-align: left"><code>Alt + XF86MonBrightnessUp</code></td>
+          <td style="text-align: left">Increase brightness (+1%)</td>
       </tr>
       <tr>
-          <td style="text-align: left"><code>ALT + XF86MonBrightnessDown</code></td>
-          <td style="text-align: left">Decrease brightness (precise)</td>
+          <td style="text-align: left"><code>Alt + XF86MonBrightnessDown</code></td>
+          <td style="text-align: left">Decrease brightness (-1%)</td>
       </tr>
       <tr>
           <td style="text-align: left"><code>XF86AudioNext</code></td>
@@ -922,9 +941,9 @@ https://github.com/alex-shpak/hugo-book
   <div class="flex flex-wrap justify-between">
     <span>
     
-      <a href="/dotarchy/docs/hyprland/" class="flex align-center">
-        <img src="/dotarchy/svg/backward.svg" class="book-icon" alt="Previous" title="Hyprland" />
-        <span>Hyprland</span>
+      <a href="/dotarchy/docs/niri/" class="flex align-center">
+        <img src="/dotarchy/svg/backward.svg" class="book-icon" alt="Previous" title="Niri" />
+        <span>Niri</span>
       </a>
     
     </span>
@@ -962,9 +981,10 @@ https://github.com/alex-shpak/hugo-book
 
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#hyprland---keyboard-shortcuts">Hyprland - Keyboard Shortcuts</a>
+    <li><a href="#niri---keyboard-shortcuts">Niri - Keyboard Shortcuts</a>
       <ul>
         <li><a href="#window-management">Window Management</a></li>
+        <li><a href="#grouping-tabbed-windows">Grouping (Tabbed Windows)</a></li>
         <li><a href="#clipboard">Clipboard</a></li>
         <li><a href="#applications">Applications</a></li>
         <li><a href="#utilities">Utilities</a></li>

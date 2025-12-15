@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en-us" dir=" ltr">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+  Niri Configuration
+  
+  #
+  
+
+Niri is a scrollable-tiling Wayland compositor with a unique column-based window model. The configuration for Niri is located in archlinux/install/tilling/config/niri.
+
+  Structure
+  
+  #
+  
+
+The configuration is split into multiple files for better organization:
+
+config.kdl: The main configuration file that sources all other configuration files.
+autostart.kdl: Manages applications and scripts that are launched at startup.
+binds.kdl: Defines all keybindings for window management, application launching, and system controls.
+environment.kdl: Sets environment variables used by Niri and other applications.
+input.kdl: Configures input devices such as keyboards, mice, and touchpads.
+output.kdl: Defines monitor layouts, resolutions, and refresh rates.
+layout.kdl: Visual settings like gaps, borders, and animations.
+window-rules.kdl: Window rules for specific applications.
+
+
+  Themes
+  
+  #
+  
+
+The look and feel of Niri, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in archlinux/install/tilling/config/themes. Each theme has its own directory containing specific configuration files.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://c4software.github.io/dotarchy/docs/niri/">
+  <meta property="og:site_name" content="Dotarchy">
+  <meta property="og:title" content="Niri">
+  <meta property="og:description" content="Niri Configuration # Niri is a scrollable-tiling Wayland compositor with a unique column-based window model. The configuration for Niri is located in archlinux/install/tilling/config/niri.
+Structure # The configuration is split into multiple files for better organization:
+config.kdl: The main configuration file that sources all other configuration files. autostart.kdl: Manages applications and scripts that are launched at startup. binds.kdl: Defines all keybindings for window management, application launching, and system controls. environment.kdl: Sets environment variables used by Niri and other applications. input.kdl: Configures input devices such as keyboards, mice, and touchpads. output.kdl: Defines monitor layouts, resolutions, and refresh rates. layout.kdl: Visual settings like gaps, borders, and animations. window-rules.kdl: Window rules for specific applications. Themes # The look and feel of Niri, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in archlinux/install/tilling/config/themes. Each theme has its own directory containing specific configuration files.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+<title>Niri | Dotarchy</title>
+<link rel="icon" href="/dotarchy/favicon.png" >
+<link rel="manifest" href="/dotarchy/manifest.json">
+<link rel="canonical" href="https://c4software.github.io/dotarchy/docs/niri/">
+<link rel="stylesheet" href="/dotarchy/book.min.8cccde2f1e7e4a5ea6c3869ce8a1df6c4204e7f83a0a84f40fdcf0f11db2c78c.css" integrity="sha256-jMzeLx5&#43;Sl6mw4ac6KHfbEIE5/g6CoT0D9zw8R2yx4w=" crossorigin="anonymous">
+  <script defer src="/dotarchy/fuse.min.js"></script>
+  <script defer src="/dotarchy/en.search.min.4685c8a6aedc9db8afb0c07c61e70719c0ca1880e4a2cf2c913f3977cf10f87d.js" integrity="sha256-RoXIpq7cnbivsMB8YecHGcDKGIDkos8skT85d88Q&#43;H0=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
+</head>
+
+<body dir=" ltr" class="book-kind-page book-type-docs book-layout-">
+
+
+  <a class="github-fork-ribbon fixed" href="https://github.com/c4software/dotarchy" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
+
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+<nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/dotarchy/"><span>Dotarchy</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/system/" class="">The System</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/user/" class="">The User</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/look/" class="">The Look</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/apps/" class="">The Apps</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/niri/" class="active">Niri</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/dotarchy/docs/keybindings/" class="">Keybindings</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header">
+        
+<div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/dotarchy/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Niri</h3>
+
+  <label for="toc-control">
+    
+    <img src="/dotarchy/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+
+<aside class="hidden clearfix">
+  
+
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#niri-configuration">Niri Configuration</a>
+      <ul>
+        <li><a href="#structure">Structure</a></li>
+        <li><a href="#themes">Themes</a></li>
+        <li><a href="#scripts">Scripts</a></li>
+        <li><a href="#global-menu">Global menu</a></li>
+        <li><a href="#keybindings">Keybindings</a></li>
+        <li><a href="#autostart">Autostart</a></li>
+        <li><a href="#environment-variables">Environment Variables</a></li>
+        <li><a href="#input-devices">Input Devices</a></li>
+        <li><a href="#monitors">Monitors</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+</aside>
+
+ 
+      </header>
+
+      
+      
+<article class="markdown book-article"><h2 id="niri-configuration">
+  Niri Configuration
+  
+  <a class="anchor" href="#niri-configuration">#</a>
+  
+</h2>
+<p>Niri is a scrollable-tiling Wayland compositor with a unique column-based window model. The configuration for Niri is located in <code>archlinux/install/tilling/config/niri</code>.</p>
+<h3 id="structure">
+  Structure
+  
+  <a class="anchor" href="#structure">#</a>
+  
+</h3>
+<p>The configuration is split into multiple files for better organization:</p>
+<ul>
+<li><strong><code>config.kdl</code></strong>: The main configuration file that sources all other configuration files.</li>
+<li><strong><code>autostart.kdl</code></strong>: Manages applications and scripts that are launched at startup.</li>
+<li><strong><code>binds.kdl</code></strong>: Defines all keybindings for window management, application launching, and system controls.</li>
+<li><strong><code>environment.kdl</code></strong>: Sets environment variables used by Niri and other applications.</li>
+<li><strong><code>input.kdl</code></strong>: Configures input devices such as keyboards, mice, and touchpads.</li>
+<li><strong><code>output.kdl</code></strong>: Defines monitor layouts, resolutions, and refresh rates.</li>
+<li><strong><code>layout.kdl</code></strong>: Visual settings like gaps, borders, and animations.</li>
+<li><strong><code>window-rules.kdl</code></strong>: Window rules for specific applications.</li>
+</ul>
+<h3 id="themes">
+  Themes
+  
+  <a class="anchor" href="#themes">#</a>
+  
+</h3>
+<p>The look and feel of Niri, including colors and styles for other applications like Waybar and Alacritty, are managed through themes located in <code>archlinux/install/tilling/config/themes</code>. Each theme has its own directory containing specific configuration files.</p>
+<h3 id="scripts">
+  Scripts
+  
+  <a class="anchor" href="#scripts">#</a>
+  
+</h3>
+<p>A collection of useful scripts is available in <code>archlinux/install/tilling/bin</code>. These scripts handle tasks like taking screenshots, managing power profiles, launching menus, and controlling system settings.</p>
+<h3 id="global-menu">
+  Global menu
+  
+  <a class="anchor" href="#global-menu">#</a>
+  
+</h3>
+<p>You can trigger the global menu with <code>SUPER + Space</code>. This menu allows you to quickly access applications, settings, and other functionalities. In this menu, if the entry doesn&rsquo;t match any application or setting, it will perform a web search using your default browser.</p>
+<h3 id="keybindings">
+  Keybindings
+  
+  <a class="anchor" href="#keybindings">#</a>
+  
+</h3>
+<p>Keybindings are defined in the <code>binds.kdl</code> file. This file includes shortcuts for launching applications, managing windows, and controlling system functions. The configuration uses a combination of modifier keys (like <code>Mod</code>, <code>Alt</code>, and <code>Ctrl</code>) and other keys to create a comprehensive set of shortcuts.</p>
+<p>For a complete list of keybindings and their functions, refer to the <a href="https://github.com/YaLTeR/niri/wiki/Configuration:-Key-Bindings">official Niri documentation</a>.</p>
+<p>There is some example content in the <code>binds.kdl</code> file:</p>
+<pre tabindex="0"><code class="language-kdl" data-lang="kdl">// Launch terminal
+Mod+Return { spawn &#34;alacritty&#34;; }
+
+// Close focused window
+Mod+W { close-window; }
+
+// Switch to workspace 1
+Mod+1 { focus-workspace 1; }
+
+// Move focused window to workspace 2
+Mod+Shift+2 { move-column-to-workspace 2; }
+</code></pre><h3 id="autostart">
+  Autostart
+  
+  <a class="anchor" href="#autostart">#</a>
+  
+</h3>
+<p>The <code>autostart.kdl</code> file is used to launch applications and scripts automatically when Niri starts. This is useful for starting essential services like the notification daemon, the status bar, or the wallpaper manager.</p>
+<p>Here is an example from the configuration:</p>
+<pre tabindex="0"><code class="language-kdl" data-lang="kdl">// Start the notification daemon
+spawn-at-startup &#34;mako&#34;
+
+// Start the status bar
+spawn-sh-at-startup &#34;waybar --config ~/.config/waybar/niri.jsonc&#34;
+
+// Set a random background
+spawn-at-startup &#34;dotarchy-background&#34; &#34;set&#34;
+</code></pre><h3 id="environment-variables">
+  Environment Variables
+  
+  <a class="anchor" href="#environment-variables">#</a>
+  
+</h3>
+<p>The <code>environment.kdl</code> file allows you to set environment variables that will be available within the Niri session. This is useful for configuring applications that rely on environment variables for their behavior.</p>
+<p>Example:</p>
+<pre tabindex="0"><code class="language-kdl" data-lang="kdl">environment {
+    XCURSOR_SIZE &#34;24&#34;
+    HYPRCURSOR_SIZE &#34;24&#34;
+}
+</code></pre><h3 id="input-devices">
+  Input Devices
+  
+  <a class="anchor" href="#input-devices">#</a>
+  
+</h3>
+<p>The <code>input.kdl</code> file is where you configure your input devices, such as keyboards, mice, and touchpads. You can set options like keyboard layout, mouse sensitivity, and touchpad gestures.</p>
+<h3 id="monitors">
+  Monitors
+  
+  <a class="anchor" href="#monitors">#</a>
+  
+</h3>
+<p>The <code>output.kdl</code> file is used to define the layout, resolution, and refresh rate of your monitors. This is essential for multi-monitor setups.</p>
+<p>You can edit this file via <code>Super + Space</code> &gt; Setup &gt; Monitors.</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+<div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/dotarchy/docs/apps/" class="flex align-center">
+        <img src="/dotarchy/svg/backward.svg" class="book-icon" alt="Previous" title="The Apps" />
+        <span>The Apps</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/dotarchy/docs/keybindings/" class="flex align-center">
+        <span>Keybindings</span>
+        <img src="/dotarchy/svg/forward.svg" class="book-icon" alt="Next" title="Keybindings" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+
+<div class="book-comments">
+
+</div>
+
+ 
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+
+<aside class="book-toc">
+  <div class="book-toc-content">
+    
+
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#niri-configuration">Niri Configuration</a>
+      <ul>
+        <li><a href="#structure">Structure</a></li>
+        <li><a href="#themes">Themes</a></li>
+        <li><a href="#scripts">Scripts</a></li>
+        <li><a href="#global-menu">Global menu</a></li>
+        <li><a href="#keybindings">Keybindings</a></li>
+        <li><a href="#autostart">Autostart</a></li>
+        <li><a href="#environment-variables">Environment Variables</a></li>
+        <li><a href="#input-devices">Input Devices</a></li>
+        <li><a href="#monitors">Monitors</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </div>
+</aside>
+
+ 
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
