@@ -13,12 +13,9 @@ pacman -Sy --noconfirm "$package"
 # Set as default terminal
 echo "Setting $package as new default terminal..."
 
-# UWSM ENV
-sed -i "/export TERMINAL=/ c\export TERMINAL=$package" ~/.config/uwsm/env
-
 # NIRI ENV
 sed -i "s|\(TERMINAL\s*\"\)[^\"]*\(\"\)|\1$package\2|" ~/.config/niri/environment.kdl
 
 # Relaunch is needed for new default to take effect
 echo
-gum confirm "Relaunch Hyprland to use new terminal?" && sudo systemctl restart greetd
+gum confirm "Relaunch Niri to use new terminal?" && sudo systemctl restart greetd

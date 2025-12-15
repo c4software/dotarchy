@@ -8,8 +8,15 @@ if [[ ! -d "$OUTPUT_DIR" ]]; then
   exit 1
 fi
 
-pkill slurp || hyprshot -m ${1:-region} --raw |
-  satty --filename - \
+MODE="${1:-region}"
+
+# Use grim + slurp for Niri
+case "$MODE" in
+  region) pkill slurp || grim -g "$(slurp)" - ;;
+  window) grim -g "$(slurp)" - ;;
+  output) grim -o "$(slurp -o -f '%o')" - ;;
+  *) grim -g "$(slurp)" - ;;
+esac | satty --filename - \
     --output-filename "$OUTPUT_DIR/screenshot-$(date +'%Y-%m-%d_%H-%M-%S').png" \
     --early-exit \
     --actions-on-enter save-to-clipboard \

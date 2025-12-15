@@ -13,39 +13,18 @@ if [[ -f ~/.local/state/omarchy/toggles/screensaver-off ]] && [[ $1 != "force" ]
   exit 1
 fi
 
-# Check if running Niri
-is_niri() {
-  [[ "$XDG_CURRENT_DESKTOP" == "Niri" ]]
-}
+# Niri implementation
+outputs=$(niri msg --json outputs | jq -r 'keys[]')
+# Note: Niri n'a pas de concept de "focused output" dans la sortie JSON
+# On garde le premier output comme référence
+focused=$(echo "$outputs" | head -n1)
 
-# Detect compositor
-if is_niri; then
-  # Niri implementation
-  outputs=$(niri msg --json outputs | jq -r 'keys[]')
-  # Note: Niri n'a pas de concept de "focused output" dans la sortie JSON
-  # On garde le premier output comme référence
-  focused=$(echo "$outputs" | head -n1)
+for m in $outputs; do
+  niri msg action focus-monitor "$m"
+  niri msg action spawn -- \
+    alacritty --class Screensaver \
+    --config-file ~/.config/alacritty/screensaver.toml \
+    -e omarchy-cmd-screensaver
+done
 
-  for m in $outputs; do
-    niri msg action focus-monitor "$m"
-    niri msg action spawn -- \
-      alacritty --class Screensaver \
-      --config-file ~/.config/alacritty/screensaver.toml \
-      -e omarchy-cmd-screensaver
-  done
-
-  niri msg action focus-monitor "$focused"
-else
-  # Hyprland implementation
-  focused=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true).name')
-
-  for m in $(hyprctl monitors -j | jq -r '.[] | .name'); do
-    hyprctl dispatch focusmonitor $m
-    hyprctl dispatch exec -- \
-      alacritty --class Screensaver \
-      --config-file ~/.config/alacritty/screensaver.toml \
-      -e omarchy-cmd-screensaver
-  done
-
-  hyprctl dispatch focusmonitor $focused
-fi
+niri msg action focus-monitor "$focused"

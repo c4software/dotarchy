@@ -10,34 +10,31 @@ evince
 # Tools
 mpv
 imv
-
-# Hyprland dependencies
 xournalpp
 qt5-wayland
 qt6-wayland
 brightnessctl
 
-# Hyprland and related packages
-hyprland
-hyprshot
+# Niri and related packages
+niri
 hyprpicker
-hyprlock
-hypridle
-polkit-gnome
-hyprland-guiutils
+hyprshot
 libqalculate
 waybar
 mako
 swaybg
 swayosd
-xdg-desktop-portal-hyprland
+grim
+slurp
+wtype
+jq
+playerctl
 xdg-desktop-portal-gtk
 xdg-desktop-portal-gnome
 wiremix
 pamixer
 bluetui
 alacritty
-uwsm
 wl-clip-persist
 wl-clipboard
 iwd
@@ -45,6 +42,3 @@ impala
 satty
 wf-recorder
 rofi
-
-# Niri related packages
-niri

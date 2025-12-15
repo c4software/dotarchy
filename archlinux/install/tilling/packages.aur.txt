@@ -1,5 +1,4 @@
 gpu-screen-recorder
-hyprmon-bin
 python-terminaltexteffects
 yaru-icon-theme
 python-pywal16

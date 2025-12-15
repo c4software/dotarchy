@@ -8,11 +8,6 @@
 FOLDER="$HOME/.config/theme/backgrounds"
 SYMLINK="$FOLDER/current_background"
 
-is_niri() {
-  [[ "$XDG_CURRENT_DESKTOP" == "Niri" ]]
-  return $?
-}
-
 get_images() {
     IMAGES=($(find "$FOLDER" -type f | sort))
 }
@@ -26,12 +21,7 @@ check_images() {
 
 apply_background() {
     pkill -x swaybg
-
-    if is_niri; then
-        setsid swaybg -i "$SYMLINK" -m fill >/dev/null 2>&1 &
-    else
-        setsid uwsm-app -- swaybg -i "$SYMLINK" -m fill >/dev/null 2>&1 &
-    fi
+    setsid swaybg -i "$SYMLINK" -m fill >/dev/null 2>&1 &
 }
 
 get_current_index() {

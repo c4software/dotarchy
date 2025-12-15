@@ -40,7 +40,7 @@ vt = 1
 
 # The default session, also known as the greeter.
 [default_session]
-command = "tuigreet --cmd 'uwsm start hyprland.desktop'"
+command = "tuigreet --cmd 'niri-session'"
 user = "greeter"
 
 EOF
@@ -50,7 +50,7 @@ EOF
     if [ "$autologin_choice" = "y" ] || [ "$autologin_choice" = "Y" ]; then
         sudo tee -a /etc/greetd/config.toml > /dev/null <<EOF
 [initial_session]
-command = "uwsm start hyprland.desktop"
+command = "niri-session"
 user="$USER"
 
 EOF

@@ -14,9 +14,9 @@ This repository contains installation and configuration scripts for Arch Linux a
 
 The main goal is to have a modular and easy-to-maintain system that can be quickly set up on a new machine.
 
-⚠️ The Hyprland setup is massively extracted/inspired from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
+⚠️ The Niri setup is massively extracted/inspired from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
 
-[Hyprland Keybindings reference](./docs/keybindings/)
+[Niri Keybindings reference](./docs/keybindings/)
 
 ## Installation
 
@@ -39,24 +39,24 @@ To set up Dotarchy on your system, follow these steps:
 
 ## Install only specific parts
 
-If you want to install only specific parts of Dotarchy, such as the Hyprland setup on Arch Linux, you can navigate to the relevant directory and run the dedicated setup script. For example:
+If you want to install only specific parts of Dotarchy, such as the Niri setup on Arch Linux, you can navigate to the relevant directory and run the dedicated setup script. For example:
 
 ```bash
 cd ~/dotarchy/
 (source /install/tilling/setup.sh && setup)
 ```
 
-## Only update Hyprland & Niri configuration
+## Only update Niri configuration
 
-To update only the Hyprland and Niri configuration files without installing packages, you can run:
+To update only the Niri configuration files without installing packages, you can run:
 
 ```bash
 ./update.sh
 ```
 
-## Dotfiles and Hyprland & Niri update
+## Dotfiles and Niri update
 
-To update the dotfiles and Hyprland & Niri setup, run:
+To update the dotfiles and Niri setup, run:
 
 ```bash
 ./update.sh --all

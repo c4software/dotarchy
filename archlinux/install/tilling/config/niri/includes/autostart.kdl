@@ -1,4 +1,3 @@
-// spawn-at-startup "hypridle"
 spawn-at-startup "mako"
 spawn-sh-at-startup "waybar --config ~/.config/waybar/niri.jsonc"
 spawn-at-startup "dotarchy-background" "set"

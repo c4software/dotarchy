@@ -4,8 +4,8 @@ This repository contains installation and configuration scripts for Arch Linux a
 
 ![Screenshot](./docs/static/screenshot.jpg)
 
-⚠️ The Hyprland setup is massively extracted/inspired from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
-[Hyprland Keybindings reference](./archlinux/install/tilling/README.md)
+⚠️ The Niri setup is massively extracted/inspired from the excellent [Omarchy project](https://omarchy.org/) by [@dhh](https://github.com/dhh).
+[Niri Keybindings reference](./archlinux/install/tilling/README.md)
 
 [Documentation](https://c4software.github.io/dotarchy/)
 
@@ -38,7 +38,7 @@ To update only the configuration files without installing packages, you can run 
 ```
 
 ⚠️ This will overwrite your existing configuration files. Make sure to back up any important configurations before running this command.
-⚠️ This will not update all [common configuration](./common/) files, only those related to Hyprland. To **update all configuration files**, please use `update.sh --all`.
+⚠️ This will not update all [common configuration](./common/) files, only those related to Niri. To **update all configuration files**, please use `update.sh --all`.
 
 ### Dotarchy doctor
 

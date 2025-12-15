@@ -4,7 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 function setup() {
     # Check for --skip-packages flag
     if [ "$1" != "--skip-packages" ]; then
-        echo -e "Installing Hyprland and Niri packages"
+        echo -e "Installing Niri packages"
 
         # Install with pacman the packages.txt
         grep -v "^#" "$SCRIPT_DIR/packages.txt" | sudo pacman -S --noconfirm --needed -
@@ -18,7 +18,7 @@ function setup() {
     source "$SCRIPT_DIR/mimetypes.sh"
 
     echo -e "Moving configuration files (replace if exists)"
-    rm -rf ~/.config/hypr
+    rm -rf ~/.config/niri
     cp -r "$SCRIPT_DIR/config/"* ~/.config/
 
     echo -e "Moving extra bin scripts"
@@ -43,29 +43,13 @@ function setup() {
         echo -e "Enabling and starting iwd"
         sudo systemctl enable iwd.service --now
     fi
-
-    # do not fail if hyprctl fails
-    set +eE
-
-    # Check if HYPRLAND_INSTANCE_SIGNATURE is set
-    if [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
-        return
-    fi
-
-    hyprctl reload # Reload Hyprland to apply changes
 }
 
 function check() {
-    if command -v hyprctl &>/dev/null; then
-        show_success "Hyprland & Niri"
+    if command -v niri &>/dev/null; then
+        show_success "Niri"
     else
-        show_error "Hyprland & Niri" "Hyprland and Niri are not installed."
-    fi
-
-    if [ -d ~/.config/hypr ]; then
-        show_success "Hyprland Configuration"
-    else
-        show_error "Hyprland Configuration" "Hyprland configuration is not set up."
+        show_error "Niri" "Niri is not installed."
     fi
 
     if [ -d ~/.config/niri ]; then
@@ -99,13 +83,13 @@ function check() {
     done
 
     if [ ${#missing_scripts[@]} -eq 0 ]; then
-        show_success "Hyprland & Niri Bin Scripts"
+        show_success "Niri Bin Scripts"
     else
         local error_msg="The following scripts are missing in ~/.local/bin:"
         for script in "${missing_scripts[@]}"; do
             error_msg+="\n\t- $script"
         done
-        show_error "Hyprland & Niri Bin Scripts" "$error_msg" 
+        show_error "Niri Bin Scripts" "$error_msg" 
     fi
 
     # Greetd check

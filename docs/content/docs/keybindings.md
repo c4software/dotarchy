@@ -3,36 +3,40 @@ title: "Keybindings"
 weight: 7
 ---
 
-## Hyprland - Keyboard Shortcuts
+## Niri - Keyboard Shortcuts
 
 ### Window Management
 
 | Shortcut | Description |
 | :--- | :--- |
-| `SUPER + W` | Close the active window |
-| `SUPER + J` | Toggle "split" (division) |
-| `SUPER + P` | Toggle centered floating mode |
-| `SHIFT + F11` | Force fullscreen |
-| `SUPER + ALT + ↑/↓` | Toggle monocle mode (fullscreen with background window management) |
-| `SUPER + ←/→/↑/↓` | Move focus |
-| `SUPER + [0-9]` | Switch to workspace |
-| `SUPER + SHIFT + [0-9]` | Move window to workspace |
-| `SUPER + TAB` | Next workspace |
-| `SUPER + SHIFT + TAB` | Previous workspace |
-| `SUPER + SHIFT + ←/→/↑/↓` | Swap active window with neighbor |
-| `ALT + Tab` | Next window in workspace |
-| `ALT + SHIFT + Tab` | Previous window in workspace |
-| `SUPER + -/=` | Resize window horizontally |
-| `SUPER + SHIFT + -/=` | Resize window vertically |
-| `ALT + ←/→/↑/↓` | Resize window horizontally/vertically |
-| `SUPER + Mouse wheel` | Scroll through workspaces |
-| `SUPER + Left click` | Move window |
-| `SUPER + Right click` | Resize window |
-| `SUPER + G` | Toggle grouped windows |
-| `SUPER + ALT + G` | Move window out of group |
-| `SUPER + ALT + TAB` | Next window in group |
-| `SUPER + ALT + SHIFT + TAB` | Previous window in group |
+| `Mod + W` | Close the active window |
+| `F11` | Maximize column (fullscreen) |
+| `Mod + F11` | Toggle windowed fullscreen |
+| `Mod + P` | Center column |
+| `Mod + Alt + ↑` | Maximize column |
+| `Mod + Alt + ↓` | Restore column |
+| `Mod + Alt + ←/→` | Expand column to available width |
+| `Mod + ←/→` | Focus column left/right |
+| `Mod + ↑/↓` | Focus workspace up/down |
+| `Mod + [1-7]` | Switch to workspace (bépo layout) |
+| `Mod + Shift + [1-7]` | Move column to workspace |
+| `Mod + Tab` | Toggle overview mode |
+| `Mod + Shift + ←/→` | Move column left/right |
+| `Mod + Shift + ↑/↓` | Move window up/down in column |
+| `Alt + ←/→` | Resize column width (±10%) |
+| `Alt + ↑/↓` | Resize window height (±10%) |
+| `Mod + Mouse wheel` | Scroll through workspaces |
+| `Mod + Shift + Alt + ←/→` | Move workspace to other monitor |
 
+---
+
+### Grouping (Tabbed Windows)
+
+| Shortcut | Description |
+| :--- | :--- |
+| `Mod + G` | Toggle tabbed display for column |
+| `Mod + Q` | Consume window into column/group |
+| `Mod + H` | Expel window from column/group |
 
 ---
 
@@ -40,8 +44,9 @@ weight: 7
 
 | Shortcut | Description |
 | :--- | :--- |
-| `SUPER + C` | Copy |
-| `SUPER + V` | Paste |
+| `Mod + C` | Copy |
+| `Mod + V` | Paste |
+| `Mod + X` | Cut |
 
 ---
 
@@ -49,15 +54,13 @@ weight: 7
 
 | Shortcut | Description |
 | :--- | :--- |
-| `SUPER + Enter` | Launch terminal |
-| `SUPER + F` | Launch file manager |
-| `SUPER + B` | Launch browser |
-| `SUPER + N` | Launch Neovim |
-| `SUPER + T` | Launch `btop` (activity monitor) |
-| `SUPER + D` | Launch `lazydocker` |
-| `SUPER + A` | Launch AI menu |
-| `SUPER + SHIFT + G` | Launch WhatsApp |
-| `SUPER + ALT + G` | Launch Google Messages |
+| `Mod + Enter` | Launch terminal (alacritty) |
+| `Mod + F` | Launch file manager (nautilus) |
+| `Mod + B` | Launch browser (Chrome) |
+| `Mod + N` | Launch Neovim |
+| `Mod + T` | Launch `btop` (system monitor) |
+| `Mod + D` | Launch `lazydocker` |
+| `Mod + A` | Launch AI menu |
 
 ---
 
@@ -65,21 +68,22 @@ weight: 7
 
 | Shortcut | Description |
 | :--- | :--- |
-| `SUPER + Space` | Launch application menu (`rofi`) |
-| `SUPER + CTRL + E` | Show emoji menu |
-| `SUPER + ALT + Space` | Omarchy menu |
-| `SUPER + ESC` or `XF86PowerOff` | Power menu |
-| `SUPER + K` | Show keyboard shortcuts |
-| `SUPER + SHIFT + Space` | Show/hide top bar (`waybar`) |
-| `SUPER + CTRL + Space` | Next wallpaper in theme |
-| `SUPER + SHIFT + CTRL + Space` | Choose a new theme |
-| `SUPER + ,` | Dismiss last notification |
-| `SUPER + SHIFT + ,` | Dismiss all notifications |
-| `SUPER + CTRL + ,` | Toggle silent mode for notifications |
-| `SUPER + CTRL + I` | Toggle lock on inactivity |
-| `Print Screen` | Screenshot menu |
-| `SUPER + SHIFT + 4` | Screenshot menu |
-| `SUPER + Print Screen` | Color picker (`hyprpicker`) |
+| `Mod + Space` | Launch application menu (rofi) |
+| `Mod + Ctrl + E` | Emoji menu |
+| `Mod + Alt + Space` | Omarchy menu |
+| `Mod + Escape` or `XF86PowerOff` | Power menu |
+| `Mod + K` | Show keyboard shortcuts |
+| `Mod + L` | Lock screen |
+| `Mod + Shift + L` | Start screensaver |
+| `Mod + Shift + Space` | Toggle top bar (waybar) |
+| `Mod + Ctrl + Space` | Next wallpaper |
+| `Mod + Shift + Ctrl + Space` | Theme picker |
+| `Mod + ,` | Dismiss notification |
+| `Mod + Shift + ,` | Dismiss all notifications |
+| `Mod + Ctrl + ,` | Toggle Do Not Disturb mode |
+| `Print` | Capture menu |
+| `Alt + Shift + 4` | Screenshot |
+| `Mod + Print` | Color picker (hyprpicker) |
 
 ---
 
@@ -93,10 +97,10 @@ weight: 7
 | `XF86AudioMicMute` | Mute/unmute microphone |
 | `XF86MonBrightnessUp` | Increase brightness |
 | `XF86MonBrightnessDown` | Decrease brightness |
-| `ALT + XF86AudioRaiseVolume` | Increase volume (precise) |
-| `ALT + XF86AudioLowerVolume` | Decrease volume (precise) |
-| `ALT + XF86MonBrightnessUp` | Increase brightness (precise) |
-| `ALT + XF86MonBrightnessDown` | Decrease brightness (precise) |
+| `Alt + XF86AudioRaiseVolume` | Increase volume (+1%) |
+| `Alt + XF86AudioLowerVolume` | Decrease volume (-1%) |
+| `Alt + XF86MonBrightnessUp` | Increase brightness (+1%) |
+| `Alt + XF86MonBrightnessDown` | Decrease brightness (-1%) |
 | `XF86AudioNext` | Next track |
 | `XF86AudioPause` / `XF86AudioPlay` | Play/pause |
 | `XF86AudioPrev` | Previous track |
