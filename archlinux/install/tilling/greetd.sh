@@ -1,15 +1,19 @@
 #!/bin/bash
 
-# Skip if greetd is already installed
+# Check if greetd is already installed
 if command -v greetd >/dev/null 2>&1; then
-    echo "greetd is already installed. Skipping installation."
-    exit 0
+    echo "greetd is already installed."
+    read -p "Do you want to update greetd configuration? (y/n): " choice
+else
+    echo "greetd is not installed."
+    read -p "Do you want to install greetd and greetd-tuigreet? (y/n): " choice
 fi
 
-read -p "Do you want to install greetd and greetd-tuigreet? (y/n): " choice
-
 if [ "$choice" = "y" ] || [ "$choice" = "Y" ]; then
-    sudo pacman -S greetd greetd-tuigreet
+    # Install only if not already installed
+    if ! command -v greetd >/dev/null 2>&1; then
+        sudo pacman -S greetd greetd-tuigreet
+    fi
 
     # Test if GDM is installed and disable it
     if systemctl list-unit-files | grep -q gdm.service; then

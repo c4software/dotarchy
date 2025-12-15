@@ -15,7 +15,6 @@ export PATH="$HOME/.local/bin:$PATH"
 if command -v pacman &> /dev/null; then
     (
         source "./archlinux/setup.sh"
-        setup
     )
 
     (
