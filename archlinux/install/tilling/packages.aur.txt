@@ -3,3 +3,14 @@ python-terminaltexteffects
 yaru-icon-theme
 python-pywal16
 swaylock-effects
+
+# Fonts
+woff2-font-awesome
+ttf-cascadia-mono-nerd
+ttf-ia-writer
+noto-fonts
+noto-fonts-emoji
+ttf-jetbrains-mono
+ttf-jetbrains-mono-nerd
+noto-fonts-cjk
+noto-fonts-extra
