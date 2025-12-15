@@ -68,9 +68,9 @@ binds {
     Mod+H hotkey-overlay-title="Expel window from the group" { expel-window-from-column; }
     
     // Column navigation
-    Mod+Ctrl+Up hotkey-overlay-title="Next tab in group" { focus-next-tab-in-column; }
-    Mod+Ctrl+Down hotkey-overlay-title="Previous tab in group" { focus-previous-tab-in-column; }
-    Mod+Ctrl+Left hotkey-overlay-title="Next column" { focus-next-column; }
-    Mod+Ctrl+Right hotkey-overlay-title="Previous column" { focus-previous-column; }
+    Mod+Ctrl+Up hotkey-overlay-title="Previous tab in group" { focus-window-up; }
+    Mod+Ctrl+Down hotkey-overlay-title="Next tab in group" { focus-window-down; }
+    Mod+Ctrl+Left hotkey-overlay-title="Next column" { focus-column-right; }
+    Mod+Ctrl+Right hotkey-overlay-title="Previous column" { focus-column-left; }
 
 }
