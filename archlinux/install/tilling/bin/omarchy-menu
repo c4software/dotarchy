@@ -87,8 +87,7 @@ show_screenrecord_menu() {
 }
 
 show_toggle_menu() {
-  case $(dotarchy-display-menu "Toggle" "󱫖  Idle Lock\n󰍜  Top Bar") in
-  *Idle*) omarchy-toggle-idle ;;
+  case $(dotarchy-display-menu "Toggle" "󰍜  Top Bar") in
   *Bar*) omarchy-toggle-waybar ;;
   *) show_main_menu ;;
   esac
