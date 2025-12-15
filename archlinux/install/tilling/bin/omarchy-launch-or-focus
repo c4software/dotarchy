@@ -1,7 +1,7 @@
 #!/bin/bash
 
 is_niri() {
-  [[ "$XDG_CURRENT_DESKTOP" == "niri" ]]
+  [[ "$XDG_CURRENT_DESKTOP" == "Niri" ]]
   return $?
 }
 
