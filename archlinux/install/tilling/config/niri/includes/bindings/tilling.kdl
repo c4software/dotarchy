@@ -66,4 +66,11 @@ binds {
     Mod+G hotkey-overlay-title="Group/Ungroup window into tabbed display" { toggle-column-tabbed-display; }
     Mod+Q hotkey-overlay-title="Comsume window into the group" { consume-window-into-column; }
     Mod+H hotkey-overlay-title="Expel window from the group" { expel-window-from-column; }
+    
+    // Column navigation
+    Mod+Ctrl+Up hotkey-overlay-title="Next tab in group" { focus-next-tab-in-column; }
+    Mod+Ctrl+Down hotkey-overlay-title="Previous tab in group" { focus-previous-tab-in-column; }
+    Mod+Ctrl+Left hotkey-overlay-title="Next column" { focus-next-column; }
+    Mod+Ctrl+Right hotkey-overlay-title="Previous column" { focus-previous-column; }
+
 }
