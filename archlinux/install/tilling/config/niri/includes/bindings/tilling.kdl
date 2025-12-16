@@ -18,8 +18,8 @@ binds {
     // Move focus with Mod + arrow keys
     Mod+Left hotkey-overlay-title="Focus left" { focus-column-left; }
     Mod+Right hotkey-overlay-title="Focus right" { focus-column-right; }
-    Mod+Up hotkey-overlay-title="Focus workspace up" { focus-workspace-up; }
-    Mod+Down hotkey-overlay-title="Focus workspace down" { focus-workspace-down; }
+    Mod+Up hotkey-overlay-title="Focus up" { focus-window-up; }
+    Mod+Down hotkey-overlay-title="Focus down" { focus-window-down; }
 
     // Switch workspaces with Mod + [1-9,0] (in bépo)
     Mod+quotedbl hotkey-overlay-title="Workspace 1" { focus-workspace 1; }
@@ -67,10 +67,8 @@ binds {
     Mod+Q hotkey-overlay-title="Comsume window into the group" { consume-window-into-column; }
     Mod+H hotkey-overlay-title="Expel window from the group" { expel-window-from-column; }
     
-    // Column navigation
-    Mod+Ctrl+Up hotkey-overlay-title="Previous tab in group" { focus-window-up; }
-    Mod+Ctrl+Down hotkey-overlay-title="Next tab in group" { focus-window-down; }
-    Mod+Ctrl+Left hotkey-overlay-title="Next column" { focus-column-right; }
-    Mod+Ctrl+Right hotkey-overlay-title="Previous column" { focus-column-left; }
+    // Workspace navigation
+    Mod+Ctrl+Up hotkey-overlay-title="Next workspace" { focus-workspace-down; }
+    Mod+Ctrl+Down hotkey-overlay-title="Previous workspace" { focus-workspace-up; }
 
 }
