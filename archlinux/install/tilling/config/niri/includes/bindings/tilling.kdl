@@ -68,7 +68,7 @@ binds {
     Mod+H hotkey-overlay-title="Expel window from the group" { expel-window-from-column; }
     
     // Workspace navigation
-    Mod+Ctrl+Up hotkey-overlay-title="Next workspace" { focus-workspace-down; }
-    Mod+Ctrl+Down hotkey-overlay-title="Previous workspace" { focus-workspace-up; }
+    Mod+Ctrl+Up hotkey-overlay-title="Next workspace" { focus-workspace-up; }
+    Mod+Ctrl+Down hotkey-overlay-title="Previous workspace" { focus-workspace-down; }
 
 }
