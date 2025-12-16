@@ -4,6 +4,9 @@ binds {
 
     // Control tiling and window modes
     F11 hotkey-overlay-title="Maximize column" { fullscreen-window; }
+    Mod+Shift+Up hotkey-overlay-title="Toggle fullscreen window" { fullscreen-window; }
+    Mod+Shift+Down hotkey-overlay-title="Toggle fullscreen window" { fullscreen-window; }
+
     Mod+Alt+Up hotkey-overlay-title="Maximize column" { maximize-column; }
     Mod+Alt+Down hotkey-overlay-title="Restore column" { maximize-column; }
     Mod+Alt+Left hotkey-overlay-title="Expand to width" { expand-column-to-available-width; }
@@ -42,8 +45,6 @@ binds {
     // Swap windows with Mod + Shift + arrow keys
     Mod+Shift+Left hotkey-overlay-title="Move column left" { move-column-left; }
     Mod+Shift+Right hotkey-overlay-title="Move column right" { move-column-right; }
-    Mod+Shift+Up hotkey-overlay-title="Move window up" { move-window-up; }
-    Mod+Shift+Down hotkey-overlay-title="Move window down" { move-window-down; }
 
     // Overview mode
     Mod+Tab hotkey-overlay-title="Toggle overview" { toggle-overview; }
