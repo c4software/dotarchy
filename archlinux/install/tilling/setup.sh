@@ -6,6 +6,9 @@ function setup() {
     if [ "$1" != "--skip-packages" ]; then
         echo -e "Installing Niri packages"
 
+        # Remove conflicting package (swaylock is incompatible with swaylock-effects)
+        sudo pacman -R --noconfirm swaylock
+
         # Install with pacman the packages.txt
         grep -v "^#" "$SCRIPT_DIR/packages.txt" | sudo pacman -S --noconfirm --needed -
 
