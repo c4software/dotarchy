@@ -17,8 +17,7 @@ binds {
     Mod+Ctrl+E hotkey-overlay-title="Emoji menu" { spawn "dotarchy-emoji-menu"; }
     Mod+Alt+Space hotkey-overlay-title="Omarchy menu" { spawn "omarchy-menu"; }
     XF86AudioMedia hotkey-overlay-title="Omarchy menu" { spawn "omarchy-menu"; }
-    Mod+Escape hotkey-overlay-title="Power menu" { spawn "omarchy-menu system"; }
-    XF86PowerOff hotkey-overlay-title="Power menu" { spawn "omarchy-menu system"; }
+    Mod+Escape hotkey-overlay-title="Power menu" { spawn "omarchy-menu" "system"; }
     Mod+K hotkey-overlay-title="Keybindings" { spawn "dotarchy-menu-keybindings-niri"; }
 
     // Aesthetics
