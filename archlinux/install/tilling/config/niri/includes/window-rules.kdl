@@ -25,9 +25,13 @@ window-rule {
     open-maximized true
 }
 
-// Vscode is maximized by default
 window-rule {
     match app-id="code"
+    open-maximized true
+}
+
+window-rule {
+    match app-id="Slack"
     open-maximized true
 }
 
