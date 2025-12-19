@@ -23,14 +23,12 @@ window-rule {
 window-rule {
     match app-id=r#"^(google-chrome|chromium|org\.chromium\.Chromium)$"#
     open-maximized true
-    open-maximized-to-edges true
 }
 
 // Vscode is maximized by default
 window-rule {
     match app-id="code"
     open-maximized true
-    open-maximized-to-edges true
 }
 
 window-rule {
