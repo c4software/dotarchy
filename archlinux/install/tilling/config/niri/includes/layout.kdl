@@ -155,7 +155,7 @@ layout {
 
     // Tab indicator settings.
     tab-indicator {
-        position "top"
+        position "left"
     }
 }
 
