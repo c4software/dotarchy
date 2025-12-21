@@ -11,6 +11,7 @@ binds {
     // Lock screen
     Mod+L hotkey-overlay-title="Lock screen" { spawn "dotarchy-lock-screen"; }
     Mod+Shift+L hotkey-overlay-title="Start Screensaver" { spawn "omarchy-launch-screensaver"; }
+    Mod+O repeat=false { toggle-overview; }
 
     // Menus
     Mod+Space hotkey-overlay-title="Launch apps" { spawn "rofi" "-show" "drun"; }
