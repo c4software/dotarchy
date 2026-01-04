@@ -2,6 +2,7 @@
 visual-studio-code-bin
 google-chrome
 spotify
+localsend-appimage
 # Fonts
 woff2-font-awesome
 ttf-cascadia-mono-nerd
