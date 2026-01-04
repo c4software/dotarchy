@@ -23,6 +23,8 @@ window-rule {
 window-rule {
     match app-id=r#"^(google-chrome|chromium|org\.chromium\.Chromium)$"#
     open-maximized true
+    open-focused true
+    open-on-workspace "Web"
 }
 
 window-rule {
