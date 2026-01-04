@@ -28,6 +28,7 @@ window-rule {
 window-rule {
     match app-id="code"
     open-maximized true
+    open-focused true
     open-on-workspace "3"
 }
 
