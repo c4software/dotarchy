@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# wg-toggle-fzf.sh - Toggle WireGuard configs avec gum + sudo + notify-send + signal Waybar
+
+CONF_DIR="/etc/wireguard"
+SIGNAL=10
+ICON_CONNECTED="network-vpn-symbolic"
+ICON_DISCONNECTED="network-vpn-no-route-symbolic"
+ICON_ERROR="dialog-error-symbolic"
+
+# Liste des configs via sudo
+configs=$(sudo find "$CONF_DIR" -maxdepth 1 -type f -name "*.conf" -exec basename {} .conf \; 2>/dev/null)
+
+if [ $? -ne 0 ] || [ -z "$configs" ]; then
+    notify-send -u critical -t 5000 -i "$ICON_ERROR" "Erreur WireGuard" "Impossible de lister les tunnels"
+    exit 1
+fi
+
+# Vérifie interface active
+active_iface=$(ip -o link show type wireguard 2>/dev/null | awk -F': ' '{print $2}' | cut -d@ -f1 | head -n1)
+
+# Prépare les options
+options="$configs"
+if [ -n "$active_iface" ]; then
+    options="[Désactiver $active_iface]"$'\n'"$configs"
+fi
+
+# Sélection avec gum
+selected=$(echo "$options" | gum filter --placeholder "Sélectionne un VPN...")
+
+[ -z "$selected" ] && exit 0
+
+# Gestion de la désactivation
+if [[ "$selected" == \[Désactiver* ]]; then
+    sudo wg-quick down "$active_iface" && \
+    notify-send -u normal -t 5000 -i "$ICON_DISCONNECTED" "WireGuard" "$active_iface désactivé"
+# Gestion des tunnels
+elif [ -n "$active_iface" ] && [ "$active_iface" = "$selected" ]; then
+    sudo wg-quick down "$selected" && \
+    notify-send -u normal -t 5000 -i "$ICON_DISCONNECTED" "WireGuard" "${selected^} désactivé"
+elif [ -n "$active_iface" ]; then
+    sudo wg-quick down "$active_iface" && sudo wg-quick up "$selected" && \
+    notify-send -u normal -t 5000 -i "$ICON_CONNECTED" "WireGuard" "${selected^} activé"
+else
+    sudo wg-quick up "$selected" && \
+    notify-send -u normal -t 5000 -i "$ICON_CONNECTED" "WireGuard" "${selected^} activé"
+fi
+
+# Rafraîchit Waybar
+pkill -SIGRTMIN+"$SIGNAL" waybar 2>/dev/null

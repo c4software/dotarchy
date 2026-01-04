@@ -51,6 +51,7 @@ window-rule {
 window-rule {
     match app-id=r#"^(blueberry\.py|Bluetui|Impala|Wiremix|org\.gnome\.NautilusPreviewer|com\.gabm\.satty|Omarchy|About|TUI\.float|org\.gnome\.Evince)$"#
     open-floating true
+    open-focused true
 }
 
 window-rule {
