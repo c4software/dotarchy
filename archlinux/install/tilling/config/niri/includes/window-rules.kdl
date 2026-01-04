@@ -35,6 +35,15 @@ window-rule {
 window-rule {
     match app-id="Slack"
     open-maximized true
+    open-on-workspace "4"
+    open-focused true
+}
+
+window-rule {
+    match app-id="signal"
+    open-maximized true
+    open-on-workspace "4"
+    open-focused true
 }
 
 window-rule {
