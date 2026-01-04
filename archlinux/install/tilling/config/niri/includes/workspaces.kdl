@@ -1,4 +1,4 @@
-workspace "1"
+workspace "Web"
 workspace "File"
 workspace "Code"
 workspace "Chat"
