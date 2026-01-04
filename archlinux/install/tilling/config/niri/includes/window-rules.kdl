@@ -29,20 +29,20 @@ window-rule {
     match app-id="code"
     open-maximized true
     open-focused true
-    open-on-workspace "3"
+    open-on-workspace "Code"
 }
 
 window-rule {
     match app-id="Slack"
     open-maximized true
-    open-on-workspace "4"
+    open-on-workspace "Chat"
     open-focused true
 }
 
 window-rule {
     match app-id="signal"
     open-maximized true
-    open-on-workspace "4"
+    open-on-workspace "Chat"
     open-focused true
 }
 
@@ -64,7 +64,7 @@ window-rule {
 
 window-rule {
     match app-id="^(org.gnome.Nautilus)$"
-    open-on-workspace "2"
+    open-on-workspace "File"
 }
 
 window-rule {
