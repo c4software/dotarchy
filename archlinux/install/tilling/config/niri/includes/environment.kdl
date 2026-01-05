@@ -11,9 +11,14 @@ environment {
     OZONE_PLATFORM "wayland"
     ELECTRON_OZONE_PLATFORM_HINT "wayland"
     XDG_SESSION_TYPE "wayland"
+    ELECTRON_ENABLE_WAYLAND "1"
 
     XDG_CURRENT_DESKTOP "Niri"
     XDG_SESSION_DESKTOP "Niri"
 
-    XCOMPOSEFILE "~/.XCompose"
+    XDG_DATA_HOME=$HOME/.local/share
+    XDG_DATA_DIRS=/usr/local/share:/usr/share
+
+    XCOMPOSEFILE "$HOME/.XCompose"
+    GDK_BACKEND "wayland,x11"
 }
