@@ -6,7 +6,8 @@
 // Remember to uncomment the node by removing "/-"!
 
 output "eDP-1" {
-    variable-refresh-rate
+    // variable-refresh-rate
+    mode "2880x1920@60.001"
 }
 
 /-output "eDP-1" {
