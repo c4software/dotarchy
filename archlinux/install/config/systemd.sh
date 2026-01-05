@@ -8,7 +8,6 @@ function setup(){
     sudo systemctl disable systemd-networkd-wait-online.service
     sudo systemctl mask systemd-networkd-wait-online.service
 
-
     # Create a file with DNS settings for wg interfaces (/etc/systemd/network/50-wg-all.network)
     local wg_config_file="/etc/systemd/network/50-wg-all.network"
     
@@ -25,6 +24,11 @@ Domains=~.
 DNSDefaultRoute=yes
 EOF
     fi
+
+    # Remplacer /etc/resolv.conf par un lien symbolique vers le stub de systemd-resolved
+    # Cela garantit que les résolutions DNS passent par systemd-resolved.
+    sudo rm /etc/resolv.conf
+    sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
     sudo systemctl enable --now systemd-resolved.service
 }
@@ -60,5 +64,11 @@ function check(){
         return
     fi
 
-    show_success "Systemd"
+    # Check if /etc/resolv.conf is a symlink to /run/systemd/resolve/stub-resolv.conf
+    if [ ! -L /etc/resolv.conf ] || [ "$(readlink /etc/resolv.conf)" != "/run/systemd/resolve/stub-resolv.conf" ]; then
+        show_error "Systemd" "/etc/resolv.conf is not a symlink to /run/systemd/resolve/stub-resolv.conf"
+        return
+    fi
+
+    show_success "Systemd and systemd-resolved are properly configured."
 }
