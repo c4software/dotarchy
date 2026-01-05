@@ -42,7 +42,7 @@ To update only the configuration files without installing packages, you can run 
 
 ### AMD AI 9 HX 370 Series CPU users
 
-You can reduce the power consumpution of your CPU by disabling the AMD P-State driver and enabling the ACPI CPPC driver. To do this, add the following kernel parameters to your bootloader configuration:
+You can reduce the power consumpution of your CPU by enabling AMD P-State and forcing PCIe ASPM.
 
 Edit the bootloader entries in `/boot/loader/entries/<your-arch-entry>.conf` and add the following line:
 

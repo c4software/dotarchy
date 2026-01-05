@@ -73,3 +73,17 @@ if gum confirm "Do you want to install Tilling (Niri) and default configuration?
     setup
   )
 fi
+
+# Check if the processor is an AMD Ryzen AI 9 HX 370
+IS_RYZEN_AI_9_HX_370=$(grep -E "AMD Ryzen AI 9 HX 370" /proc/cpuinfo)
+if [ -n "$IS_RYZEN_AI_9_HX_370" ]; then
+  (
+    clear
+    echo "Detected AMD Ryzen AI 9 HX 370 CPU."
+    echo "You can reduce power consumption by enabling AMD P-State and forcing PCIe ASPM."
+    echo "Editing bootloader entries in /boot/loader/entries/ to add necessary kernel parameters."
+    echo "Please add the following line to your bootloader entry file(s):"
+    echo ""    echo "amd_pstate=active pcie_aspm=force"
+    echo ""    echo "After editing, please reboot your system for the changes to take effect."
+  )
+fi
