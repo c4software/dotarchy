@@ -40,6 +40,16 @@ To update only the configuration files without installing packages, you can run 
 ⚠️ This will overwrite your existing configuration files. Make sure to back up any important configurations before running this command.
 ⚠️ This will not update all [common configuration](./common/) files, only those related to Niri. To **update all configuration files**, please use `update.sh --all`.
 
+### AMD AI 9 HX 370 Series CPU users
+
+You can reduce the power consumpution of your CPU by disabling the AMD P-State driver and enabling the ACPI CPPC driver. To do this, add the following kernel parameters to your bootloader configuration:
+
+Edit the bootloader entries in `/boot/loader/entries/<your-arch-entry>.conf` and add the following line:
+
+```
+amd_pstate=active pcie_aspm=force
+```
+
 ### Dotarchy doctor
 
 You can run `./dotarchy-doctor.sh` to check if your current setup is correct and if all necessary components are installed.
