@@ -16,8 +16,8 @@ environment {
     XDG_CURRENT_DESKTOP "Niri"
     XDG_SESSION_DESKTOP "Niri"
 
-    XDG_DATA_HOME=$HOME/.local/share
-    XDG_DATA_DIRS=/usr/local/share:/usr/share
+    XDG_DATA_HOME $HOME/.local/share
+    XDG_DATA_DIRS /usr/local/share:/usr/share
 
     XCOMPOSEFILE "$HOME/.XCompose"
     GDK_BACKEND "wayland,x11"
