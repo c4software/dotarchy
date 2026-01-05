@@ -15,3 +15,6 @@ nss-mdns
 # Bluetooth
 bluez
 bluez-utils
+
+# DNS
+systemd-resolvconf

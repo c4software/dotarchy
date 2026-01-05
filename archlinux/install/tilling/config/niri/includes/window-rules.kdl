@@ -35,6 +35,14 @@ window-rule {
 }
 
 window-rule {
+  match app-id="jetbrains-studio"
+  open-focused true
+  open-maximized true
+  open-on-workspace "Code"
+}
+
+
+window-rule {
     match app-id="Slack"
     open-maximized true
     open-on-workspace "Chat"
@@ -46,6 +54,12 @@ window-rule {
     open-maximized true
     open-on-workspace "Chat"
     open-focused true
+}
+
+window-rule {
+  match app-id="chrome-hnpfjngllnobngcgfapefoaidbinmjnm-Default"
+  open-on-workspace "Chat"
+  open-focused true
 }
 
 window-rule {

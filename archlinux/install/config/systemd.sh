@@ -7,6 +7,9 @@ function setup(){
     # Prevent systemd-networkd-wait-online timeout on boot
     sudo systemctl disable systemd-networkd-wait-online.service
     sudo systemctl mask systemd-networkd-wait-online.service
+
+    # Enable systemd-resolved service
+    sudo systemctl enable --now systemd-resolved.service
 }
 
 function check(){
