@@ -8,12 +8,28 @@ function setup(){
     sudo systemctl disable systemd-networkd-wait-online.service
     sudo systemctl mask systemd-networkd-wait-online.service
 
-    # Enable systemd-resolved service
+
+    # Create a file with DNS settings for wg interfaces (/etc/systemd/network/50-wg-all.network)
+    local wg_config_file="/etc/systemd/network/50-wg-all.network"
+    
+    if [ ! -f "$wg_config_file" ]; then
+        echo "Creating WireGuard DNS priority configuration..."
+        sudo mkdir -p /etc/systemd/network
+        
+        sudo tee "$wg_config_file" > /dev/null << 'EOF'
+[Match]
+Name=wg*
+
+[Network]
+Domains=~.
+DNSDefaultRoute=yes
+EOF
+    fi
+
     sudo systemctl enable --now systemd-resolved.service
 }
 
 function check(){
-
     # Chck if the /etc/systemd/journald.conf exists
     if [ ! -f /etc/systemd/journald.conf ]; then
         show_warning "Systemd" "/etc/systemd/journald.conf does not exist."
@@ -30,6 +46,17 @@ function check(){
 
     if systemctl is-enabled --quiet systemd-networkd-wait-online.service; then
         show_error "Systemd" "systemd-networkd-wait-online.service is enabled"
+        return
+    fi
+
+    if [ ! -f "/etc/systemd/network/50-wg-all.network" ]; then
+        show_error "Systemd" "/etc/systemd/network/50-wg-all.network does not exist."
+        return
+    fi
+
+    # Check if systemd-resolved.service is enabled
+    if ! systemctl is-enabled --quiet systemd-resolved.service; then
+        show_error "Systemd" "systemd-resolved.service is not enabled"
         return
     fi
 
