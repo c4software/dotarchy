@@ -4,7 +4,7 @@ binds {
     Mod+F hotkey-overlay-title="File manager" { spawn "omarchy-launch-or-focus" "nautilus" "nautilus"; }
     Mod+B hotkey-overlay-title="Browser" { spawn "omarchy-launch-or-focus" "google-chrome" "google-chrome-stable"; }
     Mod+N hotkey-overlay-title="Neovim" { spawn "alacritty" "-e" "nvim"; }
-    Mod+T hotkey-overlay-title="System monitor" { spawn "alacritty" "--class" "TUI.float" "-e" "btop"; }
+    // Mod+T hotkey-overlay-title="System monitor" { spawn "alacritty" "--class" "TUI.float" "-e" "btop"; }
     Mod+D hotkey-overlay-title="Docker UI" { spawn "alacritty" "--class" "TUI.float" "-e" "lazydocker"; }
     Mod+A hotkey-overlay-title="AI menu" { spawn "dotarchy-menu-ai"; }
 
