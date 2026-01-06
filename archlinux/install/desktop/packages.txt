@@ -1,6 +1,7 @@
 # Applications
 ghostty
 signal-desktop
+telegram-desktop
 
 # VPN
 wireguard-tools

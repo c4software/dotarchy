@@ -50,6 +50,13 @@ window-rule {
 }
 
 window-rule {
+    match app-id="org.telegram.desktop"
+    open-maximized true
+    open-on-workspace "Chat"
+    open-focused true
+}
+
+window-rule {
     match app-id="signal"
     open-maximized true
     open-on-workspace "Chat"
