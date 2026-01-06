@@ -18,3 +18,6 @@ bluez-utils
 
 # DNS
 systemd-resolvconf
+
+# Power optimization
+powertop
