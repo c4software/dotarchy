@@ -27,12 +27,8 @@ EOF
 
 function check() {
     if systemctl is-active --quiet powertop.service 2>/dev/null; then
-        echo "Powertop service: active"
+        show_success "Powertop service: active"
     else
-        echo "Powertop service: inactive or non-existent"
-    fi
-    
-    if grep -q "AMD Ryzen AI 9 HX 370" /proc/cpuinfo; then
-        echo "Processor: AMD Ryzen AI 9 HX 370 detected"
+        show_warning "Powertop service: inactive or non-existent"
     fi
 }
