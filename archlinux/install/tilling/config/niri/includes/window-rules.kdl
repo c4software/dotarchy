@@ -41,6 +41,12 @@ window-rule {
   open-on-workspace "Code"
 }
 
+window-rule {
+  match app-id="antigravity"
+  open-focused true
+  open-maximized true
+  open-on-workspace "Code"
+}
 
 window-rule {
     match app-id="Slack"
