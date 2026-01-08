@@ -15,7 +15,7 @@ window-rule {
     open-maximized true
     open-maximized-to-edges true
     open-fullscreen true
-    
+
     focus-ring { 
         off 
     }
@@ -62,7 +62,7 @@ window-rule {
 // ============================================================================
 
 window-rule {
-    match app-id="^org\.gnome\.Nautilus$"
+    match app-id="org.gnome.Nautilus"
     open-focused true
     open-on-workspace "File"
 }
