@@ -22,6 +22,7 @@ gst-plugins-good
 gst-plugins-bad
 gst-plugins-ugly
 vlc
+vlc-plugins-all
 
 # Git
 git
