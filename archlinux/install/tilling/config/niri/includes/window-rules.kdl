@@ -1,3 +1,7 @@
+// ============================================================================
+// SPECIAL BEHAVIOR WINDOWS
+// ============================================================================
+
 window-rule {
     // This app-id regular expression will work for both:
     // - host Firefox (app-id is "firefox")
@@ -11,14 +15,13 @@ window-rule {
     open-maximized true
     open-maximized-to-edges true
     open-fullscreen true
-    
-    focus-ring {
-      off
-    }
-    border {
-      off
-    }
+    focus-ring { off }
+    border { off }
 }
+
+// ============================================================================
+// WORKSPACE: WEB
+// ============================================================================
 
 window-rule {
     match app-id=r#"^(google-chrome|chromium|org\.chromium\.Chromium)$"#
@@ -27,83 +30,67 @@ window-rule {
     open-on-workspace "Web"
 }
 
+// ============================================================================
+// WORKSPACE: CODE
+// ============================================================================
+
 window-rule {
-    match app-id="code"
+    match app-id=r#"^(code|jetbrains-studio|antigravity)$"#
     open-maximized true
     open-focused true
     open-on-workspace "Code"
 }
 
-window-rule {
-  match app-id="jetbrains-studio"
-  open-focused true
-  open-maximized true
-  open-on-workspace "Code"
-}
+// ============================================================================
+// WORKSPACE: CHAT
+// ============================================================================
 
 window-rule {
-  match app-id="antigravity"
-  open-focused true
-  open-maximized true
-  open-on-workspace "Code"
-}
-
-window-rule {
-    match app-id="Slack"
+    match app-id=r#"^(Slack|org\.telegram\.desktop|signal|chrome-hnpfjngllnobngcgfapefoaidbinmjnm-Default)$"#
     open-maximized true
-    open-on-workspace "Chat"
     open-focused true
-}
-
-window-rule {
-    match app-id="org.telegram.desktop"
-    open-maximized true
     open-on-workspace "Chat"
+}
+
+// ============================================================================
+// WORKSPACE: FILE
+// ============================================================================
+
+window-rule {
+    match app-id="^org\.gnome\.Nautilus$"
     open-focused true
+    open-on-workspace "File"
 }
 
-window-rule {
-    match app-id="signal"
-    open-maximized true
-    open-on-workspace "Chat"
-    open-focused true
-}
+// ============================================================================
+// FLOATING WINDOWS
+// ============================================================================
 
+// Small utility windows
 window-rule {
-  match app-id="chrome-hnpfjngllnobngcgfapefoaidbinmjnm-Default"
-  open-on-workspace "Chat"
-  open-focused true
-}
-
-window-rule {
-    match app-id=r#"^(blueberry\.py|Bluetui|Impala|Wiremix|org\.gnome\.NautilusPreviewer|com\.gabm\.satty|Omarchy|About|TUI\.float|org\.gnome\.Evince)$"#
+    match app-id=r#"^(blueberry\.py|Bluetui|Impala|Wiremix|org\.gnome\.NautilusPreviewer|com\.gabm\.satty|Omarchy|About|TUI\.float|org\.gnome\.Evince|com\.seafile\.seafile-applet)$"#
     open-floating true
     open-focused true
 }
 
-window-rule {
-  match app-id="^com.seafile.seafile-applet$"
-  open-floating true
-}
-
+// File dialogs
 window-rule {
     match app-id=r#"^(xdg-desktop-portal-gtk|sublime_text|DesktopEditors|org\.gnome\.Nautilus)$"#
-    match title=r#"^(Open.*Files?|Open [F|f]older.*|Save.*Files?|Save.*As|Save|All Files)"#
+    match title=r#"^(Open.*Files?|Open [Ff]older.*|Save.*Files?|Save.*As|Save|All Files)"#
     open-floating true
 }
 
-window-rule {
-    match app-id="^(org.gnome.Nautilus)$"
-    open-on-workspace "File"
-    open-focused true
-}
-
+// Calculator with fixed size
 window-rule {
     match app-id="org.gnome.Calculator"
     open-floating true
     max-width 360
     max-height 616
 }
+
+// ============================================================================
+// GLOBAL STYLING
+// ============================================================================
 
 window-rule {
     geometry-corner-radius 8
@@ -113,20 +100,16 @@ window-rule {
 // Indicate screencasted windows with red colors.
 window-rule {
     match is-window-cast-target=true
-
     focus-ring {
         active-color "#f38ba8"
         inactive-color "#7d0d2d"
     }
-
     border {
         inactive-color "#7d0d2d"
     }
-
     shadow {
         color "#7d0d2d70"
     }
-
     tab-indicator {
         active-color "#f38ba8"
         inactive-color "#7d0d2d"
