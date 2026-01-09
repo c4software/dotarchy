@@ -2,3 +2,8 @@
 export EDITOR="nvim"
 export SUDO_EDITOR="$EDITOR"
 export BAT_THEME=ansi
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export SSH_AUTH_SOCK="$HOME/.ssh/ssh-agent.socket"
+else
+  export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+fi
