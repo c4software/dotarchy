@@ -54,7 +54,12 @@ window-rule {
     match app-id=r#"^(Slack|org\.telegram\.desktop|signal|chrome-hnpfjngllnobngcgfapefoaidbinmjnm-Default)$"#
     open-maximized true
     open-focused true
+    open-floating true
     open-on-workspace "Chat"
+
+    shadow {
+      on
+    }
 }
 
 // ============================================================================
@@ -83,6 +88,10 @@ window-rule {
     match app-id=r#"^(xdg-desktop-portal-gtk|sublime_text|DesktopEditors|org\.gnome\.Nautilus)$"#
     match title=r#"^(Open.*Files?|Open [Ff]older.*|Save.*Files?|Save.*As|Save|All Files)"#
     open-floating true
+
+    shadow {
+      on
+    }
 }
 
 // Calculator with fixed size
@@ -91,6 +100,10 @@ window-rule {
     open-floating true
     max-width 360
     max-height 616
+
+    shadow {
+      on
+    }
 }
 
 // ============================================================================
