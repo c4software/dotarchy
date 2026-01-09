@@ -10,6 +10,7 @@ weight: 7
 | Shortcut                  | Description                       |
 | :------------------------ | :-------------------------------- |
 | `Mod + W`                 | Close the active window           |
+| `Mod + S`                 | Toggle floating mode              |
 | `F11`                     | Maximize column (fullscreen)      |
 | `Mod + F11`               | Toggle windowed fullscreen        |
 | `Mod + P`                 | Center column                     |
