@@ -6,6 +6,9 @@ seahorse
 nautilus
 polkit-gnome
 evince
+gvfs-mtp
+gvfs-mtp
+gvfs-smb
 
 # Tools
 mpv
