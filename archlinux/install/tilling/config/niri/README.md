@@ -74,6 +74,15 @@ Guide complet des raccourcis clavier pour Niri (configuration bépo).
 | `Mod+Down`  | Focus workspace en-dessous |
 | `Mod+Tab`   | Basculer en mode aperçu    |
 
+## Navigation bis
+
+| Raccourci         | Action                   |
+| ----------------- | ------------------------ |
+| `Mod+Shift+Left`  | Focus colonne gauche     |
+| `Mod+Shift+Right` | Focus colonne droite     |
+| `Mod+Shift+Up`    | Focus fenêtre au-dessus  |
+| `Mod+Shift+Down`  | Focus fenêtre en-dessous |
+
 ### Espaces de travail (bépo)
 
 | Raccourci | Action      |
@@ -102,10 +111,10 @@ Guide complet des raccourcis clavier pour Niri (configuration bépo).
 
 | Raccourci         | Action                           |
 | ----------------- | -------------------------------- |
-| `Mod+Shift+Left`  | Déplacer la colonne à gauche     |
-| `Mod+Shift+Right` | Déplacer la colonne à droite     |
-| `Mod+Shift+Up`    | Déplacer la fenêtre vers le haut |
-| `Mod+Shift+Down`  | Déplacer la fenêtre vers le bas  |
+| `Alt+Shift+Left`  | Déplacer la colonne à gauche     |
+| `Alt+Shift+Right` | Déplacer la colonne à droite     |
+| `Alt+Shift+Up`    | Déplacer la fenêtre vers le haut |
+| `Alt+Shift+Down`  | Déplacer la fenêtre vers le bas  |
 
 ### Redimensionner
 
@@ -132,11 +141,13 @@ Guide complet des raccourcis clavier pour Niri (configuration bépo).
 
 ### Groupement de fenêtres
 
-| Raccourci | Action                                   |
-| --------- | ---------------------------------------- |
-| `Mod+G`   | Grouper/Dégrouper en affichage à onglets |
-| `Mod+Q`   | Consommer la fenêtre dans le groupe      |
-| `Mod+H`   | Expulser la fenêtre du groupe            |
+| Raccourci        | Action                                   |
+| ---------------- | ---------------------------------------- |
+| `Mod+G`          | Grouper/Dégrouper en affichage à onglets |
+| `Mod+Q`          | Consommer la fenêtre dans le groupe      |
+| `Mod+H`          | Expulser la fenêtre du groupe            |
+| `Mod+Shift+Up`   | Focus fenêtre précédente dans le groupe  |
+| `Mod+Shift+Down` | Focus fenêtre suivante dans le groupe    |
 
 ## Applications
 

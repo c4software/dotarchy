@@ -22,8 +22,10 @@ weight: 7
 | `Mod + [1-7]`             | Switch to workspace (bépo layout) |
 | `Mod + Shift + [1-7]`     | Move column to workspace          |
 | `Mod + Tab`               | Toggle overview mode              |
-| `Mod + Shift + ←/→`       | Move column left/right            |
-| `Mod + Shift + ↑/↓`       | Move window up/down in column     |
+| `Alt + Shift + ←/→`       | Move column left/right            |
+| `Alt + Shift + ↑/↓`       | Move window up/down in column     |
+| `Mod + Shift + ←/→`       | Focus column left/right (windows) |
+| `Mod + Shift + ↑/↓`       | Focus window up/down (windows)    |
 | `Alt + ←/→`               | Resize column width (±10%)        |
 | `Alt + ↑/↓`               | Resize window height (±10%)       |
 | `Mod + Mouse wheel`       | Scroll through workspaces         |
@@ -33,11 +35,13 @@ weight: 7
 
 ### Grouping (Tabbed Windows)
 
-| Shortcut  | Description                      |
-| :-------- | :------------------------------- |
-| `Mod + G` | Toggle tabbed display for column |
-| `Mod + Q` | Consume window into column/group |
-| `Mod + H` | Expel window from column/group   |
+| Shortcut          | Description                      |
+| :---------------- | :------------------------------- |
+| `Mod + G`         | Toggle tabbed display for column |
+| `Mod + Q`         | Consume window into column/group |
+| `Mod + H`         | Expel window from column/group   |
+| `Mod + Shift + ↑` | Focus previous window in group   |
+| `Mod + Shift + ↓` | Focus next window in group       |
 
 ---
 
