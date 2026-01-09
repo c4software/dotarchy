@@ -10,7 +10,7 @@ binds {
     Mod+Alt+Right hotkey-overlay-title="Expand to width" { expand-column-to-available-width; }
 
     // Toggle floating mode
-    Mod+Shift+F hotkey-overlay-title="Toggle floating mode" { toggle-window-floating; }
+    Mod+S hotkey-overlay-title="Toggle floating mode" { toggle-window-floating; }
 
     // Detached fullscreen windows
     Mod+F11 hotkey-overlay-title="Toggle windowed fullscreen" { toggle-windowed-fullscreen; }

@@ -53,6 +53,7 @@ Guide complet des raccourcis clavier pour Niri (configuration bépo).
 | `F11`     | Maximiser la colonne            |
 | `Mod+F11` | Basculer en plein écran fenêtré |
 | `Mod+P`   | Centrer la colonne              |
+| `Mod+S`   | Basculer le mode flottant       |
 
 ### Maximisation et expansion
 
