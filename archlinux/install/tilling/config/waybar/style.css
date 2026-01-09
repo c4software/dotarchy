@@ -6,7 +6,7 @@
     border: none;
     border-radius: 0;
     font-family: JetBrainsMono Nerd Font;
-    font-size: 11px;
+    font-size: 14px;
     min-height: 0;
 }
 
@@ -16,21 +16,21 @@ window#waybar {
 
 .modules-right,
 .modules-left {
-    padding: 4px 6px;
-    margin: 4px 6px 0;
-    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 6px 8px 0;
+    border-radius: 8px;
     background: alpha(@background, 0.85);
     box-shadow: 0 0 1.5px rgba(0, 0, 0, 0.5);
 }
 
 #workspaces {
-    padding: 0 3px;
+    padding: 0 5px;
 }
 
 #workspaces button {
-    padding: 0 4px;
-    margin: 0 1px;
-    min-width: 8px;
+    padding: 0 6px;
+    margin: 0 2px;
+    min-width: 12px;
     color: alpha(@foreground, 0.25);
     transition: color 0.2s ease;
 }
@@ -65,8 +65,8 @@ window#waybar {
 #custom-screenrecording-indicator,
 #custom-do-not-disturb-indicator,
 #custom-update {
-    margin: 0 3px;
-    min-width: 10px;
+    margin: 0 5px;
+    min-width: 14px;
     color: @foreground;
     transition: color 0.2s ease;
 }
