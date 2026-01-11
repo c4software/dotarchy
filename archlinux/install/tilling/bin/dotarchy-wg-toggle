@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# wg-toggle - Toggle WireGuard configs avec rofi + sudo + notify-send + signal Waybar
+# wg-toggle - Toggle WireGuard configs avec rofi + pkexec + notify-send + signal Waybar
 
 CONF_DIR="/etc/wireguard"
 SIGNAL=10
@@ -10,11 +10,11 @@ ICON_ERROR="dialog-error-symbolic"
 # Tableau : [config, label, config, label, ...]
 declare -a configs
 
-# Liste des configs via sudo
+# Liste des configs via pkexec
 while read -r file; do
     name=$(basename "$file" .conf)
     configs+=("$name" "${name^}")
-done < <(sudo find "$CONF_DIR" -maxdepth 1 -type f -name "*.conf" 2>/dev/null)
+done < <(pkexec find "$CONF_DIR" -maxdepth 1 -type f -name "*.conf" 2>/dev/null)
 
 if [ ${#configs[@]} -eq 0 ]; then
     notify-send -u critical -t 5000 -i "$ICON_ERROR" "Erreur WireGuard" "Impossible de lister les tunnels"
@@ -52,16 +52,16 @@ done
 
 # Gestion de la sélection
 if [[ "$selected" == "Disconnect" ]]; then
-    sudo wg-quick down "$active_iface" && \
+    pkexec wg-quick down "$active_iface" && \
     notify-send -u normal -t 5000 -i "$ICON_DISCONNECTED" "WireGuard" "$active_label désactivé"
 elif [ -n "$active_iface" ] && [ "$active_iface" = "$config" ]; then
-    sudo wg-quick down "$config" && \
+    pkexec wg-quick down "$config" && \
     notify-send -u normal -t 5000 -i "$ICON_DISCONNECTED" "WireGuard" "$selected désactivé"
 elif [ -n "$active_iface" ]; then
-    sudo wg-quick down "$active_iface" && sudo wg-quick up "$config" && \
+    pkexec wg-quick down "$active_iface" && pkexec wg-quick up "$config" && \
     notify-send -u normal -t 5000 -i "$ICON_CONNECTED" "WireGuard" "$selected activé"
 else
-    sudo wg-quick up "$config" && \
+    pkexec wg-quick up "$config" && \
     notify-send -u normal -t 5000 -i "$ICON_CONNECTED" "WireGuard" "$selected activé"
 fi
 
