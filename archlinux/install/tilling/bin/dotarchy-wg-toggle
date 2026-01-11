@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# wg-toggle-fzf.sh - Toggle WireGuard configs avec gum + sudo + notify-send + signal Waybar
+# wg-toggle - Toggle WireGuard configs avec rofi + sudo + notify-send + signal Waybar
 
 CONF_DIR="/etc/wireguard"
 SIGNAL=10
@@ -7,42 +7,62 @@ ICON_CONNECTED="network-vpn-symbolic"
 ICON_DISCONNECTED="network-vpn-no-route-symbolic"
 ICON_ERROR="dialog-error-symbolic"
 
-# Liste des configs via sudo
-configs=$(sudo find "$CONF_DIR" -maxdepth 1 -type f -name "*.conf" -exec basename {} .conf \; 2>/dev/null)
+# Tableau : [config, label, config, label, ...]
+declare -a configs
 
-if [ $? -ne 0 ] || [ -z "$configs" ]; then
+# Liste des configs via sudo
+while read -r file; do
+    name=$(basename "$file" .conf)
+    configs+=("$name" "${name^}")
+done < <(sudo find "$CONF_DIR" -maxdepth 1 -type f -name "*.conf" 2>/dev/null)
+
+if [ ${#configs[@]} -eq 0 ]; then
     notify-send -u critical -t 5000 -i "$ICON_ERROR" "Erreur WireGuard" "Impossible de lister les tunnels"
     exit 1
 fi
 
 # Vérifie interface active
 active_iface=$(ip -o link show type wireguard 2>/dev/null | awk -F': ' '{print $2}' | cut -d@ -f1 | head -n1)
+active_label="${active_iface^}"
 
-# Prépare les options
-options="$configs"
+# Prépare les options (labels uniquement, indices impairs)
+options=""
+for ((i=1; i<${#configs[@]}; i+=2)); do
+    options+="${configs[i]}"$'\n'
+done
+options="${options%$'\n'}"  # Supprime le dernier saut de ligne
+
 if [ -n "$active_iface" ]; then
-    options="[Désactiver $active_iface]"$'\n'"$configs"
+    options="Disconnect"$'\n'"$options"
 fi
 
-# Sélection avec gum
-selected=$(echo "$options" | gum filter --placeholder "Sélectionne un VPN...")
+# Sélection avec rofi via dotarchy-display-menu
+selected=$(dotarchy-display-menu "Sélectionne un VPN" "$options")
 
 [ -z "$selected" ] && exit 0
 
-# Gestion de la désactivation
-if [[ "$selected" == \[Désactiver* ]]; then
+# Trouve le config correspondant au label sélectionné (indice pair = config, impair = label)
+config=""
+for ((i=1; i<${#configs[@]}; i+=2)); do
+    if [ "${configs[i]}" = "$selected" ]; then
+        config="${configs[i-1]}"
+        break
+    fi
+done
+
+# Gestion de la sélection
+if [[ "$selected" == "Disconnect" ]]; then
     sudo wg-quick down "$active_iface" && \
-    notify-send -u normal -t 5000 -i "$ICON_DISCONNECTED" "WireGuard" "$active_iface désactivé"
-# Gestion des tunnels
-elif [ -n "$active_iface" ] && [ "$active_iface" = "$selected" ]; then
-    sudo wg-quick down "$selected" && \
-    notify-send -u normal -t 5000 -i "$ICON_DISCONNECTED" "WireGuard" "${selected^} désactivé"
+    notify-send -u normal -t 5000 -i "$ICON_DISCONNECTED" "WireGuard" "$active_label désactivé"
+elif [ -n "$active_iface" ] && [ "$active_iface" = "$config" ]; then
+    sudo wg-quick down "$config" && \
+    notify-send -u normal -t 5000 -i "$ICON_DISCONNECTED" "WireGuard" "$selected désactivé"
 elif [ -n "$active_iface" ]; then
-    sudo wg-quick down "$active_iface" && sudo wg-quick up "$selected" && \
-    notify-send -u normal -t 5000 -i "$ICON_CONNECTED" "WireGuard" "${selected^} activé"
+    sudo wg-quick down "$active_iface" && sudo wg-quick up "$config" && \
+    notify-send -u normal -t 5000 -i "$ICON_CONNECTED" "WireGuard" "$selected activé"
 else
-    sudo wg-quick up "$selected" && \
-    notify-send -u normal -t 5000 -i "$ICON_CONNECTED" "WireGuard" "${selected^} activé"
+    sudo wg-quick up "$config" && \
+    notify-send -u normal -t 5000 -i "$ICON_CONNECTED" "WireGuard" "$selected activé"
 fi
 
 # Rafraîchit Waybar
