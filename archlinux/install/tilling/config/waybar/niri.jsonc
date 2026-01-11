@@ -159,7 +159,7 @@
     "format": "{text}",
     "return-type": "json",
     "exec": "~/.config/waybar/scripts/wireguard.sh",
-    "on-click": "alacritty --class=TUI.float -e dotarchy-wg-toggle",
+    "on-click": "dotarchy-wg-toggle",
     "signal": 10,
     "escape": true
   }
