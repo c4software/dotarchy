@@ -5,7 +5,7 @@ input {
     keyboard {
         xkb {
             layout "bepoDev"
-            options "ralt:caps"
+          options "ralt:caps"
         }
         numlock
     }
@@ -13,7 +13,7 @@ input {
     touchpad {
         // off
         tap
-        // dwt
+        dwt
         // dwtp
         // drag false
         drag-lock
