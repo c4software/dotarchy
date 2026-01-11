@@ -2,6 +2,11 @@
 export EDITOR="nvim"
 export SUDO_EDITOR="$EDITOR"
 export BAT_THEME=ansi
+
+shopt -s histappend
+export HISTSIZE=10000
+export HISTFILESIZE=20000
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
   export SSH_AUTH_SOCK="$HOME/.ssh/ssh-agent.socket"
 else
