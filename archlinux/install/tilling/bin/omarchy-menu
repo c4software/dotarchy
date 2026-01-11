@@ -266,7 +266,7 @@ show_style_menu() {
 }
 
 show_main_menu() {
-  go_to_menu "$(dotarchy-display-menu "Go" "󰀻  Apps\n󰧑  Learn\n  Capture\n󰔎  Toggle\n󰸌  Style\n  Setup\n󰉉  Install\n󰭌  Remove\n  About\n  System")"
+  go_to_menu "$(dotarchy-display-menu "Go" "󰀻  Apps\n󰧑  Learn\n  Capture\n󰔎  Toggle\n󰸌  Style\n  Wireguard\n  Setup\n󰉉  Install\n󰭌  Remove\n  About\n  System")"
 }
 
 go_to_menu() {
@@ -282,6 +282,7 @@ go_to_menu() {
   *install*) show_install_menu ;;
   *remove*) show_remove_menu ;;
   *system*) show_system_menu ;;
+  *Wireguard*) dotarchy-wg-menu ;;
   *about*) terminal bash -c 'fastfetch; read -n 1 -s' ;;
   *power*) show_setup_power_menu ;;
   *) dotarchy-search-or-open-web "$1" ;;
