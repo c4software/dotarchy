@@ -3,7 +3,7 @@
 // ============================================================================
 
 window-rule {
-    match title="^Picture-in-Picture$"
+    match title=".*Picture-in-Picture.*"
     open-floating true
 }
 
