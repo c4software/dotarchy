@@ -30,6 +30,26 @@ EOF
     sudo rm /etc/resolv.conf
     sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
+    # Create config to force wlan0 to use network DNS settings
+    local wlan0_config_file="/etc/systemd/network/25-wlan0.network"
+
+    if [ ! -f "$wlan0_config_file" ]; then
+        echo "Creating wlan0 DNS priority configuration..."
+        sudo tee "$wlan0_config_file" > /dev/null << 'EOF'
+[Match]
+Name=wlan0
+
+[Network]
+DHCP=yes
+
+[DHCPv4]
+UseDNS=yes
+
+[Network]
+Domains=~.
+EOF
+    fi
+
     sudo systemctl enable --now systemd-resolved.service
 }
 
@@ -67,6 +87,12 @@ function check(){
     # Check if /etc/resolv.conf is a symlink to /run/systemd/resolve/stub-resolv.conf
     if [ ! -L /etc/resolv.conf ] || [ "$(readlink /etc/resolv.conf)" != "/run/systemd/resolve/stub-resolv.conf" ]; then
         show_error "Systemd" "/etc/resolv.conf is not a symlink to /run/systemd/resolve/stub-resolv.conf"
+        return
+    fi
+
+    # Check if wlan0 config file exists
+    if [ ! -f "/etc/systemd/network/25-wlan0.network" ]; then
+        show_error "Systemd" "/etc/systemd/network/25-wlan0.network does not exist."
         return
     fi
 
