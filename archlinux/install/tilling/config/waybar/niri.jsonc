@@ -18,6 +18,7 @@
     "cpu",
     "battery",
     "clock",
+    "custom/mirror",
     "custom/wireguard",
     "custom/screenrecording-indicator",
     "custom/do-not-disturb-indicator"
@@ -162,5 +163,13 @@
     "on-click": "dotarchy-wg-toggle",
     "signal": 10,
     "escape": true
+  },
+  "custom/mirror": {
+    "format": "{text}",
+    "exec": "~/.config/waybar/scripts/mirror-screen.sh indicator",
+    "on-click": "~/.config/waybar/scripts/mirror-screen.sh action",
+    "return-type": "json",
+    "signal": 11,
+    "tooltip": true
   }
 }
