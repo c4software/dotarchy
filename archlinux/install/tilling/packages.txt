@@ -46,3 +46,4 @@ satty
 wf-recorder
 rofi
 xwayland-satellite
+wl-mirror
