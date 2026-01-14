@@ -99,6 +99,10 @@ show_setup_menu() {
   [ -f ~/.config/niri/input.kdl ] && options="$options\n  Input"
   options="$options\n  Config\n󰈷  Fingerprint\n  Firmware"
 
+  if ! omarchy-hibernation-available; then
+    options="$options\n󰤁  Enable Hibernate"
+  fi
+
   case $(dotarchy-display-menu "Setup" "$options") in
   *Audio*) alacritty --class=Wiremix -e wiremix ;;
   *Wifi*)
@@ -116,6 +120,7 @@ show_setup_menu() {
   *Config*) show_setup_config_menu ;;
   *Fingerprint*) present_terminal omarchy-setup-fingerprint ;;
   *Firmware*) present_terminal omarchy-update-firmware ;;
+  *Hibernate*) present_terminal omarchy-hibernation-setup ;;
   *) show_main_menu ;;
   esac
 }
