@@ -122,8 +122,13 @@ show_setup_menu() {
   *Config*) show_setup_config_menu ;;
   *Fingerprint*) present_terminal omarchy-setup-fingerprint ;;
   *Firmware*) present_terminal omarchy-update-firmware ;;
-  *Hibernate*) present_terminal omarchy-hibernation-setup ;;
-  *Disable Hibernate*) present_terminal omarchy-hibernate-remove ;;
+  *Hibernate*)
+    if omarchy-hibernation-available; then
+      present_terminal omarchy-hibernate-remove
+    else
+      present_terminal omarchy-hibernation-setup
+    fi
+  ;;
   *) show_main_menu ;;
   esac
 }
