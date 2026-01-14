@@ -238,10 +238,19 @@ show_remove_menu() {
 }
 
 show_system_menu() {
-  case $(dotarchy-display-menu "System" "  Lock\n󱄄  Screensaver\n󰤄  Suspend\n  Logout\n󰜉  Restart\n󰐥  Shutdown") in
+  local options="  Lock\n󱄄  Screensaver\n󰤄  Suspend"
+  
+  if omarchy-hibernation-available; then
+    options="$options\n󰤄  Hibernate"
+  fi
+  
+  options="$options\n  Logout\n󰜉  Restart\n󰐥  Shutdown"
+  
+  case $(dotarchy-display-menu "System" "$options") in
   *Lock*) dotarchy-lock-screen ;;
   *Screensaver*) omarchy-launch-screensaver force ;;
   *Suspend*) systemctl suspend ;;
+  *Hibernate*) systemctl hibernate ;;
   *Logout*) systemctl restart greetd ;;
   *Restart*) systemctl reboot --no-wall ;;
   *Shutdown*) systemctl poweroff --no-wall ;;
