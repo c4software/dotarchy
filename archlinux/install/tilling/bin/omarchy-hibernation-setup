@@ -62,8 +62,8 @@ echo "Configuring suspend-then-hibernate"
 sudo mkdir -p /etc/systemd/logind.conf.d /etc/systemd/sleep.conf.d
 
 # Create the lid.conf file to /etc/systemd/logind.conf.d/
-local lid_conf="/etc/systemd/logind.conf.d/lid.conf"
-sudo tee "$lid_conf" > /dev/null << 'EOF'
+LID_CONF="/etc/systemd/logind.conf.d/lid.conf"
+sudo tee "$LID_CONF" > /dev/null << 'EOF'
 [Login]
 HandleLidSwitch=suspend-then-hibernate
 EOF
@@ -73,8 +73,8 @@ echo "Select hibernate delay time:"
 HIBERNATE_DELAY=$(gum choose "15min" "30min" "1h" "2h" "3h" --selected "30min")
 
 # Create the hibernate.conf file to /etc/systemd/sleep.conf.d/
-local hibernate_conf="/etc/systemd/sleep.conf.d/hibernate.conf"
-sudo tee "$hibernate_conf" > /dev/null << EOF
+HIBERNATE_CONF="/etc/systemd/sleep.conf.d/hibernate.conf"
+sudo tee "$HIBERNATE_CONF" > /dev/null << EOF
 [Sleep]
 HibernateDelaySec=$HIBERNATE_DELAY
 HibernateOnACPower=no
