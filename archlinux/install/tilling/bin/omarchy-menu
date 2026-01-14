@@ -94,7 +94,7 @@ show_toggle_menu() {
 }
 
 show_setup_menu() {
-  local options="  Audio\n  Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰍹  Monitors"
+  local options="  Audio\n   Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰍹  Monitors"
   [ -f ~/.config/niri/binds.kdl ] && options="$options\n  Keybindings"
   [ -f ~/.config/niri/input.kdl ] && options="$options\n  Input"
   options="$options\n  Config\n󰈷  Fingerprint\n  Firmware"
