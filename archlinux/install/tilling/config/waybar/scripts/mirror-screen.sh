@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-MIRROR_CMD="wl-mirror --show-cursor --fullscreen-output DP-2 eDP-1"
+MIRROR_CMD="wl-mirror -F --show-cursor --fullscreen-output DP-2 eDP-1"
 PROCESS_NAME="wl-mirror"
 SIGNAL_NUMBER=11
 SIGNAL_CMD="pkill -RTMIN+$SIGNAL_NUMBER waybar"
