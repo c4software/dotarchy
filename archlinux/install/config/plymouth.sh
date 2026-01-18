@@ -8,6 +8,25 @@ EOF
     # Rebuild the initramfs
     echo "Rebuilding initramfs with plymouth hook..."
     sudo mkinitcpio -P
+
+    # Add quiet, plymouth.nolog and splash to /boot/loader/entries/*.conf if not already present
+    if [ -d "/boot/loader/entries" ]; then
+        for entry in /boot/loader/entries/*.conf; do
+            if ! grep -q "quiet" "$entry"; then
+                echo "Adding quiet at the end of $entry..."
+                sudo sed -i 's/^options /&quiet /' "$entry"
+            fi
+            if ! grep -q "splash" "$entry"; then
+                echo "Adding splash at the end of $entry..."
+                sudo sed -i 's/^options /&splash /' "$entry"
+            fi
+
+            if ! grep -q "plymouth.nolog" "$entry"; then
+                echo "Adding plymouth.nolog at the end of $entry..."
+                sudo sed -i 's/^options /&plymouth.nolog /' "$entry"
+            fi
+        done
+    fi
 }
 
 function check(){
