@@ -12,6 +12,9 @@ system-config-printer
 avahi
 nss-mdns
 
+# Boot
+plymouth
+
 # Bluetooth
 bluez
 bluez-utils
