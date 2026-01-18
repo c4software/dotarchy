@@ -13,6 +13,7 @@ include "includes/layout.kdl"
 include "includes/output.kdl"
 include "includes/window-rules.kdl"
 include "includes/workspaces.kdl"
+include "includes/cursor.kdl"
 
 debug {
   honor-xdg-activation-with-invalid-serial
