@@ -7,7 +7,6 @@ nautilus
 polkit-gnome
 evince
 gvfs-mtp
-gvfs-mtp
 gvfs-smb
 
 # Tools
