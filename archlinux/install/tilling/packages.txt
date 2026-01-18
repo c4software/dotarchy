@@ -38,7 +38,6 @@ wiremix
 pamixer
 bluetui
 alacritty
-wl-clip-persist
 wl-clipboard
 iwd
 impala
