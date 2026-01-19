@@ -26,88 +26,102 @@ configuration {
   spacing: 0;
 
   background-color: transparent;
-  text-color: @foreground;
+  text-color:         @foreground;
 }
 
 window {
-  border: 2;
-  border-color: @border-color;
-  border-radius: 0;
-  transparency: "real";
-  background-color: @window-background;
-  padding: 20px;
+  border:             2;
+  border-color:       @border-color;
+  border-radius:      0;
+  transparency:       "real";
+  background-color:   @window-background;
+  padding:            20px;
 }
 
 mainbox {
-  children: [inputbar, listview];
-  background-color: transparent;
-  spacing: 0px;
+  children:           [inputbar, message, listview];
+  background-color:   transparent;
+  spacing:            12px;
 }
 
 inputbar {
-  enabled: true;
-  background-color: @background;
-  children: [entry];
-  padding: 10px;
-  margin: 0px 0px 0px 0px;
+  enabled:            true;
+  background-color:   @background;
+  children:           [entry];
+  padding:            10px;
+  margin:             0;
 }
 
 entry {
-  background-color: transparent;
-  padding: 0px;
-  placeholder: "";
-  placeholder-color: @placeholder-color;
+  background-color:   transparent;
+  padding:            0;
+  placeholder:        "";
+  placeholder-color:  @placeholder-color;
 }
 
 prompt {
-  enabled: false;
+  enabled:            false;
+}
+
+message {
+  background-color:   @background;
+  padding:            14px 18px;
+  border:             0;
+  border-radius:      0;
+  margin:             0;
+}
+
+message {
+  text-color:         #f9e2af;
+  background-color:   transparent;
+  font:               "monospace 15 bold";
 }
 
 listview {
-  lines: 8;
-  background-color: transparent;
-  spacing: 0px;
-  cycle: true;
-  dynamic: true;
-  layout: vertical;
+  lines:              8;
+  background-color:   transparent;
+  spacing:            0;
+  cycle:              true;
+  dynamic:            true;
+  layout:             vertical;
 }
 
 element {
-  children: [element-icon, element-text];
-  background-color: transparent;
-  padding: 0px 10px;
-  border-radius: 0;
+  children:           [element-icon, element-text];
+  background-color:   transparent;
+  padding:            0 10px;
+  border-radius:      0;
 }
 
 element selected,
 element-icon selected,
 element-text selected {
-  background-color: transparent;
+  background-color:   transparent;
 }
 
 element-icon {
-  padding: 10px 10px 10px 0px;
-  size: 1em;
-  background-color: transparent;
+  padding:            10px 10px 10px 0;
+  size:               1em;
+  background-color:   transparent;
 }
 
 element-text {
-  padding: 14px 0px;
-  background-color: transparent;
+  padding:            14px 0;
+  background-color:   transparent;
 }
 
 element-text selected {
-  text-color: @selected-text;
-  background-color: transparent;
+  text-color:         @selected-text;
+  background-color:   transparent;
 }
 
 element selected {
-  background-color: transparent;
+  background-color:   transparent;
 }
 
 scrollbar {
-  width: 0px;
-  handle-width: 0px;
-  handle-color: transparent;
-  background-color: transparent;
+  width:              0;
+  handle-width:       0;
+  handle-color:       transparent;
+  background-color:   transparent;
 }

@@ -43,5 +43,6 @@ impala
 satty
 wf-recorder
 rofi
+rofi-calc
 xwayland-satellite
 wl-mirror

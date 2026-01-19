@@ -20,6 +20,19 @@ Categories=Office;WordProcessor;Spreadsheet;Presentation;
 MimeType=application/msword;application/vnd.openxmlformats-officedocument.wordprocessingml.document;application/vnd.oasis.opendocument.text;application/vnd.ms-excel;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;application/vnd.oasis.opendocument.spreadsheet;application/vnd.ms-powerpoint;application/vnd.openxmlformats-officedocument.presentationml.presentation;application/vnd.oasis.opendocument.presentation;
 EOF
 
+    # Create quickcalc rofi entry
+    # ~/.local/share/applications/quickcal.desktop
+    cat <<EOF > ~/.local/share/applications/quickcal.desktop
+[Desktop Entry]
+Categories=Calculator;
+Name=QuickCal
+GenericName=Calculator
+Exec=rofi -show calc -modi calc -no-show-match -no-sort -automatic-save-to-history
+Icon=qalculate-qt
+Type=Application
+Keywords==;
+EOF
+
 }
 
 function check() {
@@ -28,5 +41,12 @@ function check() {
         show_success "OnlyOffice AppImage"
     else
         show_error "OnlyOffice AppImage" "The OnlyOffice AppImage is missing in ~/Applications/."
+    fi
+
+    # Check if quickcal desktop entry exists
+    if [ -f "$HOME/.local/share/applications/quickcal.desktop" ]; then
+        show_success "quickcal desktop entry"
+    else
+        show_error "quickcal desktop entry" "The quickcal desktop entry is missing in ~/.local/share/applications/."
     fi
 }
