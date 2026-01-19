@@ -19,4 +19,5 @@ function check(){
         show_success "NuPhy udev rules file exists"
     else
         show_error "NuPhy udev rules file" "The /etc/udev/rules.d/50-nuphy.rules file is missing."
-    fi}
+    fi
+}
