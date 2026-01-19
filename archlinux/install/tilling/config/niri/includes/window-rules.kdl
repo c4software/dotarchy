@@ -21,6 +21,13 @@ window-rule {
     }
 }
 
+window-rule {
+    match app-id="org.gnome.Nautilus"
+    open-focused true
+}
+
+
+
 // ============================================================================
 // WORKSPACE: WEB
 // ============================================================================
@@ -60,21 +67,11 @@ window-rule {
 }
 
 // ============================================================================
-// WORKSPACE: FILE
-// ============================================================================
-
-window-rule {
-    match app-id="org.gnome.Nautilus"
-    open-focused true
-    open-on-workspace "File"
-}
-
-// ============================================================================
 // WORKSPACE: Music 
 // ============================================================================
 
 window-rule {
-    match app-id="spotify"
+    match app-id=r#"^(spotify|feishin)$"#
     open-focused true
     open-on-workspace "Music"
 }

@@ -1,6 +1,5 @@
 workspace "Web"
-workspace "File"
 workspace "Code"
 workspace "Chat"
 workspace "Music"
-workspace "6"
+
