@@ -123,3 +123,8 @@ tooltip {
     color: #f53c3c;
     animation: blink 0.5s linear infinite alternate;
 }
+
+menu {
+    background-color: @background;
+    opacity: 1.0;
+}
