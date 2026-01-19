@@ -26,7 +26,6 @@
   "niri/workspaces": {
     "format": "{icon}",
     "format-icons": {
-      "default": "",
       "1": "Web",
       "3": "Code",
       "4": "Chat",
