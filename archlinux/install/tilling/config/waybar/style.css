@@ -128,3 +128,11 @@ menu {
     background-color: @background;
     opacity: 1.0;
 }
+
+menu menuitem {
+    background-color: transparent;
+}
+
+menu menuitem:hover {
+    background-color: alpha(@foreground, 0.2);
+}
