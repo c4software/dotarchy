@@ -50,6 +50,8 @@ Edit the bootloader entries in `/boot/loader/entries/<your-arch-entry>.conf` and
 amd_pstate=active pcie_aspm=force
 ```
 
+(this is obiously optional)
+
 ### Dotarchy doctor
 
 You can run `./dotarchy-doctor.sh` to check if your current setup is correct and if all necessary components are installed.
