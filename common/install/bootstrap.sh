@@ -40,6 +40,10 @@ function setup(){
   # Install Bash configuration
   cp "$SCRIPT_DIR/../default/bashrc" ~/.bashrc
 
+  # Install try command
+  curl -sL https://raw.githubusercontent.com/c4software/try.sh/main/try.sh -o ~/.local/bin/try
+  chmod +x ~/.local/bin/try
+
   # If not MacOS, install the Bépo Dev keyboard layout
   if [[ "$OSTYPE" != "darwin"* ]]; then
     # Installation du layout de clavier Bépo Dev
