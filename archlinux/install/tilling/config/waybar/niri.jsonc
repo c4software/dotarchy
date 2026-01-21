@@ -18,10 +18,10 @@
     "cpu",
     "battery",
     "clock",
+    "custom/do-not-disturb-indicator",
     "custom/mirror",
     "custom/wireguard",
-    "custom/screenrecording-indicator",
-    "custom/do-not-disturb-indicator"
+    "custom/screenrecording-indicator"
   ],
   "niri/workspaces": {
     "format": "{icon}",
