@@ -26,10 +26,10 @@
   "niri/workspaces": {
     "format": "{icon}",
     "format-icons": {
-      "1": "Web",
-      "3": "Code",
-      "4": "Chat",
-      "5": "Music",
+      "web": "Web",
+      "code": "Code",
+      "chat": "Chat",
+      "music": "Music",
       "active": "󱓻"
     }
   },
