@@ -1,49 +1,38 @@
 #!/usr/bin/env bash
 
-MIRROR_PROCESS="wl-mirror"
-WAYBAR_SIGNAL_CMD="pkill -RTMIN+11 waybar"
+MIRROR_PROC="wl-mirror"
+SIGNAL_WAYBAR="pkill -RTMIN+11 waybar"
 
-get_outputs() {
-  niri msg --json outputs 2>/dev/null |
-    jq -r '.[] | .name' 2>/dev/null |
-    sort -u
-}
+get_outputs() { niri msg --json outputs 2>/dev/null | jq -r '.[] | .name' | sort -u; }
 
-get_status() {
-  pgrep -x "$MIRROR_PROCESS" >/dev/null &&
-    echo '{"text":" 󰄙 ","class":"on","tooltip":"wl-mirror actif"}' ||
-    echo '{"text":" 󰞊 ","class":"off","tooltip":"wl-mirror arrêté"}'
-}
+get_status() { pgrep -x "$MIRROR_PROC" >/dev/null && echo '{"text":" 󰄙 ","class":"on"}' || echo '{"text":" 󰞊 ","class":"off"}'; }
 
 case "${1:-action}" in
-indicator)
-  get_status
-  ;;
-
+indicator) get_status ;;
 action)
-  if pgrep -x "$MIRROR_PROCESS" >/dev/null; then
-    pkill -x "$MIRROR_PROCESS"
+  if pgrep -x "$MIRROR_PROC" >/dev/null; then
+    pkill -x "$MIRROR_PROC"
   else
-    outputs=$(get_outputs)
-    [[ -z "$outputs" ]] && {
-      notify-send "Erreur" "Aucune sortie détectée via niri msg outputs"
-      exit 1
-    }
+    o=$(get_outputs)
+    [[ -z "$o" ]] && exit 1
 
-    source_output=$(dotarchy-display-menu "Source (à refléter)" "$outputs" "" "" 380)
-    [[ -z "$source_output" ]] && exit 0
+    src=$(dotarchy-display-menu "Source" "$o" "" "" 380)
+    [[ -z "$src" ]] && exit 0
 
-    dest_output=$(dotarchy-display-menu "Destination (affichage)" "$outputs" "" "" 380)
-    [[ -z "$dest_output" ]] && exit 0
+    dst_list=$(echo "$o" | grep -v "^$src$")
+    if [ $(echo "$dst_list" | wc -l) -eq 1 ] && [ -n "$dst_list" ]; then
+      dst="$dst_list"
+    else
+      dst=$(dotarchy-display-menu "Destination" "$dst_list" "" "" 380)
+      [[ -z "$dst" ]] && exit 0
+    fi
 
-    wl-mirror -F --show-cursor --fullscreen-output "$dest_output" "$source_output" &
+    wl-mirror -F --show-cursor --fullscreen-output "$dst" "$src" &
     sleep 0.3
   fi
-
   get_status
-  $WAYBAR_SIGNAL_CMD || true
+  $SIGNAL_WAYBAR || true
   ;;
-
 *)
   echo "Usage: $0 {indicator|action}" >&2
   exit 1
