@@ -1,33 +1,49 @@
 #!/usr/bin/env bash
 
-MIRROR_CMD="wl-mirror -F --show-cursor --fullscreen-output DP-2 eDP-1"
-PROCESS_NAME="wl-mirror"
-SIGNAL_NUMBER=11
-SIGNAL_CMD="pkill -RTMIN+$SIGNAL_NUMBER waybar"
+MIRROR_PROCESS="wl-mirror"
+WAYBAR_SIGNAL_CMD="pkill -RTMIN+11 waybar"
 
-MODE="${1:-action}"
-
-get_status() {
-  if pgrep -x "$PROCESS_NAME" >/dev/null; then
-    echo "{\"text\": \" 󰄙 \", \"class\": \"on\", \"tooltip\": \"wl-mirror running on DP-2\"}"
-  else
-    echo "{\"text\": \" 󰞊 \", \"class\": \"off\", \"tooltip\": \"wl-mirror stopped\"}"
-  fi
+get_outputs() {
+  niri msg --json outputs 2>/dev/null |
+    jq -r '.[] | .name' 2>/dev/null |
+    sort -u
 }
 
-case "$MODE" in
+get_status() {
+  pgrep -x "$MIRROR_PROCESS" >/dev/null &&
+    echo '{"text":" 󰄙 ","class":"on","tooltip":"wl-mirror actif"}' ||
+    echo '{"text":" 󰞊 ","class":"off","tooltip":"wl-mirror arrêté"}'
+}
+
+case "${1:-action}" in
 indicator)
   get_status
   ;;
+
 action)
-  if pgrep -x "$PROCESS_NAME" >/dev/null; then
-    pkill -x "$PROCESS_NAME"
+  if pgrep -x "$MIRROR_PROCESS" >/dev/null; then
+    pkill -x "$MIRROR_PROCESS"
   else
-    $MIRROR_CMD &
+    outputs=$(get_outputs)
+    [[ -z "$outputs" ]] && {
+      notify-send "Erreur" "Aucune sortie détectée via niri msg outputs"
+      exit 1
+    }
+
+    source_output=$(dotarchy-display-menu "Source (à refléter)" "$outputs" "" "" 380)
+    [[ -z "$source_output" ]] && exit 0
+
+    dest_output=$(dotarchy-display-menu "Destination (affichage)" "$outputs" "" "" 380)
+    [[ -z "$dest_output" ]] && exit 0
+
+    wl-mirror -F --show-cursor --fullscreen-output "$dest_output" "$source_output" &
+    sleep 0.3
   fi
+
   get_status
-  $SIGNAL_CMD || true
+  $WAYBAR_SIGNAL_CMD || true
   ;;
+
 *)
   echo "Usage: $0 {indicator|action}" >&2
   exit 1
