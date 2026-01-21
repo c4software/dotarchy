@@ -57,13 +57,13 @@ window-rule {
 window-rule {
     match app-id=r#"^(Slack|org\.telegram\.desktop|signal|chrome-hnpfjngllnobngcgfapefoaidbinmjnm-Default)$"#
     open-maximized true
-    open-focused true
-    open-floating true
+    //open-focused true
+    //open-floating true
     open-on-workspace "Chat"
 
-    shadow {
-      on
-    }
+    //shadow {
+    //  off
+    //}
 }
 
 // ============================================================================
