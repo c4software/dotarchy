@@ -146,8 +146,8 @@
     "icon-size": 12
   },
   "custom/do-not-disturb-indicator": {
-    "on-click": "makoctl mode -t do-not-disturb && notify-send 'Enabled notifications'",
-    "exec": "~/.config/waybar/indicators/do-not-disturb.sh",
+    "on-click": "~/.config/waybar/scripts/do-not-disturb.sh action",
+    "exec": "~/.config/waybar/scripts/do-not-disturb.sh indicator",
     "signal": 9,
     "return-type": "json"
   },
