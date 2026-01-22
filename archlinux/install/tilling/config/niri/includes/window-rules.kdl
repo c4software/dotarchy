@@ -50,6 +50,13 @@ window-rule {
     open-on-workspace "Code"
 }
 
+window-rule {
+    match app-id="ONLYOFFICE"
+    open-maximized true
+    open-focused true
+    open-on-workspace "Code"
+}
+
 // ============================================================================
 // WORKSPACE: CHAT
 // ============================================================================
