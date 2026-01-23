@@ -90,7 +90,7 @@ window-rule {
 
 // Small utility windows
 window-rule {
-    match app-id=r#"^(blueberry\.py|Bluetui|Impala|Wiremix|org\.gnome\.NautilusPreviewer|com\.gabm\.satty|Omarchy|About|TUI\.float|org\.gnome\.Evince|com\.seafile\.seafile-applet)$"#
+    match app-id=r#"^(blueberry\.py|Bluetui|Impala|Wiremix|org\.gnome\.NautilusPreviewer|com\.gabm\.satty|Omarchy|About|TUI\.float|org\.gnome\.Evince|com\.seafile\.seafile-applet|localsend_app)$"#
     open-floating true
     open-focused true
 }
