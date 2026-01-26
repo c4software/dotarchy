@@ -11,16 +11,15 @@
 }
 
 window#waybar {
-    all: unset;
+  all: unset;
 }
 
 .modules-right,
 .modules-left {
     padding: 5px 8px;
-    margin: 5px 7px 0;
+    margin: 5px 7px;
     border-radius: 8px;
     background: alpha(@background, 0.85);
-    box-shadow: 0 0 1.5px rgba(0, 0, 0, 0.5);
 }
 
 #workspaces {
@@ -138,3 +137,4 @@ menu menuitem {
 menu menuitem:hover {
     background-color: alpha(@foreground, 0.2);
 }
+
