@@ -157,6 +157,19 @@ layout {
     tab-indicator {
         position "left"
     }
+    
+    background-color "transparent"
+}
+
+layer-rule {
+    match namespace="^wallpaper$"
+    place-within-backdrop true
+}
+
+overview {
+    workspace-shadow {
+        off
+    }
 }
 
 prefer-no-csd
