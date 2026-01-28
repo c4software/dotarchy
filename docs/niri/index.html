@@ -313,18 +313,18 @@ https://github.com/alex-shpak/hugo-book
 <p>Keybindings are defined in the <code>binds.kdl</code> file. This file includes shortcuts for launching applications, managing windows, and controlling system functions. The configuration uses a combination of modifier keys (like <code>Mod</code>, <code>Alt</code>, and <code>Ctrl</code>) and other keys to create a comprehensive set of shortcuts.</p>
 <p>For a complete list of keybindings and their functions, refer to the <a href="https://github.com/YaLTeR/niri/wiki/Configuration:-Key-Bindings">official Niri documentation</a>.</p>
 <p>There is some example content in the <code>binds.kdl</code> file:</p>
-<pre tabindex="0"><code class="language-kdl" data-lang="kdl">// Launch terminal
-Mod+Return { spawn &#34;alacritty&#34;; }
-
-// Close focused window
-Mod+W { close-window; }
-
-// Switch to workspace 1
-Mod+1 { focus-workspace 1; }
-
-// Move focused window to workspace 2
-Mod+Shift+2 { move-column-to-workspace 2; }
-</code></pre><h3 id="autostart">
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-kdl" data-lang="kdl"><span style="display:flex;"><span><span style="color:#75715e">// Launch terminal
+</span></span></span><span style="display:flex;"><span>Mod+Return <span style="color:#f92672">{</span> spawn <span style="color:#e6db74">&#34;alacritty&#34;</span><span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Close focused window
+</span></span></span><span style="display:flex;"><span>Mod+W <span style="color:#f92672">{</span> close-window<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Switch to workspace 1
+</span></span></span><span style="display:flex;"><span>Mod+1 <span style="color:#f92672">{</span> focus-workspace <span style="color:#ae81ff">1</span><span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Move focused window to workspace 2
+</span></span></span><span style="display:flex;"><span>Mod+Shift+2 <span style="color:#f92672">{</span> move-column-to-workspace <span style="color:#ae81ff">2</span><span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+</span></span></code></pre></div><h3 id="autostart">
   Autostart
   
   <a class="anchor" href="#autostart">#</a>
@@ -332,15 +332,15 @@ Mod+Shift+2 { move-column-to-workspace 2; }
 </h3>
 <p>The <code>autostart.kdl</code> file is used to launch applications and scripts automatically when Niri starts. This is useful for starting essential services like the notification daemon, the status bar, or the wallpaper manager.</p>
 <p>Here is an example from the configuration:</p>
-<pre tabindex="0"><code class="language-kdl" data-lang="kdl">// Start the notification daemon
-spawn-at-startup &#34;mako&#34;
-
-// Start the status bar
-spawn-sh-at-startup &#34;waybar --config ~/.config/waybar/niri.jsonc&#34;
-
-// Set a random background
-spawn-at-startup &#34;dotarchy-background&#34; &#34;set&#34;
-</code></pre><h3 id="environment-variables">
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-kdl" data-lang="kdl"><span style="display:flex;"><span><span style="color:#75715e">// Start the notification daemon
+</span></span></span><span style="display:flex;"><span>spawn-at-startup <span style="color:#e6db74">&#34;mako&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Start the status bar
+</span></span></span><span style="display:flex;"><span>spawn-sh-at-startup <span style="color:#e6db74">&#34;waybar --config ~/.config/waybar/niri.jsonc&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Set a random background
+</span></span></span><span style="display:flex;"><span>spawn-at-startup <span style="color:#e6db74">&#34;dotarchy-background&#34;</span> <span style="color:#e6db74">&#34;set&#34;</span>
+</span></span></code></pre></div><h3 id="environment-variables">
   Environment Variables
   
   <a class="anchor" href="#environment-variables">#</a>
@@ -348,11 +348,11 @@ spawn-at-startup &#34;dotarchy-background&#34; &#34;set&#34;
 </h3>
 <p>The <code>environment.kdl</code> file allows you to set environment variables that will be available within the Niri session. This is useful for configuring applications that rely on environment variables for their behavior.</p>
 <p>Example:</p>
-<pre tabindex="0"><code class="language-kdl" data-lang="kdl">environment {
-    XCURSOR_SIZE &#34;24&#34;
-    HYPRCURSOR_SIZE &#34;24&#34;
-}
-</code></pre><h3 id="input-devices">
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-kdl" data-lang="kdl"><span style="display:flex;"><span>environment <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    XCURSOR_SIZE <span style="color:#e6db74">&#34;24&#34;</span>
+</span></span><span style="display:flex;"><span>    HYPRCURSOR_SIZE <span style="color:#e6db74">&#34;24&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><h3 id="input-devices">
   Input Devices
   
   <a class="anchor" href="#input-devices">#</a>
