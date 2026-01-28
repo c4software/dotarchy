@@ -161,18 +161,18 @@ layout {
     //background-color "transparent"
 }
 
-/*
-layer-rule {
+/*layer-rule {
     match namespace="^wallpaper$"
     place-within-backdrop true
 }
 
 overview {
     workspace-shadow {
-        off
+        on
+        spread 0
+        softness 10
+        color "#000000"
     }
 }
 */
-
-
 prefer-no-csd
