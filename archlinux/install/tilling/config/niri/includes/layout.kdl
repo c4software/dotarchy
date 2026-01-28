@@ -158,9 +158,10 @@ layout {
         position "left"
     }
     
-    background-color "transparent"
+    //background-color "transparent"
 }
 
+/*
 layer-rule {
     match namespace="^wallpaper$"
     place-within-backdrop true
@@ -171,5 +172,7 @@ overview {
         off
     }
 }
+*/
+
 
 prefer-no-csd
