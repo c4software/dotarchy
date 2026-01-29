@@ -25,6 +25,22 @@ DNSDefaultRoute=yes
 EOF
     fi
 
+    # Rules for WSIO
+    local wsio_config_file="/etc/systemd/network/25-wlan-wsio.network"
+    if [ ! -f "$wsio_config_file" ]; then
+        echo "Creating WSIO DNS priority configuration..."
+        sudo tee "$wsio_config_file" > /dev/null << 'EOF'
+[Match]
+[Match]
+Name=wl*
+SSID=WSIO
+
+[Network]
+Domains=~.
+DNSDefaultRoute=yes
+EOF
+    fi
+
     # Remplacer /etc/resolv.conf par un lien symbolique vers le stub de systemd-resolved
     # Cela garantit que les résolutions DNS passent par systemd-resolved.
     sudo rm /etc/resolv.conf
@@ -55,6 +71,11 @@ function check(){
 
     if [ ! -f "/etc/systemd/network/50-wg-all.network" ]; then
         show_error "Systemd" "/etc/systemd/network/50-wg-all.network does not exist."
+        return
+    fi
+
+    if [ ! -f "/etc/systemd/network/25-wlan-wsio.network" ]; then
+        show_error "Systemd" "/etc/systemd/network/25-wlan-wsio.network does not exist."
         return
     fi
 
