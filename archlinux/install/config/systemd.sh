@@ -4,27 +4,6 @@ function setup(){
         echo "SystemMaxUse=50M" | sudo tee -a /etc/systemd/journald.conf
     fi
 
-    # Prevent systemd-networkd-wait-online timeout on boot
-    sudo systemctl disable systemd-networkd-wait-online.service
-    sudo systemctl mask systemd-networkd-wait-online.service
-
-    # Create a file with DNS settings for wg interfaces (/etc/systemd/network/50-wg-all.network)
-    local wg_config_file="/etc/systemd/network/50-wg-all.network"
-    
-    if [ ! -f "$wg_config_file" ]; then
-        echo "Creating WireGuard DNS priority configuration..."
-        sudo mkdir -p /etc/systemd/network
-        
-        sudo tee "$wg_config_file" > /dev/null << 'EOF'
-[Match]
-Name=wg*
-
-[Network]
-Domains=~.
-DNSDefaultRoute=yes
-EOF
-    fi
-
     # Remplacer /etc/resolv.conf par un lien symbolique vers le stub de systemd-resolved
     # Cela garantit que les résolutions DNS passent par systemd-resolved.
     sudo rm /etc/resolv.conf

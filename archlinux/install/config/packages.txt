@@ -1,6 +1,10 @@
 # Wireless
 iw
 wireless-regdb
+dialog
+wpa_supplicant
+networkmanager
+network-manager-applet
 
 # Printer
 cups
