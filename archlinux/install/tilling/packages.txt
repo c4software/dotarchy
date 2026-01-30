@@ -38,8 +38,6 @@ pamixer
 bluetui
 alacritty
 wl-clipboard
-iwd
-impala
 satty
 wf-recorder
 rofi
