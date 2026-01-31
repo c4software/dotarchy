@@ -10,7 +10,7 @@
 }
 
 window#waybar {
-  background: @background;
+  background: alpha(@background, 0.9);
 }
 
 .modules-right,
