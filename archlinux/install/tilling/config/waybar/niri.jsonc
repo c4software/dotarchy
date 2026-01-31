@@ -1,27 +1,27 @@
 {
   "reload_style_on_change": true,
   "layer": "top",
-  "position": "bottom",
+  "position": "top",
   "spacing": 0,
   "height": 26,
   "modules-left": [
     "niri/workspaces"
   ],
   "modules-center": [
-    "privacy"
+    "privacy",
+    "custom/screenrecording-indicator"
   ],
   "modules-right": [
+    "custom/wireguard",
     "tray",
     "bluetooth",
-    "network",
+    //"network", nm-applet is doing the indicator
     "pulseaudio",
     "cpu",
     "battery",
-    "clock",
     "custom/do-not-disturb-indicator",
     "custom/mirror",
-    "custom/wireguard",
-    "custom/screenrecording-indicator"
+    "clock"
   ],
   "niri/workspaces": {
     "format": "{icon}",
@@ -61,7 +61,7 @@
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "nospacing": 1,
-    "on-click": "alacritty --class=Impala -e impala"
+    "on-click": "alacritty --class=Impala -e nmtui"
   },
   "battery": {
     "format": "{capacity}% {icon}",

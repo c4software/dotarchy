@@ -1,7 +1,6 @@
 @import "../theme/waybar.css";
 
 * {
-    background: transparent;
     color: @foreground;
     border: none;
     border-radius: 0;
@@ -11,15 +10,13 @@
 }
 
 window#waybar {
-  all: unset;
+  background: @background;
 }
 
 .modules-right,
 .modules-left {
-    padding: 5px 8px;
-    margin: 0 5px 7px; 
-    border-radius: 8px;
-    background: alpha(@background, 0.85);
+    padding: 2px;
+    margin: 2px; 
 }
 
 #workspaces {
@@ -60,7 +57,6 @@ window#waybar {
 #bluetooth,
 #pulseaudio,
 #privacy,
-#custom-omarchy,
 #custom-screenrecording-indicator,
 #custom-do-not-disturb-indicator,
 #curstom-mirror,
@@ -72,21 +68,15 @@ window#waybar {
     transition: color 0.2s ease;
 }
 
-#custom-expand-icon {
-    margin-right: 3px;
-    color: alpha(@foreground, 0.8);
-    text-shadow: 0 0 1.5px rgba(0, 0, 0, 0.6);
-}
-
-#custom-expand-icon:hover {
-    text-shadow: 0 0 1.5px rgba(255, 255, 255, 0.5);
-}
-
 tooltip {
     background: @background;
     color: @foreground;
     font-size: 9px;
-    padding: 2px 4px;
+    padding: 2px;
+}
+
+tooltip * {
+  text-shadow: none;
 }
 
 #custom-update,
@@ -137,4 +127,3 @@ menu menuitem {
 menu menuitem:hover {
     background-color: alpha(@foreground, 0.2);
 }
-

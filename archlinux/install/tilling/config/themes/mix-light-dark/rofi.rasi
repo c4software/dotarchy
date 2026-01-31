@@ -1,12 +1,12 @@
 @import "base-theme.rasi"
 
 * {
-  background: #eff1f5;
-  background-alt: #eff1f5;
-  foreground: #4c4f69;
-  selected-text: #1e66f5;
-  border-color: #dce0e8;
+  background: #11221C;
+  background-alt: #11221C;
+  foreground: #ebfff2;
+  selected-text: #e1b55e;
+  border-color: #214237;
   
-  window-background: rgba(239, 241, 245, 0.95);
-  placeholder-color: rgba(76, 79, 105, 0.5);
+  window-background: rgba(17, 34, 28, 0.95);
+  placeholder-color: rgba(235, 255, 242, 0.5);
 }
