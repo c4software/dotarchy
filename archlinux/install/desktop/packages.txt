@@ -6,3 +6,8 @@ telegram-desktop
 # VPN
 wireguard-tools
 proton-vpn-gtk-app
+
+# Remmina
+remmina
+gtk-vnc
+freerdp
