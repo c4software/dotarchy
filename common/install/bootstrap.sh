@@ -53,6 +53,11 @@ function setup(){
           break
           ;;
         zsh )
+          # If pacman is available, install zsh and zsh-completions
+          if command -v pacman &> /dev/null; then
+            sudo pacman -Sy --noconfirm zsh zsh-completions
+          fi
+          
           chsh -s "$(which zsh)"
           break
           ;;
