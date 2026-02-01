@@ -37,6 +37,9 @@ function setup(){
   mkdir -p ~/.local/bin
   cp "$SCRIPT_DIR/../bin/"* ~/.local/bin/
 
+  # Install the default .profile
+  cp "$SCRIPT_DIR/../default/profile" ~/.profile
+
   # Install Bash configuration
   cp "$SCRIPT_DIR/../default/bashrc" ~/.bashrc
 
