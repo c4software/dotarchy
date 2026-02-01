@@ -1,0 +1,13 @@
+# History control
+setopt APPEND_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+HISTSIZE=32768
+SAVEHIST=32768
+
+# Autocompletion
+autoload -Uz compinit
+compinit
+
+# Set complete path
+export PATH="./bin:$HOME/.local/bin:$PATH"

@@ -40,6 +40,27 @@ function setup(){
   # Install Bash configuration
   cp "$SCRIPT_DIR/../default/bashrc" ~/.bashrc
 
+  # Install Zsh configuration
+  cp "$SCRIPT_DIR/../default/zshrc" ~/.zshrc
+
+  # If chsh is available, ask the user to choose between bash and zsh as default shell
+  if command -v chsh &> /dev/null; then
+    echo "Choose your default shell (bash or zsh):"
+    select shell_choice in "bash" "zsh"; do
+      case $shell_choice in
+        bash )
+          chsh -s "$(which bash)"
+          break
+          ;;
+        zsh )
+          chsh -s "$(which zsh)"
+          break
+          ;;
+        * ) echo "Please choose bash or zsh.";;
+      esac
+    done
+  fi
+
   # Install try command
   curl -sL https://raw.githubusercontent.com/c4software/try.sh/main/try.sh -o ~/.local/bin/try
   chmod +x ~/.local/bin/try
