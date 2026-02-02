@@ -1,6 +1,8 @@
 # Dynamic theme colors
 config-file = ?"~/.config/theme/ghostty.conf"
 
+window-show-tab-bar = always
+
 # You can preview the config here
 font-family = "JetBrainsMono Nerd Font"
 font-style = Regular
@@ -11,13 +13,14 @@ window-padding-y = 4
 macos-option-as-alt = left
 keybind = super+enter=new_split:auto
 keybind = super+f11=toggle_fullscreen
+keybind = super+t=new_tab
 #keybind = alt+left=unbind
 #keybind = alt+right=unbind
 
 window-decoration=auto
 background-blur=true
 background-blur-radius = 20
-background-opacity = 0.98
+background-opacity = 1 
 
 macos-non-native-fullscreen = true
 macos-titlebar-style = tabs
