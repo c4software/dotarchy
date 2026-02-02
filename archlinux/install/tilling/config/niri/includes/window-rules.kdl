@@ -93,7 +93,7 @@ window-rule {
 
 // File dialogs
 window-rule {
-    match app-id=r#"^(xdg-desktop-portal-gtk|sublime_text|DesktopEditors|org\.gnome\.Nautilus)$"#
+    match app-id=r#"^(xdg-desktop-portal-gtk|sublime_text|DesktopEditors)$"#
     match title=r#"^(Open.*Files?|Open [Ff]older.*|Save.*Files?|Save.*As|Save|All Files)"#
     open-floating true
 }
