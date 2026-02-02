@@ -9,7 +9,8 @@
   ],
   "modules-center": [
     "privacy",
-    "custom/screenrecording-indicator"
+    "custom/screenrecording-indicator",
+    "wlr/taskbar"
   ],
   "modules-right": [
     "custom/wireguard",
@@ -32,6 +33,10 @@
       "music": "Music",
       "active": "󱓻"
     }
+  },
+  "wlr/taskbar": {
+    "on-click": "activate",
+    "on-click-right": "minimize"
   },
   "cpu": {
     "interval": 10,
