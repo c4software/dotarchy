@@ -1,5 +1,7 @@
 # History control
-setopt APPEND_HISTORY
+HISTFILE=~/.zsh_history
+setopt share_history
+setopt inc_append_history
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
 HISTSIZE=32768

@@ -4,5 +4,4 @@ source ~/.config/zsh/functions
 source ~/.config/zsh/prompt
 source ~/.config/zsh/init
 source ~/.config/zsh/envs
-
-[[ -o interactive ]] && source ~/.config/zsh/inputrc
+source ~/.config/zsh/inputrc

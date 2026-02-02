@@ -5,11 +5,11 @@
   "spacing": 0,
   "height": 26,
   "modules-left": [
-    "niri/workspaces"
+    "niri/workspaces",
+    "custom/screenrecording-indicator",
+    "privacy"
   ],
   "modules-center": [
-    "privacy",
-    "custom/screenrecording-indicator",
     "wlr/taskbar"
   ],
   "modules-right": [
