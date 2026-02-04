@@ -41,31 +41,11 @@ DNSDefaultRoute=yes
 EOF
     fi
 
-    # Disable systemd-resolved.
-    sudo systemctl stop systemd-resolved.service
-    sudo systemctl disable systemd-resolved.service
-
-    # 2. Remove the symlink created by resolved
-    sudo rm -f /etc/resolv.conf
-
-    # 3. Tell NetworkManager to manage DNS itself (very important)
-    sudo mkdir -p /etc/NetworkManager/conf.d
-
-    # Create or edit this file (use nano/vim/whatever you prefer)
-    sudo tee /etc/NetworkManager/conf.d/no-resolved.conf > /dev/null << 'EOF'
-[main]
-dns=default
-EOF
-
-    # 4. Force enable and restart NetworkManager to apply changes
-    sudo systemctl enable NetworkManager.service
-    sudo systemctl restart NetworkManager.service
-
     # Remplacer /etc/resolv.conf par un lien symbolique vers le stub de systemd-resolved
     # Cela garantit que les résolutions DNS passent par systemd-resolved.
-    # sudo rm /etc/resolv.conf
-    # sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-    # sudo systemctl enable --now systemd-resolved.service
+    sudo rm /etc/resolv.conf
+    sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+    sudo systemctl enable --now systemd-resolved.service
 }
 
 function check(){
