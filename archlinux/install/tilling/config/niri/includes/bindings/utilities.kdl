@@ -1,7 +1,7 @@
 binds {
     // Apps
-    // Mod+Return hotkey-overlay-title="Terminal" { spawn "alacritty"; }
-    Mod+Return hotkey-overlay-title="Terminal" { spawn "omarchy-launch-or-focus" "com.mitchellh.ghostty" "ghostty"; }
+    Mod+Return hotkey-overlay-title="Terminal" { spawn "alacritty"; }
+    // Mod+Return hotkey-overlay-title="Terminal" { spawn "omarchy-launch-or-focus" "com.mitchellh.ghostty" "ghostty"; }
     Mod+F hotkey-overlay-title="File manager" { spawn "omarchy-launch-or-focus" "nautilus" "nautilus"; }
     Mod+B hotkey-overlay-title="Browser" { spawn "omarchy-launch-or-focus" "google-chrome" "google-chrome-stable"; }
     Mod+N hotkey-overlay-title="Neovim" { spawn "alacritty" "-e" "nvim"; }
