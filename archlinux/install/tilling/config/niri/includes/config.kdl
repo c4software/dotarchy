@@ -1,0 +1,20 @@
+// This config is in the KDL format: https://kdl.dev
+// "/-" comments out the following node.
+// Check the wiki for a full description of the configuration:
+// https://yalter.github.io/niri/Configuration:-Introduction
+
+include "includes/environment.kdl"
+include "includes/autostart.kdl"
+include "includes/animations.kdl"
+include "includes/binds.kdl"
+include "includes/hotkey-overlay.kdl"
+include "includes/input.kdl"
+include "includes/layout.kdl"
+include "includes/output.kdl"
+include "includes/window-rules.kdl"
+include "includes/workspaces.kdl"
+include "includes/cursor.kdl"
+
+debug {
+  honor-xdg-activation-with-invalid-serial
+}
