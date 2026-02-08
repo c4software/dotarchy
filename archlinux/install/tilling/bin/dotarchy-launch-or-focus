@@ -1,0 +1,28 @@
+#!/bin/bash
+
+SINGLE=false
+if [ "${1:-}" = "--single-per-workspace" ]; then
+  SINGLE=true
+  shift
+fi
+
+if (($# == 0)); then
+  echo "Usage: dotarchy-launch-or-focus [--single-per-workspace] [window-pattern] [launch-command]"
+  exit 1
+fi
+
+WINDOW_PATTERN="$1"
+LAUNCH_COMMAND="${2:-"$WINDOW_PATTERN"}"
+
+if $SINGLE; then
+  CURRENT_WS_ID=$(niri msg -j workspaces | jq '.[] | select(.is_focused) | .id')
+  WINDOW_ID=$(niri msg -j windows | jq -r --arg p "$WINDOW_PATTERN" --argjson ws "$CURRENT_WS_ID" '.[]|select( (.workspace_id == $ws) and ((.app_id|test("\\b" + $p + "\\b";"i")) or (.title|test("\\b" + $p + "\\b";"i"))) )|.id' | head -n1)
+else
+  WINDOW_ID=$(niri msg -j windows | jq -r --arg p "$WINDOW_PATTERN" '.[]|select((.app_id|test("\\b" + $p + "\\b";"i")) or (.title|test("\\b" + $p + "\\b";"i")))|.id' | head -n1)
+fi
+
+if [[ -n $WINDOW_ID ]]; then
+  niri msg action focus-window --id "$WINDOW_ID"
+else
+  eval exec $LAUNCH_COMMAND
+fi

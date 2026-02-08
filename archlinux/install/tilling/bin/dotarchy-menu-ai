@@ -1,11 +1,11 @@
 #!/bin/bash
 
 case $(dotarchy-display-menu "LLM" "󱚤  ChatGPT\n󱚤  Gemini\n󱚤  Claude\n󱚤  LeChat\n󱚤  Grok\n󱚤  Meta") in
-*ChatGPT*) omarchy-launch-or-focus-webapp "ChatGPT" "https://chat.openai.com/" ;;
-*Gemini*) omarchy-launch-or-focus-webapp "Gemini" "https://gemini.google.com/" ;;
-*Claude*) omarchy-launch-or-focus-webapp "Claude" "https://claude.ai/" ;;
-*LeChat*) omarchy-launch-or-focus-webapp "LeChat" "https://chat.mistral.ai/chat" ;;
-*Grok*) omarchy-launch-or-focus-webapp "Grok" "https://grok.com/" ;;
-*Meta*) omarchy-launch-or-focus-webapp "Meta" "https://ai.meta.com/" ;;
+*ChatGPT*) dotarchy-launch-or-focus-webapp "ChatGPT" "https://chat.openai.com/" ;;
+*Gemini*) dotarchy-launch-or-focus-webapp "Gemini" "https://gemini.google.com/" ;;
+*Claude*) dotarchy-launch-or-focus-webapp "Claude" "https://claude.ai/" ;;
+*LeChat*) dotarchy-launch-or-focus-webapp "LeChat" "https://chat.mistral.ai/chat" ;;
+*Grok*) dotarchy-launch-or-focus-webapp "Grok" "https://grok.com/" ;;
+*Meta*) dotarchy-launch-or-focus-webapp "Meta" "https://ai.meta.com/" ;;
 *) exit ;;
 esac

@@ -26,7 +26,11 @@ window-rule {
     open-focused true
 }
 
-
+window-rule {
+    match app-id="Alacritty"
+    draw-border-with-background false
+    opacity 0.98
+}
 
 // ============================================================================
 // WORKSPACE: WEB
@@ -111,7 +115,7 @@ window-rule {
 // ============================================================================
 
 window-rule {
-    geometry-corner-radius 10 
+    geometry-corner-radius 10
     clip-to-geometry true
 }
 

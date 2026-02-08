@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# Récupération de l'historique brut
+HISTORY="$(makoctl history)"
+
+[ -z "$HISTORY" ] && exit 0
+
+# Parsing : "ID|Titre"
+OPTIONS=$(echo "$HISTORY" | awk '
+/^Notification [0-9]+:/ {
+  id=$2
+  sub(":", "", id)
+  title=$0
+  sub(/^Notification [0-9]+: /, "", title)
+  print id "|" title
+}
+')
+
+# Aucune notification
+[ -z "$OPTIONS" ] && exit 0
+
+# Liste affichée (sans l’ID)
+MENU_ENTRIES=$(echo "$OPTIONS" | cut -d'|' -f2)
+
+# Sélection
+CHOICE=$(dotarchy-display-menu \
+  "Historique des notifications" \
+  "$MENU_ENTRIES" \
+  "-dmenu -i" \
+  "" \
+  600)
+
+[ -z "$CHOICE" ] && exit 0
+
+# Récupération de l’ID correspondant
+NOTIF_ID=$(echo "$OPTIONS" | awk -F'|' -v choice="$CHOICE" '$2 == choice {print $1}')
+
+# Restauration
+[ -n "$NOTIF_ID" ] && makoctl restore "$NOTIF_ID"
