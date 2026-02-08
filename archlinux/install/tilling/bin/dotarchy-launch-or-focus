@@ -15,14 +15,52 @@ WINDOW_PATTERN="$1"
 LAUNCH_COMMAND="${2:-"$WINDOW_PATTERN"}"
 
 if $SINGLE; then
-  CURRENT_WS_ID=$(niri msg -j workspaces | jq '.[] | select(.is_focused) | .id')
-  WINDOW_ID=$(niri msg -j windows | jq -r --arg p "$WINDOW_PATTERN" --argjson ws "$CURRENT_WS_ID" '.[]|select( (.workspace_id == $ws) and ((.app_id|test("\\b" + $p + "\\b";"i")) or (.title|test("\\b" + $p + "\\b";"i"))) )|.id' | head -n1)
-else
-  WINDOW_ID=$(niri msg -j windows | jq -r --arg p "$WINDOW_PATTERN" '.[]|select((.app_id|test("\\b" + $p + "\\b";"i")) or (.title|test("\\b" + $p + "\\b";"i")))|.id' | head -n1)
-fi
+  # On récupère tout une seule fois
+  WINDOWS_JSON=$(niri msg -j windows)
+  WORKSPACES_JSON=$(niri msg -j workspaces)
 
-if [[ -n $WINDOW_ID ]]; then
-  niri msg action focus-window --id "$WINDOW_ID"
+  CURRENT_WS_ID=$(echo "$WORKSPACES_JSON" | jq '.[] | select(.is_focused) | .id')
+  ACTIVE_WIN_ID=$(echo "$WORKSPACES_JSON" | jq -r --argjson ws "$CURRENT_WS_ID" '.[] | select(.id == $ws) | .active_window_id // ""')
+
+  # 1. Est-ce que la fenêtre actuellement active correspond au pattern ?
+  if [[ -n "$ACTIVE_WIN_ID" ]] &&
+    echo "$WINDOWS_JSON" | jq -e --arg id "$ACTIVE_WIN_ID" --arg p "$WINDOW_PATTERN" '
+       any(.[]; .id == ($id | tonumber)
+           and ((.app_id | test("\\b" + $p + "\\b"; "i"))
+             or (.title | test("\\b" + $p + "\\b"; "i"))))
+     ' >/dev/null 2>&1; then
+    # Oui → la fenêtre single-instance est déjà focusée → on lance une nouvelle instance
+    eval exec "$LAUNCH_COMMAND"
+  else
+    # Non → on cherche s’il existe déjà une instance sur ce workspace
+    WINDOW_ID=$(echo "$WINDOWS_JSON" | jq -r --arg p "$WINDOW_PATTERN" --argjson ws "$CURRENT_WS_ID" '
+      .[] | select(
+        (.workspace_id == $ws)
+        and ((.app_id | test("\\b" + $p + "\\b"; "i"))
+          or (.title | test("\\b" + $p + "\\b"; "i")))
+      ) | .id
+    ' | head -n1)
+
+    if [[ -n "$WINDOW_ID" ]]; then
+      # Il y en a une (mais pas focusée) → on la focus
+      niri msg action focus-window --id "$WINDOW_ID"
+    else
+      # Aucune instance sur ce workspace → on lance
+      eval exec "$LAUNCH_COMMAND"
+    fi
+  fi
 else
-  eval exec $LAUNCH_COMMAND
+  # Comportement original (recherche globale)
+  WINDOW_ID=$(niri msg -j windows | jq -r --arg p "$WINDOW_PATTERN" '
+    .[] | select(
+      (.app_id | test("\\b" + $p + "\\b"; "i"))
+      or (.title | test("\\b" + $p + "\\b"; "i"))
+    ) | .id
+  ' | head -n1)
+
+  if [[ -n "$WINDOW_ID" ]]; then
+    niri msg action focus-window --id "$WINDOW_ID"
+  else
+    eval exec "$LAUNCH_COMMAND"
+  fi
 fi
