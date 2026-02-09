@@ -155,7 +155,12 @@ layout {
 
     // Tab indicator settings.
     tab-indicator {
-        position "left"
+        width 8
+        gap 8
+        length total-proportion=1.0
+        position "top"
+        place-within-column
+        corner-radius 8
     }
     
     //background-color "transparent"

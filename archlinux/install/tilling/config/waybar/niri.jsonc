@@ -13,6 +13,7 @@
     "wlr/taskbar"
   ],
   "modules-right": [
+    "mpris",
     "custom/wireguard",
     "tray",
     "bluetooth",
@@ -171,5 +172,16 @@
     "return-type": "json",
     "signal": 11,
     "tooltip": true
+  },
+  "mpris": {
+    "format": "{title}",
+    "format-paused": "{player_icon}",
+    "player-icons": {
+      "default": "▶",
+      "mpv": "🎵"
+    },
+    "status-icons": {
+      "paused": "⏸"
+    }
   }
 }
