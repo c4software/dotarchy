@@ -21,6 +21,7 @@ window#waybar {
         alpha(@background, 0.25)
     );
 
+    border-radius: 10px;
     border-bottom: 1px solid alpha(@foreground, 0.15);
     box-shadow: 0 6px 28px alpha(@foreground, 0.08);
 }
@@ -72,7 +73,6 @@ window#waybar {
 #tray,
 #cpu,
 #battery,
-#network,
 #bluetooth,
 #pulseaudio,
 #privacy,
@@ -80,9 +80,7 @@ window#waybar {
 #custom-do-not-disturb-indicator,
 #custom-mirror,
 #custom-wireguard,
-#custom-update,
 #clock {
-
     margin: 2px;
     padding: 2px 8px;
 
@@ -96,11 +94,9 @@ window#waybar {
 #tray:hover,
 #cpu:hover,
 #battery:hover,
-#network:hover,
 #bluetooth:hover,
 #pulseaudio:hover,
 #clock:hover,
-#custom-update:hover,
 #custom-wireguard:hover {
     background: alpha(@foreground, 0.15);
 }
