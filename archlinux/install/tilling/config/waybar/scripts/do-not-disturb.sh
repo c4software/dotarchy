@@ -3,9 +3,9 @@
 SIGNAL_WAYBAR="pkill -RTMIN+9 waybar"
 
 get_status() {
-  current_mode=$(makoctl mode | grep "do-not-disturb")
+  current_mode=$(swaync-client --get-dnd)
   
-  if [[ "$current_mode" == "do-not-disturb" ]]; then
+  if [[ "$current_mode" == "true" ]]; then
     echo '{"text": "", "tooltip": "All notifications are silenced", "class": "active"}'
   else
     echo '{"text": "", "tooltip": "Notifications are enabled", "class": "inactive"}'
@@ -23,27 +23,17 @@ send_notification() {
 case "${1:-action}" in
 indicator) get_status ;;
 disable)
-  makoctl mode -a do-not-disturb
+  swaync-client --dnd-off
   send_notification disable
   $SIGNAL_WAYBAR || true
   ;;
 enable)
-  makoctl mode -r do-not-disturb
+  swaync-client --dnd-on
   send_notification enable
   $SIGNAL_WAYBAR || true
   ;;
 action)
-  current_mode=$(makoctl mode | grep "do-not-disturb")
-  
-  if [[ "$current_mode" == "do-not-disturb" ]]; then
-    makoctl mode -t do-not-disturb
-    send_notification enable
-  else
-    send_notification disable
-    makoctl mode -t do-not-disturb
-  fi
-  
-  $SIGNAL_WAYBAR || true
+  swaync-client --toggle-panel
   ;;
 *)
   echo "Usage: $0 {indicator|action}" >&2

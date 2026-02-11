@@ -27,11 +27,6 @@ binds {
     Mod+Ctrl+Space hotkey-overlay-title="Next background" { spawn "dotarchy-background" "next"; }
     Mod+Shift+Ctrl+Space hotkey-overlay-title="Theme picker" { spawn "omarchy-menu" "theme"; }
 
-    // Notifications
-    Mod+Comma hotkey-overlay-title="Dismiss notification" { spawn "makoctl" "dismiss"; }
-    Mod+Shift+Comma hotkey-overlay-title="Dismiss all notifications" { spawn "makoctl" "dismiss" "--all"; }
-    Mod+Ctrl+Comma hotkey-overlay-title="Toggle DND" { spawn "sh" "-c" "makoctl mode -t do-not-disturb && makoctl mode | grep -q 'do-not-disturb' && notify-send 'Silenced notifications' || notify-send 'Enabled notifications' && pkill -RTMIN+9 waybar"; }
-
     // Screenshots
     Print hotkey-overlay-title="Capture menu" { spawn "omarchy-menu" "capture"; }
     Alt+Shift+parenleft hotkey-overlay-title="Capture screenshot" { spawn "omarchy-cmd-screenshot" "region"; } // parenleft is 4 key on bépo

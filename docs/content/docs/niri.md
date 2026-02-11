@@ -62,7 +62,7 @@ Here is an example from the configuration:
 
 ```kdl
 // Start the notification daemon
-spawn-at-startup "mako"
+spawn-at-startup "swaync"
 
 // Start the status bar
 spawn-sh-at-startup "waybar --config ~/.config/waybar/niri.jsonc"

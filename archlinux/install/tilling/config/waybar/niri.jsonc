@@ -154,6 +154,7 @@
     "icon-size": 12
   },
   "custom/do-not-disturb-indicator": {
+    "tooltip": false,
     "on-click": "~/.config/waybar/scripts/do-not-disturb.sh action",
     "exec": "~/.config/waybar/scripts/do-not-disturb.sh indicator",
     "signal": 9,

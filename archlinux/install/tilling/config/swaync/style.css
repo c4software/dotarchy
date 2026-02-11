@@ -1,0 +1,179 @@
+@import "../theme/waybar.css";
+
+/* ===== GLOBAL ===== */
+
+* {
+  all: unset;
+  font-family: JetBrainsMono Nerd Font;
+  font-size: 12px;
+  color: @foreground;
+  transition: 0.2s ease;
+}
+
+/* ===== FLOATING NOTIFICATIONS ===== */
+
+.floating-notifications.background .notification-row {
+  padding: 0.8rem;
+}
+
+.floating-notifications.background .notification-row .notification-background {
+  border-radius: 10px;
+  background: alpha(@background, 0.90);
+  border: 1px solid alpha(@foreground, 0.12);
+  box-shadow: 0 6px 20px alpha(@foreground, 0.08);
+}
+
+.floating-notifications.background .notification-row .notification-background .notification {
+  padding: 0.6rem;
+  border-radius: 8px;
+}
+
+.floating-notifications.background .notification-row .notification-background .notification.critical {
+  border: 1px solid alpha(@foreground, 0.45);
+}
+
+/* ===== CONTENT ===== */
+
+.notification-content .summary {
+  margin: 0.4rem;
+  font-weight: 500;
+  color: @foreground;
+}
+
+.notification-content .body {
+  margin: 0.4rem;
+  color: alpha(@foreground, 0.70);
+}
+
+/* ===== ACTIONS ===== */
+
+.notification-action {
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+
+  background: alpha(@foreground, 0.08);
+  border: 1px solid alpha(@foreground, 0.10);
+}
+
+.notification-action:hover {
+  background: alpha(@foreground, 0.15);
+}
+
+.notification-action:active {
+  background: alpha(@foreground, 0.25);
+}
+
+/* ===== CLOSE BUTTON ===== */
+
+.close-button {
+  margin: 0.4rem;
+  padding: 0.3rem;
+
+  border-radius: 8px;
+  background: alpha(@foreground, 0.18);
+}
+
+.close-button:hover {
+  background: alpha(@foreground, 0.30);
+}
+
+/* ===== CONTROL CENTER ===== */
+
+.control-center {
+  border-radius: 12px;
+  margin: 1rem;
+
+  background: linear-gradient(to left,
+      alpha(@background, 0.99),
+      alpha(@background, 0.90));
+
+  border: 1px solid alpha(@foreground, 0.12);
+  box-shadow: 0 10px 30px alpha(@foreground, 0.08);
+
+  padding: 1rem;
+}
+
+/* ===== WIDGET TITLES ===== */
+
+.control-center .widget-title {
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.control-center .widget-title button {
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+
+  background: alpha(@foreground, 0.08);
+  border: 1px solid alpha(@foreground, 0.10);
+}
+
+.control-center .widget-title button:hover {
+  background: alpha(@foreground, 0.15);
+}
+
+.control-center .widget-title button:active {
+  background: alpha(@foreground, 0.25);
+}
+
+/* ===== CONTROL CENTER NOTIFICATIONS ===== */
+
+.control-center .notification-row .notification-background {
+  border-radius: 10px;
+  margin: 0.4rem 0;
+
+  background: alpha(@background, 0.85);
+  border: 1px solid alpha(@foreground, 0.10);
+}
+
+/* ===== PROGRESS BAR ===== */
+
+progressbar,
+progress,
+trough {
+  border-radius: 8px;
+}
+
+.notification.critical progress {
+  background: alpha(@foreground, 0.50);
+}
+
+.notification.low progress,
+.notification.normal progress {
+  background: alpha(@foreground, 0.35);
+}
+
+trough {
+  background: alpha(@foreground, 0.12);
+}
+
+.control-center trough {
+  background: alpha(@foreground, 0.18);
+}
+
+/* ===== DND ===== */
+
+.control-center-dnd {
+  margin: 0.8rem 0;
+  border-radius: 10px;
+}
+
+.widget-dnd {
+  color: alpha(@foreground, 0.70);
+}
+
+.widget-dnd>switch {
+  border-radius: 8px;
+  background: alpha(@foreground, 0.10);
+  border: 1px solid alpha(@foreground, 0.12);
+}
+
+.widget-dnd>switch slider {
+  background: alpha(@foreground, 0.35);
+  border-radius: 6px;
+  margin: 0.25rem;
+}
+
+.widget-dnd>switch:checked slider {
+  background: alpha(@foreground, 0.65);
+}

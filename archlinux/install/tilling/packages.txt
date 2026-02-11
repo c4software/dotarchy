@@ -24,7 +24,7 @@ hyprpicker
 hyprshot
 libqalculate
 waybar
-mako
+swaync
 swaybg
 swayosd
 grim
