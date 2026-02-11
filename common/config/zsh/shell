@@ -2,14 +2,40 @@
 HISTFILE=~/.zsh_history
 setopt share_history
 setopt inc_append_history
+setopt inc_append_history_time
+setopt HIST_SAVE_NO_DUPS
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
+setopt HIST_FIND_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
 HISTSIZE=32768
 SAVEHIST=32768
 
+# Directory stack control
+setopt PUSHD_MINUS
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_TO_HOME
+setopt AUTO_PUSHD
+setopt PUSHD_SILENT
+
+# Helper
+setopt AUTO_CD # Change to a directory by typing its name
+setopt CORRECT_ALL # Enable command correction for all arguments
+setopt AUTO_MENU # Show completion menu even if there is only one match
+setopt GLOB_DOTS # Include hidden files in globbing
+setopt AUTO_PARAM_SLASH # Immediately add a trailing slash when autocompleting symlinks to directories
+
 # Autocompletion
 autoload -Uz compinit
-compinit
+
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
 
 # Set complete path
 export PATH="./bin:$HOME/.local/bin:$PATH"

@@ -16,9 +16,4 @@ zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}" # Colored completion
 zstyle ':completion:*' special-dirs true # Complete . and ..
 zstyle ':completion:*' file-list all # Show file information
 zstyle ':completion:*' accept-exact-dirs true # Don't complete already exact dirs
-
-# Don't autocomplete hidden files unless the pattern explicitly begins with a dot
-setopt GLOB_DOTS
-
-# Immediately add a trailing slash when autocompleting symlinks to directories
-setopt AUTO_PARAM_SLASH
+zstyle ':completion:*' group-name '' # Don't group completion results
