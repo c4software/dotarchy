@@ -4,42 +4,27 @@ function setup(){
         echo "SystemMaxUse=50M" | sudo tee -a /etc/systemd/journald.conf
     fi
 
-    # Prevent systemd-networkd-wait-online timeout on boot
-    sudo systemctl disable systemd-networkd-wait-online.service
-    sudo systemctl mask systemd-networkd-wait-online.service
+    # 1. D'abord arrêter les services conflictuels
+    sudo systemctl stop systemd-networkd 2>/dev/null || true
+    sudo systemctl stop iwd 2>/dev/null || true
 
-    # Create a file with DNS settings for wg interfaces (/etc/systemd/network/50-wg-all.network)
-    local wg_config_file="/etc/systemd/network/50-wg-all.network"
-    
-    if [ ! -f "$wg_config_file" ]; then
-        echo "Creating WireGuard DNS priority configuration..."
-        sudo mkdir -p /etc/systemd/network
-        
-        sudo tee "$wg_config_file" > /dev/null << 'EOF'
-[Match]
-Name=wg*
+    # 2. Ensuite les désactiver et masquer
+    sudo systemctl disable systemd-networkd 2>/dev/null || true
+    sudo systemctl mask systemd-networkd 2>/dev/null || true
 
-[Network]
-Domains=~.
-DNSDefaultRoute=yes
-EOF
-    fi
+    sudo systemctl disable iwd 2>/dev/null || true
+    sudo systemctl mask iwd 2>/dev/null || true
 
-    # Rules for WSIO
-    local wsio_config_file="/etc/systemd/network/25-wlan-wsio.network"
-    if [ ! -f "$wsio_config_file" ]; then
-        echo "Creating WSIO DNS priority configuration..."
-        sudo tee "$wsio_config_file" > /dev/null << 'EOF'
-[Match]
-[Match]
-Name=wl*
-SSID=WSIO
+    # 3. Masquer les services wait-online (avant d'activer NetworkManager)
+    sudo systemctl disable systemd-networkd-wait-online.service 2>/dev/null || true
+    sudo systemctl mask systemd-networkd-wait-online.service 2>/dev/null || true
 
-[Network]
-Domains=~.
-DNSDefaultRoute=yes
-EOF
-    fi
+    sudo systemctl disable NetworkManager-wait-online.service 2>/dev/null || true
+    sudo systemctl mask NetworkManager-wait-online.service 2>/dev/null || true
+
+    # 4. Enfin, activer et démarrer NetworkManager
+    sudo systemctl enable NetworkManager
+    sudo systemctl start NetworkManager
 
     # Remplacer /etc/resolv.conf par un lien symbolique vers le stub de systemd-resolved
     # Cela garantit que les résolutions DNS passent par systemd-resolved.
@@ -63,18 +48,38 @@ function check(){
         return
     fi
 
+    if systemctl is-active --quiet systemd-networkd.service; then
+        show_error "Systemd" "systemd-networkd.service is active, it should be stopped and masked"
+        return
+    fi
+
+    if systemctl is-active --quiet iwd.service; then
+        show_error "Systemd" "iwd.service is active, it should be stopped and masked"
+        return
+    fi
+
+    if systemctl is-enabled --quiet systemd-networkd.service; then
+        show_error "Systemd" "systemd-networkd.service is enabled, it should be disabled and masked"
+        return
+    fi
+
+    if systemctl is-enabled --quiet iwd.service; then
+        show_error "Systemd" "iwd.service is enabled, it should be disabled and masked"
+        return
+    fi
+
     if systemctl is-enabled --quiet systemd-networkd-wait-online.service; then
-        show_error "Systemd" "systemd-networkd-wait-online.service is enabled"
+        show_error "Systemd" "systemd-networkd-wait-online.service is enabled, it should be disabled and masked"
         return
     fi
 
-    if [ ! -f "/etc/systemd/network/50-wg-all.network" ]; then
-        show_error "Systemd" "/etc/systemd/network/50-wg-all.network does not exist."
+    if systemctl is-enabled --quiet NetworkManager-wait-online.service; then
+        show_error "Systemd" "NetworkManager-wait-online.service is enabled, it should be disabled and masked"
         return
     fi
 
-    if [ ! -f "/etc/systemd/network/25-wlan-wsio.network" ]; then
-        show_error "Systemd" "/etc/systemd/network/25-wlan-wsio.network does not exist."
+    if ! systemctl is-active --quiet NetworkManager.service; then
+        show_error "Systemd" "NetworkManager.service is not active"
         return
     fi
 
