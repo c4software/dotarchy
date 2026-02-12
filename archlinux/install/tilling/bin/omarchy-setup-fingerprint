@@ -20,7 +20,11 @@ print_info() {
 }
 
 check_fingerprint_hardware() {
-  if ! lsusb | grep -Eiq 'fingerprint|synaptics|goodix|elan|validity|FPC'; then
+  # Get fingerprint devices for the user
+  devices=$(fprintd-list "$USER" 2>/dev/null)
+
+  # Exit if no devices found
+  if [[ -z "$devices" ]]; then
     print_error "\nNo fingerprint sensor detected."
     return 1
   fi
@@ -101,7 +105,7 @@ else
     print_info "\nNow let's verify that it's working correctly.\n"
     if fprintd-verify; then
       print_success "\nPerfect! Fingerprint authentication is now configured."
-      print_info "You can use your fingerprint for sudo, polkit."
+      print_info "You can use your fingerprint for sudo and polkit."
     else
       print_error "\nVerification failed. You may want to try enrolling again."
     fi
