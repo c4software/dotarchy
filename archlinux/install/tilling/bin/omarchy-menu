@@ -49,7 +49,7 @@ aur_install_and_launch() {
 }
 
 show_learn_menu() {
-  case $(dotarchy-display-menu "Learn" "  Keybindings\n  Omarchy\n  Niri\n󰣇  Arch\n  Neovim\n󱆃  Bash") in
+  case $(dotarchy-display-menu "Learn" " Keybindings\n  Omarchy\n  Niri\n󰣇  Arch\n  Neovim\n󱆃  Bash") in
   *Keybindings*) dotarchy-menu-keybindings-niri ;;
   *Niri*) xdg-open "https://yalter.github.io/niri/Configuration%3A-Introduction.html" ;;
   *Arch*) xdg-open "https://wiki.archlinux.org/title/Main_page" ;;
@@ -93,9 +93,9 @@ show_toggle_menu() {
 }
 
 show_setup_menu() {
-  local options="  Audio\n   Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰍹  Monitors"
-  [ -f ~/.config/niri/binds.kdl ] && options="$options\n   Keybindings"
-  [ -f ~/.config/niri/input.kdl ] && options="$options\n  Input"
+  local options="  Audio\n  Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰍹  Monitors"
+  [ -f ~/.config/niri/includes/binds.kdl ] && options="$options\n  Keybindings"
+  [ -f ~/.config/niri/includes/input.kdl ] && options="$options\n  Input"
   options="$options\n  Config\n󰈷  Fingerprint\n  Firmware"
 
   if ! omarchy-hibernation-available; then
@@ -108,16 +108,16 @@ show_setup_menu() {
   *Audio*) alacritty --class=Wiremix -e wiremix ;;
   *Wifi*)
     rfkill unblock wifi
-    alacritty --class=Impala -e impala
+    alacritty --class=Impala -e nmtui
     ;;
   *Bluetooth*)
     rfkill unblock bluetooth
     alacritty --class=Bluetui -e bluetui
     ;;
   *Power*) show_setup_power_menu ;;
-  *Monitors*) edit_in_nvim ~/.config/niri/output.kdl ;;
-  *Keybindings*) edit_in_nvim ~/.config/niri/binds.kdl ;;
-  *Input*) edit_in_nvim ~/.config/niri/input.kdl ;;
+  *Monitors*) edit_in_nvim ~/.config/niri/includes/output.kdl ;;
+  *Keybindings*) edit_in_nvim ~/.config/niri/includes/binds.kdl ;;
+  *Input*) edit_in_nvim ~/.config/niri/includes/input.kdl ;;
   *Config*) show_setup_config_menu ;;
   *Fingerprint*) present_terminal omarchy-setup-fingerprint ;;
   *Firmware*) present_terminal omarchy-update-firmware ;;
