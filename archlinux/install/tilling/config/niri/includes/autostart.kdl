@@ -1,4 +1,5 @@
-spawn-at-startup "swaync"
+// Swaync is automatically via dbus call. No need to start it here.
+// spawn-at-startup "swaync"
 spawn-sh-at-startup "waybar --config ~/.config/waybar/niri.jsonc"
 spawn-at-startup "dotarchy-background" "set"
 spawn-at-startup "swayosd-server"
