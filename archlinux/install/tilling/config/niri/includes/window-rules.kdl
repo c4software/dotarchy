@@ -29,7 +29,7 @@ window-rule {
 window-rule {
     match app-id="Alacritty"
     draw-border-with-background false
-    opacity 0.98
+    opacity 0.96
 }
 
 // ============================================================================
