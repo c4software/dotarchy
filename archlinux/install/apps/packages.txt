@@ -47,6 +47,6 @@ gum
 bash-completion
 btop
 fastfetch
-zellij
+tmux
 yazi
 starship

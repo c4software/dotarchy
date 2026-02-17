@@ -32,10 +32,10 @@ alias yesterdaystory="git log --pretty=format:'- %s' --since=yesterday --before=
 alias git-no-sign="git -c commit.gpgsign=false"
 alias git-last-tag="git describe --tags --abbrev=0"
 alias serve-php='php -S localhost:9000'
-#alias kamal='[ -f .env ] && source .env; docker run -it --rm -e DOCKER_OPTS="--tls-verify=false" -v "${HOME}/.ssh/config:/root/.ssh/config" -v "${PWD}:/workdir" -v "/run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock" -e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/basecamp/kamal:v2.2.0'
+#alias kamal='[ -f .env ] && source .env; docker run -it --rm -e DOCKER_OPTS="--tls-verify=false" -v "${HOME}/.ssh/config:/root/.ssh/config" -v "${PWD}:/workdir" -v "/run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock" -e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/basecamp/kamal:v2.1.1'
 alias openLinkAndroid='adb shell am start -a android.intent.action.VIEW -d'
 alias spotdl='docker run --rm -v "$(pwd):/music" spotdl/spotify-downloader --output "{artist}/{album}/{track-number} - {title}.{output-ext}" download'
 alias ytdl='docker run --rm -v .:/downloads -it jauderho/yt-dlp:latest -x --audio-format mp3 --audio-quality 0 --embed-metadata -o "%(uploader)s/%(title)s [%(id)s].%(ext)s"'
 alias repo='open "$(git remote get-url origin | sed -E "s#git@([^:]+):#https://\1/#; s#\.git\$##")"'
 alias vim='nvim'
-
+alias t='tmux attach || tmux new -s Work'
