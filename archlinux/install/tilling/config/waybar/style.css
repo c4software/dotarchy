@@ -14,7 +14,7 @@
 
 /* ===== BAR ===== */
 
-window#waybar {
+window#waybar{
     background: linear-gradient(
         to bottom,
         alpha(@background, 0.85),
@@ -224,4 +224,3 @@ menu menuitem:hover {
         opacity: 0.3;
     }
 }
-

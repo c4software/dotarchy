@@ -49,8 +49,17 @@
   "clock": {
     "format": "{:%H:%M}",
     "tooltip": true,
-    "on-click": "omarchy-launch-or-focus-webapp 'calendar' 'https://calendar.google.com/'",
-    "tooltip-format": "{:L%A %d %B W%V %Y}"
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "calendar": {
+      "mode": "year",
+      "mode-mon-col": 3,
+      "weeks-pos": "left",
+      "iso8601": true,
+      "format": {
+        "today": "<u>{}</u>"
+      }
+    },
+    "on-click": "omarchy-launch-or-focus-webapp 'calendar' 'https://calendar.google.com/'"
   },
   "network": {
     "format-icons": [
