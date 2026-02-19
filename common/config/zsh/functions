@@ -49,6 +49,14 @@ img2jpg-small() {
   magick "$img" $@ -resize 1080x\> -quality 95 -strip ${img%.*}-optimized.jpg
 }
 
+# Transcode any image to JPG image that's great for sharing online without being too big
+img2jpg-medium() {
+  img="$1"
+  shift
+
+  magick "$img" $@ -resize 1800x\> -quality 95 -strip ${img%.*}-medium.jpg
+}
+
 # Transcode any image to compressed-but-lossless PNG
 img2png() {
   img="$1"
@@ -61,15 +69,7 @@ img2png() {
     "${img%.*}-optimized.png"
 }
 
-
-# Create a tmux layout for dev with editor, ai, and terminal
 tml() {
-  # If we are not in a tmux session, start one
-  if [ -z "$TMUX" ]; then
-    tmux new-session -d -s Dev
-    tmux attach-session -t Dev
-  fi
-
   local current_dir="${PWD}"
   local editor_pane ai_pane
   local ai="$1"
@@ -77,8 +77,8 @@ tml() {
   # Get current pane ID (will become editor pane after splits)
   editor_pane=$(tmux display-message -p '#{pane_id}')
 
-  # Split window vertically - top 90%, bottom 10%
-  tmux split-window -v -p 10 -c "$current_dir"
+  # Split window vertically - top 85%, bottom 15%
+  tmux split-window -v -p 15 -c "$current_dir"
 
   # Go back to top pane (editor_pane) and split it horizontally
   tmux select-pane -t "$editor_pane"
