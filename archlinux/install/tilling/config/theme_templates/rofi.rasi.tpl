@@ -1,0 +1,12 @@
+@import "base-theme.rasi"
+
+* {
+  background: {{ background }};
+  background-alt: {{ background }};
+  foreground: {{ foreground }};
+  selected-text: {{ color4 }};
+  border-color: {{ color8 }};
+
+  window-background: {{ background }};
+  placeholder-color: {{ color12 }};
+}

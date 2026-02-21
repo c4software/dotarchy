@@ -270,7 +270,7 @@ show_theme_menu() {
   if [[ "$theme" == "CNCLD" || -z "$theme" ]]; then
     show_main_menu
   else
-    omarchy-theme-set "$theme"
+    dotarchy-theme-set "$theme"
   fi
 }
 

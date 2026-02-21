@@ -1,0 +1,160 @@
+#!/bin/bash
+
+# dotarchy-theme-set: Set a theme, specified by its name.
+# Expects themes to be in ~/.config/themes/<theme-name>/
+# Background-path is optional, if provided it will be set as the background.
+# Usage: dotarchy-theme-set <theme-name>
+
+cmd_present() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Convert hex color to decimal RGB (e.g., "#1e1e2e" -> "30,30,46")
+hex_to_rgb() {
+  local hex="${1#\#}"
+  printf "%d,%d,%d" "0x${hex:0:2}" "0x${hex:2:2}" "0x${hex:4:2}"
+}
+
+if [[ -z "$1" && "$1" != "CNCLD" ]]; then
+  echo "Usage: dotarchy-theme-set <theme-name>" >&2
+  exit 1
+fi
+
+THEMES_DIR="$HOME/.config/themes/"
+THEME_TEMPLATE_DIR="$HOME/.config/theme_templates" # Source file for generating the real theme.
+CURRENT_THEME_DIR="$HOME/.config/theme" # This is where the current theme files are located, and where applications read their theme configs from.
+NEXT_THEME_DIR="$HOME/.config/theme-next" # Use to generate the new theme files
+COLORS_FILE="$NEXT_THEME_DIR/colors.toml"
+
+THEME_NAME=$(echo "$1" | sed -E 's/<[^>]+>//g' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+THEME_PATH="$THEMES_DIR/$THEME_NAME"
+
+# Create themes directory if it doesn't exist
+mkdir -p "$THEMES_DIR"
+
+# Check if the theme entered exists
+if [[ ! -d "$THEME_PATH" ]]; then
+  echo "Theme '$THEME_NAME' does not exist in $THEMES_DIR" >&2
+  exit 2
+fi
+
+###
+# Step 1: Generate the new theme files in a temporary directory
+###
+
+# First generate the new theme files in a temporary directory, then move them to the current theme directory. This way we avoid having a half-updated theme if something goes wrong during generation.
+rm -rf "$NEXT_THEME_DIR"
+mkdir -p "$NEXT_THEME_DIR"
+
+cp -r "$THEME_PATH/"* "$NEXT_THEME_DIR/"
+
+sed_script=$(mktemp)
+while IFS='=' read -r key value; do
+  key="${key//[\"\' ]/}"                # strip quotes and spaces from key
+  [[ $key && $key != \#* ]] || continue # skip empty lines and comments
+  value="${value#*[\"\']}"
+  value="${value%%[\"\']*}" # extract value between quotes (ignores inline comments)
+
+  printf 's|{{ %s }}|%s|g\n' "$key" "$value"            # {{ key }} -> value
+  printf 's|{{ %s_strip }}|%s|g\n' "$key" "${value#\#}" # {{ key_strip }} -> value without leading #
+  if [[ $value =~ ^# ]]; then
+    rgb=$(hex_to_rgb "$value")
+    echo "s|{{ ${key}_rgb }}|${rgb}|g"
+  fi
+done <"$COLORS_FILE" >"$sed_script"
+
+for tpl in "$THEME_TEMPLATE_DIR"/*.tpl; do
+  filename=$(basename "$tpl" .tpl)
+  output_path="$NEXT_THEME_DIR/$filename"
+
+  # Don't overwrite configs already exists in the output directory (copied from theme specific folder)
+  if [[ ! -f $output_path ]]; then
+    sed -f "$sed_script" "$tpl" >"$output_path"
+  fi
+done
+
+rm "$sed_script"
+
+##
+# Step 2: Move the generated theme to the current theme directory
+##
+
+rm -rf "$CURRENT_THEME_DIR"
+mv "$NEXT_THEME_DIR" "$CURRENT_THEME_DIR"
+
+##
+# Step 3: Apply the new theme to the system and applications
+##
+
+# Change gnome modes
+if [[ -f ~/.config/theme/light.mode ]]; then
+  gsettings set org.gnome.desktop.interface color-scheme "prefer-light"
+  gsettings set org.gnome.desktop.interface gtk-theme "Adwaita"
+else
+  gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
+  gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
+fi
+
+# Change gnome icon theme color
+if [[ -f ~/.config/theme/icons.theme ]]; then
+  gsettings set org.gnome.desktop.interface icon-theme "$(<~/.config/theme/icons.theme)"
+else
+  gsettings set org.gnome.desktop.interface icon-theme "Yaru-blue"
+fi
+
+# Trigger terminal config reload
+case "$TERMINAL" in
+"alacritty") touch ~/.config/alacritty/alacritty.toml ;;
+"kitty") killall -SIGUSR1 kitty ;;
+"ghostty") killall -SIGUSR2 ghostty ;;
+esac
+
+# ln the btop current.theme to the current theme
+ln -nsf "$CURRENT_THEME_DIR/btop.theme" "$HOME/.config/btop/themes/current.theme"
+
+# Set the mako theme
+mkdir -p ~/.config/mako
+ln -snf ~/.config/theme/mako.ini ~/.config/mako/config
+
+# Theme eza
+mkdir -p ~/.config/eza
+if [ -f ~/.config/omarchy/current/theme/eza.yml ]; then
+  ln -snf ~/.config/omarchy/current/theme/eza.yml ~/.config/eza/theme.yml
+else
+  rm -f ~/.config/eza/theme.yml
+fi
+
+# Theme Chromium / Brave
+CHROMIUM_THEME=~/.config/theme/chromium.theme
+if cmd_present chromium || cmd_present brave; then
+
+  # Extract RGB color from theme file
+  if [[ -f $CHROMIUM_THEME ]]; then
+    THEME_RGB_COLOR=$(<$CHROMIUM_THEME)
+    THEME_HEX_COLOR=$(printf '#%02x%02x%02x' ${THEME_RGB_COLOR//,/ })
+  else
+    # Use a default, neutral grey if theme doesn't have a color
+    THEME_RGB_COLOR="28,32,39"
+    THEME_HEX_COLOR="#1c2027"
+  fi
+
+  rm -f /etc/brave/policies/managed/color.json 2>/dev/null || true
+  rm -f /etc/chromium/policies/managed/color.json 2>/dev/null || true
+
+  chromium --no-startup-window --set-theme-color="$THEME_RGB_COLOR"
+
+  if [[ -f ~/.config/theme/light.mode ]]; then
+    chromium --no-startup-window --set-color-scheme="light"
+  else
+    chromium --no-startup-window --set-color-scheme="dark"
+  fi
+fi
+
+# Restart components to apply new theme
+pkill -SIGUSR2 btop >/dev/null 2>&1 || true
+omarchy-restart-waybar >/dev/null 2>&1 || true
+omarchy-restart-swayosd >/dev/null 2>&1 || true
+swaync-client --reload-css >/dev/null 2>&1 || true
+
+dotarchy-background set
+

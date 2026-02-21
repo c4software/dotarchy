@@ -38,7 +38,7 @@ function setup() {
 
     # Apply the default theme if not already set
     if [ ! -L ~/.config/theme ]; then
-        omarchy-theme-set "osaka-jade"
+        dotarchy-theme-set "osaka-jade"
     fi
 
     # Check if iwd is enabled
@@ -72,7 +72,7 @@ function check() {
     if [ -L ~/.config/theme ]; then
         show_success "Theme Symlink"
     else
-        show_warning "Theme folder exists" "Your folder is not a symlink to a valid theme. You can run 'omarchy-theme-set <theme-name>' to change it."
+        show_warning "Theme folder exists" "Your folder is not a symlink to a valid theme. You can run 'dotarchy-theme-set <theme-name>' to change it."
     fi
 
     # Check if bin scripts are present in ~/.local/bin
