@@ -16,7 +16,7 @@ configuration {
 window {
     enabled:                     true;
     fullscreen:                  false;
-    width:                       80%;
+    width:                       82%;
 }
 
 //----- Main Box -----//
@@ -33,10 +33,10 @@ listview {
     enabled:                     true;
     columns:                     3;
     lines:                       2;
-    spacing:                     40px;
-    padding:                     20px;
+    spacing:                     12px;
+    padding:                     14px;
     cycle:                       true;
-    dynamic:                     true;
+    dynamic:                     false;
     scrollbar:                   false;
     layout:                      vertical;
     reverse:                     false;
@@ -52,25 +52,30 @@ listview {
 element {
     enabled:                     true;
     orientation:                 vertical;
+    children:                    [ element-icon ];
     spacing:                     0px;
-    padding:                     0px;
-    border-radius:               20px;
+    padding:                     6px;
+    border-radius:               14px;
+    height:                      310px;     /* ← C’est ÇA qui rend la grille beaucoup moins haute */
     cursor:                      pointer;
     background-color:            transparent;
     text-color:                  @foreground;
 }
 
-element selected.normal {
-    background-color:            @selected-text;
-    text-color:                  @selected-text;
+element selected {
+    background-color:            rgba(255,255,255,0.07);
 }
 
 element-icon {
-    size:                        33%;
+    size:                        280px;     /* images toujours bien grosses mais dans une case plus basse */
     cursor:                      inherit;
-    border-radius:               0px;
+    border-radius:               12px;
     background-color:            transparent;
     text-color:                  inherit;
+}
+
+element-icon selected {
+    border:                      0;         /* pas de bordure comme tu as retiré */
 }
 
 element-text {
