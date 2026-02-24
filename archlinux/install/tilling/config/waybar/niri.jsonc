@@ -29,6 +29,8 @@
   ],
   "niri/workspaces": {
     "format": "{icon}",
+    "on-scroll-up": "niri msg action focus-workspace-up",
+    "on-scroll-down": "niri msg action focus-workspace-down",
     "format-icons": {
       "web": "Web",
       "code": "Code",
@@ -39,7 +41,9 @@
   },
   "wlr/taskbar": {
     "on-click": "activate",
-    "on-click-right": "minimize"
+    "on-click-right": "minimize",
+    "on-scroll-up": "niri msg action focus-workspace-up",
+    "on-scroll-down": "niri msg action focus-workspace-down"
   },
   "cpu": {
     "interval": 10,
