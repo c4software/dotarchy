@@ -8,6 +8,7 @@
 output "eDP-1" {
     // variable-refresh-rate
     mode "2880x1920@60.001"
+    scale 1.8
 }
 
 /-output "eDP-1" {
