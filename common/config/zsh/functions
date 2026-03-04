@@ -70,9 +70,9 @@ img2png() {
 }
 
 # Create a Tmux Dev Layout with editor, ai, and terminal
-# Usage: tdl <c|cx|codex|other_ai> [<second_ai>]
+# Usage: tdl <code|opencode> [<second_ai>]
 tdl() {
-  [[ -z $1 ]] && { echo "Usage: tdl <c|cx|codex|other_ai> [<second_ai>]"; return 1; }
+  [[ -z $1 ]] && { echo "Usage: tdl <claude|opencode> [<second_ai>]"; return 1; }
   [[ -z $TMUX ]] && { echo "You must start tmux to use tdl."; return 1; }
 
   local current_dir="${PWD}"
@@ -109,9 +109,9 @@ tdl() {
 }
 
 # Create multiple tdl windows with one per subdirectory in the current directory
-# Usage: tdlm <c|cx|codex|other_ai> [<second_ai>]
+# Usage: tdlm <claude|opencode> [<second_ai>]
 tdlm() {
-  [[ -z $1 ]] && { echo "Usage: tdlm <c|cx|codex|other_ai> [<second_ai>]"; return 1; }
+  [[ -z $1 ]] && { echo "Usage: tdlm <claude|opencode> [<second_ai>]"; return 1; }
   [[ -z $TMUX ]] && { echo "You must start tmux to use tdlm."; return 1; }
 
   local ai="$1"
