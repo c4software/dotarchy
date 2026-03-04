@@ -40,11 +40,14 @@ To update only the configuration files without installing packages, you can run 
 ⚠️ This will overwrite your existing configuration files. Make sure to back up any important configurations before running this command.
 ⚠️ This will not update all [common configuration](./common/) files, only those related to Niri. To **update all configuration files**, please use `update.sh --all`.
 
-### AMD AI 9 HX 370 Suspend cause reboot
+### AMD AI 9 HX 370
 
-In the latest version the NPU seems trigger reboot, adding `module_blacklist=amdxdna` disable it, suspend is ok again.
+#### Suspend cause reboot
 
-### AMD AI 9 HX 370 Series CPU users
+In recent kernels, the NPU may trigger a reboot during suspend. Adding `module_blacklist=amdxdna` to the kernel command line disables the module and restores normal suspend behavior.
+Edit the bootloader entries in `/boot/loader/entries/<your-arch-entry>.conf`.
+
+#### Power saving
 
 You can reduce the power consumpution of your CPU by enabling AMD P-State and forcing PCIe ASPM.
 
