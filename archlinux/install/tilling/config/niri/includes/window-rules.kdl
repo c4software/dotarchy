@@ -24,6 +24,7 @@ window-rule {
 window-rule {
     match app-id="org.gnome.Nautilus"
     open-focused true
+    default-column-width { fixed 1000; }
 }
 
 window-rule {
