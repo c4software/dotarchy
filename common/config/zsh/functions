@@ -166,3 +166,21 @@ tsl() {
 
   tmux select-pane -t "${panes[0]}"
 }
+
+ssh() {
+  if [[ $# -eq 0 ]]; then
+    local selected
+    selected=$(
+      grep -E '^: [0-9]+:[0-9]+;ssh ' "${HISTFILE:-$HOME/.zsh_history}" \
+      | sed 's/^: \([0-9]*\):[0-9]*;ssh[[:space:]]*/\1 /' \
+      | awk '{print $1, $2}' \
+      | grep -v ' -' \
+      | sort -k1,1rn \
+      | awk '!seen[$2]++ {print $2}' \
+      | fzf --prompt="SSH › " --height=40% --border=rounded --pointer="▶"
+    )
+    [[ -n "$selected" ]] && command ssh "$selected"
+  else
+    command ssh "$@"
+  fi
+}
