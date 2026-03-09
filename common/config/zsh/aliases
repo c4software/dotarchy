@@ -20,6 +20,10 @@ alias g='git'
 alias d='docker'
 n() { if [ "$#" -eq 0 ]; then nvim .; else nvim "$@"; fi; }
 
+# Tmux
+alias tmux='tmux attach || tmux new -s Work'
+
+
 # Git
 alias gcm='git commit -m'
 alias gcam='git commit -a -m'
