@@ -185,7 +185,7 @@ ssh() {
   fi
 }
 
-kub() {
+kube() {
  local kubeconfig
  kubeconfig=$(eza --only-files ~/projets/k9s/ | fzf \
     --height=~10 \
