@@ -23,4 +23,6 @@ if command -v try &> /dev/null; then
   eval "$(~/.local/bin/try init)"
 fi
 
-
+if command -v proj &> /dev/null; then
+  eval "$(~/.local/bin/proj init)"
+fi

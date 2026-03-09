@@ -73,6 +73,10 @@ function setup(){
   curl -sL https://raw.githubusercontent.com/c4software/try.sh/main/try.sh -o ~/.local/bin/try
   chmod +x ~/.local/bin/try
 
+  # Installation proj command
+  curl -sL https://raw.githubusercontent.com/c4software/prj.sh/main/prj.sh -o ~/.local/bin/proj
+  chmod +x ~/.local/bin/proj
+
   # If not MacOS, install the Bépo Dev keyboard layout
   if [[ "$OSTYPE" != "darwin"* ]]; then
     # Installation du layout de clavier Bépo Dev
