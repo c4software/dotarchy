@@ -184,3 +184,18 @@ ssh() {
     command ssh "$@"
   fi
 }
+
+kub() {
+ local kubeconfig
+ kubeconfig=$(eza --only-files ~/projets/k9s/ | fzf \
+    --height=~10 \
+    --min-height=3 \
+    --reverse \
+    --no-border \
+    --no-info \
+    --no-separator \
+    --prompt=">" \
+    --pointer="") || return
+
+ [[ -n "$kubeconfig" ]] && command k9s --kubeconfig ~/projets/k9s/"$kubeconfig"
+}
