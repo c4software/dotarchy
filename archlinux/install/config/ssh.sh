@@ -1,7 +1,7 @@
 function setup(){
     grep -qxF 'net.ipv4.tcp_mtu_probing=1' /etc/sysctl.d/99-sysctl.conf || echo 'net.ipv4.tcp_mtu_probing=1' | sudo tee -a /etc/sysctl.d/99-sysctl.conf
 
-    // Enable Agent for the user
+    # Enable Agent for the user
     systemctl --user enable --now ssh-agent.service
 }
 

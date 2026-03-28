@@ -1,7 +1,7 @@
 # Install AppImage not available in the Arch repos
 
 function setup(){
-    mkdir -p "~/Applications"
+    mkdir -p ~/Applications
     # Create quickcalc rofi entry
     # ~/.local/share/applications/quickcal.desktop
     cat <<EOF > ~/.local/share/applications/quickcal.desktop
