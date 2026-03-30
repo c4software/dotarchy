@@ -22,6 +22,10 @@ cd "$SCRIPT_DIR" || exit
 # Add local bin to PATH (since we installed binaries there)
 export PATH="$HOME/.local/bin:$PATH"
 
+# Installation des scripts dans ~.local/bin
+mkdir -p ~/.local/bin
+cp "$SCRIPT_DIR/bin/"* ~/.local/bin/
+
 # Source all script under install/system with confirmation
 if gum confirm "Do you want to run system setup scripts?"; then
   for script in "$SCRIPT_DIR/install/system/"*.sh; do 

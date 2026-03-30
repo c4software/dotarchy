@@ -41,10 +41,6 @@ function setup(){
   # Ensure application directory exists for update-desktop-database
   mkdir -p ~/.local/share/applications
 
-  # Installation des scripts dans ~.local/bin
-  mkdir -p ~/.local/bin
-  cp "$SCRIPT_DIR/../bin/"* ~/.local/bin/
-
   # Install the default .profile
   cp "$SCRIPT_DIR/../default/profile" ~/.profile
 
@@ -124,27 +120,5 @@ function check(){
   done
   if $all_matched; then
       show_success "Configuration"
-  fi
-
-  # Check if all scripts are present in ~/.local/bin
-  local missing_scripts=()
-  for script in "$SCRIPT_DIR/../bin/"*; do
-      local script_name
-      script_name=$(basename "$script")
-      if [ ! -f "$HOME/.local/bin/$script_name" ]; then
-          missing_scripts+=("$script_name")
-      fi
-  done
-  if [ ${#missing_scripts[@]} -eq 0 ]; then
-      show_success "Local bin scripts"
-  else
-      show_error "Local bin scripts" "Missing scripts: ${missing_scripts[*]}"
-  fi
-
-  # Check if current shell is bash
-  if [ "$SHELL" = "/bin/bash" ] || [ "$SHELL" = "/usr/bin/bash" ] || [ "$SHELL" = "$HOME/.local/bin/bash" ]; then
-      show_success "Default shell"
-  else
-      show_warning "Default shell" "Your default shell is not bash (It's $SHELL). Please change it to bash. By running 'chsh -s $(which bash)'"
   fi
 }
