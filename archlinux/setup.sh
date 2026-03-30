@@ -11,10 +11,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 )
 
 # Download all packages using pacman for install/**/packages.txt (excluding the tilling since its optional)
-find "$SCRIPT_DIR/install/" -path "$SCRIPT_DIR/install/tilling" -prune -o -name "packages.txt" -exec sh -c 'grep -v "^#" "$1" | sudo pacman -Sw --noconfirm --needed -' _ {} \;
+# find "$SCRIPT_DIR/install/" -path "$SCRIPT_DIR/install/tilling" -prune -o -name "packages.txt" -exec sh -c 'grep -v "^#" "$1" | sudo pacman -Sw --noconfirm --needed -' _ {} \;
 
 # Download all packages using yay for install/**/packages.aur.txt (excluding the tilling since its optional)
-find "$SCRIPT_DIR/install/" -path "$SCRIPT_DIR/install/tilling" -prune -o -name "packages.aur.txt" -exec sh -c 'grep -v "^#" "$1" | yay -Sw --noconfirm --needed -' _ {} \;
+# find "$SCRIPT_DIR/install/" -path "$SCRIPT_DIR/install/tilling" -prune -o -name "packages.aur.txt" -exec sh -c 'grep -v "^#" "$1" | yay -Sw --noconfirm --needed -' _ {} \;
 
 # Force the script to be executed from its directory (since init.sh move us to /tmp during yay installation)
 cd "$SCRIPT_DIR" || exit
@@ -28,11 +28,11 @@ cp "$SCRIPT_DIR/bin/"* ~/.local/bin/
 
 # Source all script under install/system with confirmation
 if gum confirm "Do you want to run system setup scripts?"; then
-  for script in "$SCRIPT_DIR/install/system/"*.sh; do 
-  (
-    source "$script"
-    setup
-  )
+  for script in "$SCRIPT_DIR/install/system/"*.sh; do
+    (
+      source "$script"
+      setup
+    )
   done
 fi
 
@@ -40,10 +40,10 @@ fi
 if gum confirm "Do you want to run apps setup scripts?"; then
   clear
   for script in "$SCRIPT_DIR/install/apps/"*.sh; do
-  (
-    source "$script"
-    setup
-  )
+    (
+      source "$script"
+      setup
+    )
   done
 fi
 
@@ -51,10 +51,10 @@ fi
 if gum confirm "Do you want to run desktop setup scripts?"; then
   clear
   for script in "$SCRIPT_DIR/install/desktop/"*.sh; do
-  (
-    source "$script"
-    setup
-  )
+    (
+      source "$script"
+      setup
+    )
   done
 fi
 
@@ -62,10 +62,10 @@ fi
 if gum confirm "Do you want to run config setup scripts?"; then
   clear
   for script in "$SCRIPT_DIR/install/config/"*.sh; do
-  (
-    source "$script"
-    setup
-  )
+    (
+      source "$script"
+      setup
+    )
   done
 fi
 
@@ -87,7 +87,8 @@ if [ -n "$IS_RYZEN_AI_9_HX_370" ]; then
     echo "You can reduce power consumption by enabling AMD P-State and forcing PCIe ASPM."
     echo "Editing bootloader entries in /boot/loader/entries/ to add necessary kernel parameters."
     echo "Please add the following line to your bootloader entry file(s):"
-    echo ""    echo "amd_pstate=active pcie_aspm=force"
-    echo ""    echo "After editing, please reboot your system for the changes to take effect."
+    echo "" echo "amd_pstate=active pcie_aspm=force"
+    echo "" echo "After editing, please reboot your system for the changes to take effect."
   )
 fi
+
