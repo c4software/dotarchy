@@ -10,6 +10,7 @@ function setup(){
     git config --global alias.st status
     git config --global pull.rebase true
     git config --global init.defaultBranch main
+    git config --global alias.s switch
 }
 
 function check(){
