@@ -3,6 +3,14 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 function setup(){
+
+  # Prompt the user if he wants to do the common setup, if not exit the script
+  if ! gum confirm "Do you want to do the common setup?"; then
+    echo "Common setup skipped. Exiting."
+    exit 0
+  fi
+    
+
   echo -e "Move configuration files..."
 
   # Install rsync if not present
@@ -46,27 +54,25 @@ function setup(){
   # Install Zsh configuration
   cp "$SCRIPT_DIR/../default/zshrc" ~/.zshrc
 
-  # If chsh is available, ask the user to choose between bash and zsh as default shell
-  if command -v chsh &> /dev/null; then
-    echo "Choose your default shell (bash or zsh):"
-    select shell_choice in "bash" "zsh"; do
-      case $shell_choice in
-        bash )
-          chsh -s "$(which bash)"
-          break
-          ;;
-        zsh )
-          # If pacman is available, install zsh and zsh-completions
-          if command -v pacman &> /dev/null; then
-            sudo pacman -Sy --noconfirm zsh zsh-completions
-          fi
-          
-          chsh -s "$(which zsh)"
-          break
-          ;;
-        * ) echo "Please choose bash or zsh.";;
-      esac
-    done
+  # If gum is available, ask the user to choose between bash and zsh as default shell
+  if command -v gum &> /dev/null; then
+    shell_choice=$(gum choose "bash" "zsh" "skip" --header "Choose your default shell:")
+    
+    case $shell_choice in
+      bash )
+        chsh -s "$(which bash)"
+        ;;
+      zsh )
+        # If pacman is available, install zsh and zsh-completions
+        if command -v pacman &> /dev/null; then
+          sudo pacman -Sy --noconfirm zsh zsh-completions
+        fi
+        chsh -s "$(which zsh)"
+        ;;
+      skip )
+        echo "No shell selected. Keeping current shell ($SHELL)."
+        ;;
+    esac
   fi
 
   # Install try command

@@ -12,21 +12,19 @@ set -eE
 # Add .local/bin to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
-if command -v pacman &> /dev/null; then
-    (
-        source "./archlinux/setup.sh"
-    )
+# Prompt with gum to choose the folder to setup.
+FOLDER=$(gum choose "archlinux" "macos" --header "Choose the setup you want to run:")
 
-    (
-        source "./common/install/webapp.sh"
-        setup
-    )
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    source "./macos/setup.sh"
-else
-    echo "Unsupported distribution."
+if [ -z "$FOLDER" ]; then
+    echo "No folder selected. Exiting."
     exit 1
 fi
+
+# Start the setup process based on the chosen folder.
+(
+    source "./$FOLDER/setup.sh"
+    setup
+)
 
 echo "Setup completed successfully."
 echo "Please restart your computer to apply all changes."

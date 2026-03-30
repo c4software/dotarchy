@@ -5,9 +5,6 @@ btrfs-assistant
 # Development
 k9s
 kubectl
-neovim
-luarocks
-tree-sitter-cli
 mise
 mariadb-libs
 postgresql-libs
