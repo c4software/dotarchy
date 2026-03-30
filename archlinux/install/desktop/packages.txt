@@ -1,5 +1,4 @@
 # Applications
-ghostty
 signal-desktop
 telegram-desktop
 
