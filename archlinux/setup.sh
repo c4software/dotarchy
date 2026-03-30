@@ -10,10 +10,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   setup
 )
 
-# Download all packages using pacman for install/**/packages.txt
+# Download all packages using pacman for install/**/packages.txt (excluding the tilling since its optional)
 find "$SCRIPT_DIR/install/" -path "$SCRIPT_DIR/install/tilling" -prune -o -name "packages.txt" -exec sh -c 'grep -v "^#" "$1" | sudo pacman -Sw --noconfirm --needed -' _ {} \;
 
-# Download all packages using yay for install/**/packages.aur.txt
+# Download all packages using yay for install/**/packages.aur.txt (excluding the tilling since its optional)
 find "$SCRIPT_DIR/install/" -path "$SCRIPT_DIR/install/tilling" -prune -o -name "packages.aur.txt" -exec sh -c 'grep -v "^#" "$1" | yay -Sw --noconfirm --needed -' _ {} \;
 
 # Force the script to be executed from its directory (since init.sh move us to /tmp during yay installation)
