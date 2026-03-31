@@ -1,0 +1,12 @@
+# Applications
+signal-desktop
+telegram-desktop
+
+# VPN
+wireguard-tools
+proton-vpn-gtk-app
+
+# Remote
+krdc
+freerdp
+libvncserver

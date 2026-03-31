@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+echo -e "\e[32mUpdate Firmware\e[0m"
+
+cmd_present() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+if ! cmd_present fwupdmgr; then
+  yay -S fwupd --noconfirm
+fi
+
+fwupdmgr refresh
+sudo fwupdmgr update

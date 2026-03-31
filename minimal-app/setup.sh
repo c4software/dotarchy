@@ -10,15 +10,12 @@ cd "$SCRIPT_DIR" || exit
 # Add local bin to PATH (since we installed binaries there)
 export PATH="$HOME/.local/bin:$PATH"
 
-# Installation des scripts dans ~.local/bin
-mkdir -p ~/.local/bin
-cp "$SCRIPT_DIR/bin/"* ~/.local/bin/
-
 # Download all packages using pacman for install/**/packages.txt (excluding the tilling since its optional)
 grep -v "^#" "./install/packages.txt" | sudo pacman -S --noconfirm --needed -
+grep -v "^#" "./install/packages.aur.txt" | paru -S --noconfirm --needed -
 
 # Source all script under install/system with confirmation
-if gum confirm "Do you want to run minimal setup scripts?"; then
+if gum confirm "Do you want to run app setup scripts?"; then
   for script in "$SCRIPT_DIR/install/"*.sh; do
     (
       source "$script"
