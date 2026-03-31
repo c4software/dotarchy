@@ -2,25 +2,24 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-function setup(){
+function setup() {
 
   # Prompt the user if he wants to do the common setup, if not exit the script
   if ! gum confirm "Do you want to do the common setup?"; then
     echo "Common setup skipped. Exiting."
     exit 0
   fi
-    
 
   echo -e "Move configuration files..."
 
   # Install rsync if not present
-  if ! command -v rsync &> /dev/null; then
-    if command -v apt &> /dev/null; then
+  if ! command -v rsync &>/dev/null; then
+    if command -v apt &>/dev/null; then
       sudo apt-get update
       sudo apt-get install -y rsync
-    elif command -v pacman &> /dev/null; then
+    elif command -v pacman &>/dev/null; then
       sudo pacman -Sy --noconfirm rsync
-    elif command -v dnf &> /dev/null; then
+    elif command -v dnf &>/dev/null; then
       sudo dnf install -y rsync
     else
       echo "Package manager not found. Please install rsync manually." >&2
@@ -51,23 +50,23 @@ function setup(){
   cp "$SCRIPT_DIR/../default/zshrc" ~/.zshrc
 
   # If gum is available, ask the user to choose between bash and zsh as default shell
-  if command -v gum &> /dev/null; then
+  if command -v gum &>/dev/null; then
     shell_choice=$(gum choose "bash" "zsh" "skip" --header "Choose your default shell:")
-    
+
     case $shell_choice in
-      bash )
-        chsh -s "$(which bash)"
-        ;;
-      zsh )
-        # If pacman is available, install zsh and zsh-completions
-        if command -v pacman &> /dev/null; then
-          sudo pacman -Sy --noconfirm zsh zsh-completions
-        fi
-        chsh -s "$(which zsh)"
-        ;;
-      skip )
-        echo "No shell selected. Keeping current shell ($SHELL)."
-        ;;
+    bash)
+      chsh -s "$(which bash)"
+      ;;
+    zsh)
+      # If pacman is available, install zsh and zsh-completions
+      if command -v pacman &>/dev/null; then
+        sudo pacman -Sy --noconfirm zsh zsh-completions
+      fi
+      chsh -s "$(which zsh)"
+      ;;
+    skip)
+      echo "No shell selected. Keeping current shell ($SHELL)."
+      ;;
     esac
   fi
 
@@ -86,6 +85,7 @@ function setup(){
 
     if [ -d /usr/share/X11/xkb/symbols/ ]; then
       sudo wget -nc https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/bepoDev -O /usr/share/X11/xkb/symbols/bepoDev || true
+      sudo cp /usr/share/X11/xkb/symbols/bepoDev /usr/share/X11/xkb/symbols/custom
       return
     fi
 
@@ -100,25 +100,26 @@ function setup(){
   fi
 }
 
-function check(){
+function check() {
   # Check if rsync is installed
-  if command -v rsync &> /dev/null; then
-      show_success "rsync"
+  if command -v rsync &>/dev/null; then
+    show_success "rsync"
   else
-      show_error "rsync" "rsync is not installed."
+    show_error "rsync" "rsync is not installed."
   fi
 
   # Check if ./config contains the same directories as ~/.config (excluding theme)
   local all_matched=true
   for dir in "$SCRIPT_DIR/../config/"*; do
-      local dirname
-      dirname=$(basename "$dir")
-      if [ "$dirname" != "theme" ] && [ ! -e "$HOME/.config/$dirname" ]; then
-          show_error "Configuration" "$dirname is not installed in ~/.config/"
-          all_matched=false
-      fi
+    local dirname
+    dirname=$(basename "$dir")
+    if [ "$dirname" != "theme" ] && [ ! -e "$HOME/.config/$dirname" ]; then
+      show_error "Configuration" "$dirname is not installed in ~/.config/"
+      all_matched=false
+    fi
   done
   if $all_matched; then
-      show_success "Configuration"
+    show_success "Configuration"
   fi
 }
+
