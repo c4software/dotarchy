@@ -13,7 +13,7 @@ set -eE
 export PATH="$HOME/.local/bin:$PATH"
 
 # Prompt with gum to choose the folder to setup.
-FOLDER=$(gum choose "archlinux" "macos" --header "Choose the setup you want to run:")
+FOLDER=$(gum choose "archlinux" "macos" "minimal" --header "Choose the setup you want to run :")
 
 if [ -z "$FOLDER" ]; then
     echo "No folder selected. Exiting."
