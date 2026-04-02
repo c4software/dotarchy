@@ -19,7 +19,7 @@ git
 lazygit
 
 # Terminal Applications
-tldr
+wl-clipboard
 fzf
 ripgrep
 zoxide
