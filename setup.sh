@@ -30,7 +30,6 @@ fi
 # Start the setup process based on the chosen folder.
 (
   source "./$FOLDER/setup.sh"
-  setup
 )
 
 echo "Setup completed successfully."
