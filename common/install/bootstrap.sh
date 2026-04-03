@@ -4,6 +4,22 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 function setup() {
 
+  # Check if gum is installed, if not, install it
+  if ! command -v gum &>/dev/null; then
+    echo "gum is not installed. Installing gum..."
+    if command -v apt &>/dev/null; then
+      sudo apt-get update
+      sudo apt-get install -y gum
+    elif command -v pacman &>/dev/null; then
+      sudo pacman -Sy --noconfirm gum
+    elif command -v dnf &>/dev/null; then
+      sudo dnf install -y gum
+    else
+      echo "Package manager not found. Please install gum manually." >&2
+      exit 1
+    fi
+  fi
+
   # Prompt the user if he wants to do the common setup, if not exit the script
   if ! gum confirm "Do you want to do the common setup?"; then
     echo "Common setup skipped. Exiting."
