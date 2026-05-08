@@ -12,7 +12,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Download all packages using pacman for install/**/packages.txt (excluding the tilling since its optional)
 grep -v "^#" "./install/packages.txt" | sudo pacman -S --noconfirm --needed -
-grep -v "^#" "./install/packages.aur.txt" | paru -S --noconfirm --needed -
+grep -v "^#" "./install/packages.aur.txt" | yay -S --noconfirm --needed -
 
 # Source all script under install/system with confirmation
 if gum confirm "Do you want to run app setup scripts?"; then

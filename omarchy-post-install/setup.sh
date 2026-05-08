@@ -32,7 +32,6 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
   if [ -d /usr/share/X11/xkb/symbols/ ]; then
     sudo wget -nc https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/bepoDev -O /usr/share/X11/xkb/symbols/bepoDev || true
     sudo cp /usr/share/X11/xkb/symbols/bepoDev /usr/share/X11/xkb/symbols/custom
-    return
   fi
 
   # Installation bepoDev pour l'utilisateur

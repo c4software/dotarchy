@@ -5,8 +5,9 @@ telegram-desktop
 # VPN
 wireguard-tools
 proton-vpn-gtk-app
+tailscale
 
 # Remote
-krdc
+remmina
 freerdp
 libvncserver
