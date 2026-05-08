@@ -11,3 +11,6 @@ tailscale
 remmina
 freerdp
 libvncserver
+
+# Code
+opencode
