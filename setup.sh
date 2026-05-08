@@ -3,24 +3,12 @@
 # Exit immediately if a command exits with a non-zero status
 set -eE
 
-INIT_SCRIPTS=(
-  "./common/install/bootstrap.sh"
-  "./common/install/git.sh"
-  "./common/install/nvim.sh"
-)
-
-for script in "${INIT_SCRIPTS[@]}"; do
-  (
-    source "$script"
-    setup
-  )
-done
 
 # Add .local/bin to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
 # Prompt with gum to choose the folder to setup.
-FOLDER=$(gum choose "archlinux" "macos" "minimal" "minimal-app" --header "Choose the setup you want to run :")
+FOLDER=$(gum choose "omarchy-post-install" "common-no-omarchy" "archlinux" "macos" "minimal" "minimal-app" --header "Choose the setup you want to run :")
 
 if [ -z "$FOLDER" ]; then
   echo "No folder selected. Exiting."
