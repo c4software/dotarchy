@@ -50,4 +50,4 @@ echo "Move default configuration for Hyprland"
 cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
 
 # Uninstall some extra default application
-sudo pacman -Rsnc 1password-beta 1password-cli
+sudo pacman -Rsnc 1password-beta 1password-cli || true
