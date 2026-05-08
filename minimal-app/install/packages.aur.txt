@@ -1,3 +1,6 @@
 visual-studio-code-bin
 google-chrome
 spotify
+seafile-client-appimage
+slack-desktop
+jetbrains-toolbox
