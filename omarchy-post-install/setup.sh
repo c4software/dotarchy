@@ -44,6 +44,10 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
   [ -L ~/.config/xkb/rules/base.xml ] || ln -s ~/.config/xkb/rules/evdev.xml ~/.config/xkb/rules/base.xml || true
 fi
 
+
+echo -e "\nConfiguring uhid module to fix BLE mouse issue..."
+echo -e  "# Fix BLE mouse issue\nuhid" | sudo tee /etc/modules-load.d/uhid.conf
+
 # Move default configuration for hyprland
 echo "Move default configuration for Hyprland"
 cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
