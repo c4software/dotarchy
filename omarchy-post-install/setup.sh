@@ -25,7 +25,7 @@ curl -sL https://raw.githubusercontent.com/c4software/prj.sh/main/prj.sh -o ~/.l
 chmod +x ~/.local/bin/proj
 
 # Copy the « Mix Light / Dark » theme to the Omarych Theme folder
-cp -R $SCRIPT_DIR/../archlinux/install/tilling/config/themes ~/.config/omarchy/themes
+cp -R $SCRIPT_DIR/../archlinux/install/tilling/config/themes/mix-light-dark ~/.config/omarchy/themes
 
 # Installation bepoDev pour l'utilisateur
 echo "Installing Bépo Dev keyboard layout (Utilisateur)..."
