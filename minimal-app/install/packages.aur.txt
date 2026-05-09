@@ -4,3 +4,4 @@ spotify
 seafile-client-appimage
 slack-desktop
 jetbrains-toolbox
+onlyoffice-bin
