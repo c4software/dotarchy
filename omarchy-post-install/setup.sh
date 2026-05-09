@@ -24,26 +24,17 @@ chmod +x ~/.local/bin/try
 curl -sL https://raw.githubusercontent.com/c4software/prj.sh/main/prj.sh -o ~/.local/bin/proj
 chmod +x ~/.local/bin/proj
 
-# If not MacOS, install the Bépo Dev keyboard layout
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  # Installation du layout de clavier Bépo Dev
-  echo "Installing Bépo Dev keyboard layout (Système)..."
+# Copy the « Mix Light / Dark » theme to the Omarych Theme folder
+cp -R $SCRIPT_DIR/../archlinux/install/tilling/config/themes ~/.config/omarchy/themes
 
-  if [ -d /usr/share/X11/xkb/symbols/ ]; then
-    sudo wget -nc https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/bepoDev -O /usr/share/X11/xkb/symbols/bepoDev || true
-    sudo cp /usr/share/X11/xkb/symbols/bepoDev /usr/share/X11/xkb/symbols/custom
-  fi
-
-  # Installation bepoDev pour l'utilisateur
-  echo "Installing Bépo Dev keyboard layout (Utilisateur)..."
-  mkdir -p ~/.config/xkb/symbols ~/.config/xkb/rules || true
-  wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/bepoDev -O ~/.config/xkb/symbols/bepoDev || true
-  wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/evdev.lst -O ~/.config/xkb/rules/evdev.lst || true
-  wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/evdev.xml -O ~/.config/xkb/rules/evdev.xml || true
-  [ -L ~/.config/xkb/rules/base.lst ] || ln -s ~/.config/xkb/rules/evdev.lst ~/.config/xkb/rules/base.lst || true
-  [ -L ~/.config/xkb/rules/base.xml ] || ln -s ~/.config/xkb/rules/evdev.xml ~/.config/xkb/rules/base.xml || true
-fi
-
+# Installation bepoDev pour l'utilisateur
+echo "Installing Bépo Dev keyboard layout (Utilisateur)..."
+mkdir -p ~/.config/xkb/symbols ~/.config/xkb/rules || true
+wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/bepoDev -O ~/.config/xkb/symbols/bepoDev || true
+wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/evdev.lst -O ~/.config/xkb/rules/evdev.lst || true
+wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/evdev.xml -O ~/.config/xkb/rules/evdev.xml || true
+[ -L ~/.config/xkb/rules/base.lst ] || ln -s ~/.config/xkb/rules/evdev.lst ~/.config/xkb/rules/base.lst || true
+[ -L ~/.config/xkb/rules/base.xml ] || ln -s ~/.config/xkb/rules/evdev.xml ~/.config/xkb/rules/base.xml || true
 
 echo -e "\nConfiguring uhid module to fix BLE mouse issue..."
 echo -e  "# Fix BLE mouse issue\nuhid" | sudo tee /etc/modules-load.d/uhid.conf
