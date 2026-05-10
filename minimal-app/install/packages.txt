@@ -14,3 +14,5 @@ libvncserver
 
 # Code
 opencode
+k9s
+kubectl
