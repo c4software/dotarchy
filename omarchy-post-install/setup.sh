@@ -45,3 +45,6 @@ cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
 
 # Uninstall some extra default application
 sudo pacman -Rsnc 1password-beta 1password-cli chromium || true
+
+echo "Blacklisting amdxdna module to fix suspend crash..."
+echo "blacklist amdxdna" | sudo tee /etc/modprobe.d/amdxdna-blacklist.conf
