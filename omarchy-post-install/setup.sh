@@ -48,6 +48,7 @@ sudo pacman -Rsnc 1password-beta 1password-cli chromium || true
 
 # Changement taille font dans Alacritty & Foot
 sed -i 's/^size = 9$/size = 10/' ~/.config/alacritty/alacritty.toml
+sed -i 's/^size=9$/size=10/' ~/.config/foot/foot.ini
 
 echo "Blacklisting amdxdna module to fix suspend crash..."
 echo "blacklist amdxdna" | sudo tee /etc/modprobe.d/amdxdna-blacklist.conf
