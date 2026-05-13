@@ -50,5 +50,9 @@ sudo pacman -Rsnc 1password-beta 1password-cli chromium || true
 sed -i 's/^size = 9$/size = 10/' ~/.config/alacritty/alacritty.toml
 sed -i 's/^size=9$/size=10/' ~/.config/foot/foot.ini
 
+# Enable autologin
+sudo cp "$SCRIPT_DIR/configs/sddm-autologin.conf" /etc/sddm.conf.d/autologin.conf
+sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
+
 echo "Blacklisting amdxdna module to fix suspend crash..."
 echo "blacklist amdxdna" | sudo tee /etc/modprobe.d/amdxdna-blacklist.conf
