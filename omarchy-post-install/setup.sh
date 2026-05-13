@@ -46,7 +46,7 @@ cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
 # Uninstall some extra default application
 sudo pacman -Rsnc 1password-beta 1password-cli chromium || true
 
-# Changement taille font dans Alacritty
+# Changement taille font dans Alacritty & Foot
 sed -i 's/^size = 9$/size = 10/' ~/.config/alacritty/alacritty.toml
 
 echo "Blacklisting amdxdna module to fix suspend crash..."
