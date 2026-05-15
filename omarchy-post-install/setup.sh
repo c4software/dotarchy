@@ -39,6 +39,9 @@ wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/
 echo -e "\nConfiguring uhid module to fix BLE mouse issue..."
 echo -e  "# Fix BLE mouse issue\nuhid" | sudo tee /etc/modules-load.d/uhid.conf
 
+# Cp the bin/* contents to ~/.local/bin/
+cp $SCRIPT_DIR/bin/* ~/.local/bin/
+
 # Move default configuration for hyprland
 echo "Move default configuration for Hyprland"
 cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/

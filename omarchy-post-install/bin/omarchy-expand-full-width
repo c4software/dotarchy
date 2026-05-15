@@ -1,0 +1,15 @@
+#!/bin/bash
+# ~/.config/hypr/scripts/toggle-fullwidth.sh
+
+LAYOUT=$(hyprctl activeworkspace -j | jq -r '.tiledLayout')
+
+echo $LAYOUT
+
+case "$LAYOUT" in
+    scrolling)
+        hyprctl dispatch layoutmsg colresize 1
+        ;;
+    dwindle|master|*)
+        hyprctl dispatch fullscreen 1
+        ;;
+esac
