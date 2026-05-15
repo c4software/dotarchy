@@ -54,5 +54,8 @@ sed -i 's/^size=9$/size=10/' ~/.config/foot/foot.ini
 sudo cp "$SCRIPT_DIR/configs/sddm-autologin.conf" /etc/sddm.conf.d/autologin.conf
 sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
 
-echo "Blacklisting amdxdna module to fix suspend crash..."
-echo "blacklist amdxdna" | sudo tee /etc/modprobe.d/amdxdna-blacklist.conf
+# Enable some keyboard stuff (nuphy, apple keyboard key swapping)
+(
+  source "$SCRIPT_DIR/keyboard.sh"
+  setupssss
+)
