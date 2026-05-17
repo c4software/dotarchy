@@ -60,5 +60,5 @@ sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
 # Enable some keyboard stuff (nuphy, apple keyboard key swapping)
 (
   source "$SCRIPT_DIR/keyboard.sh"
-  setupssss
+  setup
 )

@@ -15,5 +15,5 @@ EOF
     # Apple keyboard key swapping
     echo "Swapping left alt and left super keys..."
     echo "options hid_apple swap_opt_cmd=1 swap_fn_leftctrl=1" | sudo tee /etc/modprobe.d/hid_apple.conf
-    mkinitcpio -P
+    limine-update 
 }
