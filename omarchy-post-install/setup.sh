@@ -9,9 +9,7 @@ cp -R $SCRIPT_DIR/../common-no-omarchy/config/zsh/ ~/.config/
 cp $SCRIPT_DIR/../common-no-omarchy/default/zshrc ~/.zshrc
 
 # If pacman is available, install zsh and zsh-completions
-if command -v pacman &>/dev/null; then
-  sudo pacman -Sy --noconfirm zsh zsh-completions
-fi
+sudo pacman -Sy --noconfirm zsh zsh-completions
 
 # Force zsh startup (inspired by omarchy-zsh)
 cp $SCRIPT_DIR/configs/bashrc ~/.bashrc
@@ -47,7 +45,10 @@ echo "Move default configuration for Hyprland"
 cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
 
 # Uninstall some extra default application
-sudo pacman -Rsnc 1password-beta 1password-cli chromium || true
+sudo pacman -Rsnc 1password-beta 1password-cli chromium --noconfirm || true
+
+# Installation de hunspell-fr
+sudo pacman -Sy hunspell-fr --noconfirm
 
 # Changement taille font dans Alacritty & Foot
 sed -i 's/^size = 9$/size = 10/' ~/.config/alacritty/alacritty.toml
