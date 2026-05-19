@@ -158,9 +158,8 @@ def get_windows():
             ws_map[ws_id] = {"name": ws_name, "clients": []}
         ws_map[ws_id]["clients"].append(c)
 
-    # Trier les workspaces par MRU : le workspace avec le focusHistoryID le plus bas en premier.
-    # Le workspace actif arrive naturellement en tête (il contient fhid=0).
-    ws_ids = sorted(ws_map.keys(), key=lambda i: min(c["focusHistoryID"] for c in ws_map[i]["clients"]))
+    # Trier les workspaces : actif en premier, puis par ID croissant
+    ws_ids = sorted(ws_map.keys(), key=lambda i: (0 if i == active_ws_id else 1, i))
 
     groups = []
     for ws_id in ws_ids:
