@@ -158,8 +158,9 @@ def get_windows():
             ws_map[ws_id] = {"name": ws_name, "clients": []}
         ws_map[ws_id]["clients"].append(c)
 
-    # Trier les workspaces : actif en premier, puis par ID croissant
-    ws_ids = sorted(ws_map.keys(), key=lambda i: (0 if i == active_ws_id else 1, i))
+    # Trier les workspaces par MRU : le workspace avec le focusHistoryID le plus bas en premier.
+    # Le workspace actif arrive naturellement en tête (il contient fhid=0).
+    ws_ids = sorted(ws_map.keys(), key=lambda i: min(c["focusHistoryID"] for c in ws_map[i]["clients"]))
 
     groups = []
     for ws_id in ws_ids:
@@ -170,7 +171,7 @@ def get_windows():
                    key=lambda c: c["focusHistoryID"])
         )
         entries = [
-            (c["class"], c["title"] or "-", c["address"], c.get("hidden", False))
+            (c["class"], c["title"] or "-", c["address"], c.get("hidden", False), c["focusHistoryID"])
             for c in clients_sorted
         ]
         groups.append((ws["name"], entries))
@@ -363,7 +364,10 @@ class AltTabWindow(Gtk.ApplicationWindow):
         super().__init__(application=app)
         self.groups  = groups
         self.windows = flat_windows(groups)
-        self.selected = 1 if len(self.windows) > 1 else 0
+        # Sélectionner la fenêtre globalement précédente (fhid le plus bas > 0),
+        # pas juste la 2ème de la liste (qui peut être sur le même workspace).
+        non_zero = [(i, w[4]) for i, w in enumerate(self.windows) if w[4] > 0]
+        self.selected = min(non_zero, key=lambda x: x[1])[0] if non_zero else 0
         self.set_decorated(False)
 
         Gtk4LayerShell.init_for_window(self)
@@ -488,7 +492,7 @@ class AltTabWindow(Gtk.ApplicationWindow):
             icons_row.set_halign(Gtk.Align.CENTER)
             col.append(icons_row)
 
-            for cls, title, addr, hidden in entries:
+            for cls, title, addr, hidden, _fhid in entries:
                 i = flat_idx
                 frame = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
                 frame.set_margin_top(4)
@@ -534,7 +538,7 @@ class AltTabWindow(Gtk.ApplicationWindow):
             self.selected = 0
             self._frames[0].add_css_class("selected-icon")
 
-        cls, title, _, _hidden = self.windows[self.selected]
+        cls, title, _, _hidden, _fhid = self.windows[self.selected]
         self.title_label.set_text(f"{cls}  —  {title}")
         
     def _select(self, idx):
@@ -574,7 +578,7 @@ class AltTabWindow(Gtk.ApplicationWindow):
     def _activate(self):
         if not self.windows:
             return
-        _, _, addr, _hidden = self.windows[self.selected]
+        _, _, addr, _hidden, _fhid = self.windows[self.selected]
         # Close the layer-shell switcher first, then focus the real target.
         self.set_visible(False)
         self._cleanup()
