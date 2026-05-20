@@ -152,6 +152,8 @@ def get_windows():
     # Grouper par workspace (toutes fenêtres, y compris hidden)
     ws_map: dict[int, dict] = {}
     for c in clients:
+        if c.get("pinned", False):
+            continue
         ws_id   = c["workspace"]["id"]
         ws_name = c["workspace"]["name"]
         if ws_id not in ws_map:
