@@ -8,13 +8,13 @@ sudo pacman -Sy --noconfirm wget
 cp -R $SCRIPT_DIR/../common-no-omarchy/config/zsh/ ~/.config/ 
 cp $SCRIPT_DIR/../common-no-omarchy/default/zshrc ~/.zshrc
 
-# If pacman is available, install zsh and zsh-completions
+# Install zsh and zsh-completions
 sudo pacman -Sy --noconfirm zsh zsh-completions
 
 # Force zsh startup (inspired by omarchy-zsh)
 cp $SCRIPT_DIR/configs/bashrc ~/.bashrc
 
-# Install try command
+# Install try.sh command
 curl -sL https://raw.githubusercontent.com/c4software/try.sh/main/try.sh -o ~/.local/bin/try
 chmod +x ~/.local/bin/try
 
