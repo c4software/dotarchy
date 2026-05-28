@@ -205,3 +205,13 @@ kube() {
 
  [[ -n "$kubeconfig" ]] && command k9s --kubeconfig ~/projets/k9s/"$kubeconfig"
 }
+
+copy() {
+  if [ -n "$1" ]; then
+    cat "$1" | wl-copy
+  else
+    wl-copy
+  fi
+
+  echo "Your selection is now in your clipboard."
+}
