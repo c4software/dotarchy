@@ -13,7 +13,7 @@ case "$LAYOUT" in
         if [ "$IS_FULL" = "1" ]; then
             hyprctl dispatch layoutmsg "colresize 0.5"
         else
-            hyprctl dispatch layoutmsg "colresize 1"
+            hyprctl dispatch layoutmsg "colresize 0.98"
         fi
         ;;
     dwindle|master|*)
