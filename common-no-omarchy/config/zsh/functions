@@ -1,14 +1,13 @@
-function serve() {
-  echo "Scan open port 8888…8899"
-  for PORTNUMBER in {8888..8899}; do
-    # Test si port dispo
-    PDISPO=$(ss -an | grep $PORTNUMBER | grep -i listen | wc -l | awk '{print $1}')
-    if [[ $PDISPO -eq 0 ]]; then
-      echo "Open port found : $PORTNUMBER"
-      python3 ~/Dropbox/Python/dev/log-server/main.py $PORTNUMBER
-      break
+serve() {
+  local port
+  for port in {8888..8899}; do
+    if ! ss -tlnp "sport = :$port" | grep -q LISTEN; then
+      echo "Open port found: $port"
+      python3 ~/Dropbox/Python/dev/log-server/main.py "$port"
+      return
     fi
   done
+  echo "No open port found in range 8888–8899"
 }
 
 function killp(){
@@ -203,12 +202,9 @@ ssh() {
   if [[ $# -eq 0 ]]; then
     local selected
     selected=$(
-      grep -E '^: [0-9]+:[0-9]+;ssh ' "${HISTFILE:-$HOME/.zsh_history}" \
-      | sed 's/^: \([0-9]*\):[0-9]*;ssh[[:space:]]*/\1 /' \
-      | awk '{print $1, $2}' \
-      | grep -v ' -' \
-      | sort -k1,1rn \
-      | awk '!seen[$2]++ {print $2}' \
+      fc -l 1 \
+      | grep -oP '(?<=ssh )([^-]\S+)' \
+      | sort -u \
       | fzf --prompt="SSH › " --height=40% --border=rounded --pointer="▶"
     )
     [[ -n "$selected" ]] && command ssh "$selected"
@@ -242,7 +238,9 @@ copy() {
   echo "Your selection is now in your clipboard."
 }
 
-function enable-java() {
+enable-java() {
   export JAVA_HOME=$HOME/.local/share/JetBrains/Toolbox/apps/android-studio/jbr
-  export PATH="$JAVA_HOME/bin:$HOME/.local/share/gradle/gradle-8.14.1/bin:$PATH"
+  local gradle_bin
+  gradle_bin=$(find "$HOME/.local/share/gradle" -maxdepth 2 -name 'gradle' -type f | sort -V | tail -1)
+  [[ -n "$gradle_bin" ]] && export PATH="$JAVA_HOME/bin:$(dirname "$gradle_bin"):$PATH"
 }
