@@ -65,6 +65,17 @@ img2png() {
     "${img%.*}-optimized.png"
 }
 
+# Transcade any image to compressed-but-lossless WebP
+img2webp() {
+  img="$1"
+  shift
+
+  magick "$img" $@ -strip -define webp:lossless=true \
+    -define webp:method=6 \
+    -define webp:image-hint=default \
+    "${img%.*}-optimized.webp"
+}
+
 # Create a Tmux Dev Layout with editor, ai, and terminal
 # Usage: tdl <code|opencode> [<second_ai>]
 tdl() {
