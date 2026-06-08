@@ -38,3 +38,4 @@ alias ytdl='docker run --rm -v .:/downloads -it jauderho/yt-dlp:latest -x --audi
 alias repo='open "$(git remote get-url origin | sed -E "s#git@([^:]+):#https://\1/#; s#\.git\$##")"'
 alias vim='nvim'
 alias t='tmux attach || tmux new-session -s Work /bin/zsh'
+alias p='proj'
