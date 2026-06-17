@@ -203,6 +203,7 @@ ssh() {
     local selected
     selected=$(
       fc -l 1 \
+      | grep -P '^\s*\d+\s+ssh\s+' \
       | grep -oP '(?<=ssh )([^-]\S+)' \
       | tac \
       | awk '!seen[$0]++' \
