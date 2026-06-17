@@ -1,0 +1,13 @@
+_ssh_widget() {
+  ssh
+  zle reset-prompt
+}
+zle -N _ssh_widget
+bindkey '^E' _ssh_widget
+
+_proj_widget() {
+  proj
+  zle reset-prompt
+}
+zle -N _proj_widget
+bindkey '^F' _proj_widget

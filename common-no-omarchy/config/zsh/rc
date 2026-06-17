@@ -5,3 +5,4 @@ source ~/.config/zsh/prompt
 source ~/.config/zsh/init
 source ~/.config/zsh/envs
 source ~/.config/zsh/inputrc
+source ~/.config/zsh/widgets
