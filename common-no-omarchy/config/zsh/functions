@@ -204,7 +204,8 @@ ssh() {
     selected=$(
       fc -l 1 \
       | grep -oP '(?<=ssh )([^-]\S+)' \
-      | sort -u \
+      | tac \
+      | awk '!seen[$0]++' \
       | fzf --prompt="SSH › " --height=40% --border=rounded --pointer="▶"
     )
     [[ -n "$selected" ]] && command ssh "$selected"
