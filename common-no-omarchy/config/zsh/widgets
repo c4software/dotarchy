@@ -1,5 +1,7 @@
 _ssh_widget() {
+  zle -I
   ssh < /dev/tty
+  stty sane
   zle reset-prompt
 }
 zle -N _ssh_widget
