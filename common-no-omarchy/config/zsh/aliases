@@ -39,3 +39,6 @@ alias repo='open "$(git remote get-url origin | sed -E "s#git@([^:]+):#https://\
 alias vim='nvim'
 alias t='tmux attach || tmux new-session -s Work /bin/zsh'
 alias p='proj'
+alias claude-local="ANTHROPIC_BASE_URL=http://bigchuck:8009 ANTHROPIC_AUTH_TOKEN=valentin ANTHROPIC_DEFAULT_OPUS_MODEL=qwopus3.6-27b-coder-mtp-nothink ANTHROPIC_DEFAULT_SONNET_MODEL=qwen3.6-35b-a3b-nothink ANTHROPIC_DEFAULT_HAIKU_MODEL=qwen3.5-9b API_TIMEOUT_MS=3000000 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 claude --model qwen3.6-35b-a3b-nothink"
+
+alias mup='MISE_MINIMUM_RELEASE_AGE=0 mise up'
