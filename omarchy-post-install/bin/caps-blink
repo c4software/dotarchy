@@ -1,0 +1,36 @@
+#!/bin/bash
+# ~/.local/bin/blink-capslock.sh
+# Usage: blink-capslock.sh [profile]
+# profile: "done" (Stop) ou "wait" (Notification), défaut "done"
+
+PROFILE="${1:-done}"
+
+case "$PROFILE" in
+    done)
+        COUNT=2
+        ON_TIME=0.15
+        OFF_TIME=0.15
+        ;;
+    wait)
+        COUNT=3
+        ON_TIME=0.3
+        OFF_TIME=0.2
+        ;;
+    *)
+        COUNT=3
+        ON_TIME=0.15
+        OFF_TIME=0.15
+        ;;
+esac
+
+for led in /sys/class/leds/*capslock*/brightness; do
+    (
+        for i in $(seq 1 "$COUNT"); do
+            echo 1 > "$led"
+            sleep "$ON_TIME"
+            echo 0 > "$led"
+            sleep "$OFF_TIME"
+        done
+    ) &
+done
+wait
