@@ -40,6 +40,9 @@ echo -e  "# Fix BLE mouse issue\nuhid" | sudo tee /etc/modules-load.d/uhid.conf
 # Cp the bin/* contents to ~/.local/bin/
 cp $SCRIPT_DIR/bin/* ~/.local/bin/
 
+# Create a vim alias
+sudo ln -s /usr/bin/nvim /usr/bin/vim
+
 # Move default configuration for hyprland
 echo "Move default configuration for Hyprland"
 cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
