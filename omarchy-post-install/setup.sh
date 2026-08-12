@@ -47,8 +47,8 @@ sudo ln -s /usr/bin/nvim /usr/bin/vim
 echo "Move default configuration for Hyprland"
 cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
 
-# Source customisation.conf from hyprland.conf if not already present
-grep -q 'source = ~/.config/hypr/customisation.conf' ~/.config/hypr/hyprland.conf || echo 'source = ~/.config/hypr/customisation.conf' >> ~/.config/hypr/hyprland.conf
+# Require customisation.lua from hyprland.lua if not already present
+grep -q '^require("hypr.customisation")' ~/.config/hypr/hyprland.lua || echo 'require("hypr.customisation")' >> ~/.config/hypr/hyprland.lua
 
 # Uninstall some extra default application
 sudo pacman -Rsnc 1password-beta 1password-cli chromium --noconfirm || true
