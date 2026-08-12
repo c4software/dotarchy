@@ -37,6 +37,9 @@ wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/
 echo -e "\nConfiguring uhid module to fix BLE mouse issue..."
 echo -e  "# Fix BLE mouse issue\nuhid" | sudo tee /etc/modules-load.d/uhid.conf
 
+# Installation plugin alt-tab
+omarchy plugin add https://github.com/c4software/hyprland-alttab --enable
+
 # Cp the bin/* contents to ~/.local/bin/
 cp $SCRIPT_DIR/bin/* ~/.local/bin/
 

@@ -8,10 +8,10 @@ hl.env("GDK_SCALE", "1")
 
 -- Input
 hl.config({
-  input = {
-    kb_layout = "bepoDev",
-    kb_options = "lv3:caps_switch", -- ,grp:alts_toggle
-  },
+	input = {
+		kb_layout = "bepoDev",
+		kb_options = "lv3:caps_switch", -- ,grp:alts_toggle
+	},
 })
 
 -- Enable touchpad gestures for changing workspaces (commented out in stock)
@@ -24,10 +24,10 @@ hl.gesture({ fingers = 3, direction = "vertical", action = "fullscreen", mode = 
 
 -- Bindings — added
 hl.unbind("ALT + TAB")
-o.bind("ALT + TAB", nil, "alttab", { repeating = true })
+o.bind("ALT + TAB", nil, hl.dsp.global("omarchy-alttab:next"), { repeating = true })
 hl.unbind("SUPER + TAB")
-o.bind("SUPER + TAB", nil, "alttab", { repeating = true })
-hl.layer_rule({ match = { namespace = "hypr-alttab" }, no_anim = true })
+o.bind("SUPER + TAB", nil, hl.dsp.global("omarchy-alttab:next"), { repeating = true })
+hl.layer_rule({ match = { namespace = "omarchy-alttab" }, no_anim = true })
 
 -- Was: unbind SUPER, code:61 / SUPER ALT, code:61 — the Lua defaults now bind
 -- monitor scaling by keysym (SLASH) instead of keycode.
@@ -44,4 +44,4 @@ o.bind("ALT + SHIFT + UP", nil, hl.dsp.window.resize({ x = 0, y = -50, relative 
 o.bind("ALT + SHIFT + DOWN", nil, hl.dsp.window.resize({ x = 0, y = 50, relative = true }), { repeating = true })
 
 hl.unbind("ALT + SHIFT + code:13")
-o.bind("ALT + SHIFT + code:13", nil, "omarchy-menu capture")
+o.bind("ALT + SHIFT + code:13", nil, "omarchy-menu summon capture")
