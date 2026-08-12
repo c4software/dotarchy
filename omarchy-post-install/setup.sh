@@ -50,6 +50,9 @@ cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
 # Require customisation.lua from hyprland.lua if not already present
 grep -q '^require("hypr.customisation")' ~/.config/hypr/hyprland.lua || echo 'require("hypr.customisation")' >> ~/.config/hypr/hyprland.lua
 
+# Idle : screensaver après 1h, lock après 2h (remplace l'ancien hypridle.conf)
+jq '.idle.screensaver = 3600 | .idle.lock = 7200' ~/.config/omarchy/shell.json > ~/.config/omarchy/shell.json.tmp && mv ~/.config/omarchy/shell.json.tmp ~/.config/omarchy/shell.json
+
 # Uninstall some extra default application
 sudo pacman -Rsnc 1password-beta 1password-cli chromium --noconfirm || true
 
