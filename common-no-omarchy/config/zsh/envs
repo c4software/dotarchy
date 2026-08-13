@@ -3,3 +3,17 @@ export EDITOR="nvim"
 export SUDO_EDITOR="$EDITOR"
 export BAT_THEME=ansi
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+export BROWSER="${BROWSER:-omarchy-launch-browser}"
+
+export MANROFFOPT="-c"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+if [ -z "${LANG:-}" ]; then
+  [ -r /etc/locale.conf ] && . /etc/locale.conf
+  LANG="${LANG:-C.UTF-8}"
+  export LANG LANGUAGE LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY \
+    LC_MESSAGES LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT \
+    LC_IDENTIFICATION
+fi
+
+[ -r /usr/share/omarchy/default/bash/env-bootstrap ] && . /usr/share/omarchy/default/bash/env-bootstrap

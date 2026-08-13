@@ -188,14 +188,14 @@ tsl() {
     local split_target="${panes[-1]}"
     new_pane=$(tmux split-window -h -t "$split_target" -c "$current_dir" -P -F '#{pane_id}')
     panes+=("$new_pane")
-    tmux select-layout -t "${panes[0]}" tiled
+    tmux select-layout -t "${panes[1]}" tiled
   done
 
   for pane in "${panes[@]}"; do
     tmux send-keys -t "$pane" "$cmd" C-m
   done
 
-  tmux select-pane -t "${panes[0]}"
+  tmux select-pane -t "${panes[1]}"
 }
 
 ssh() {
@@ -246,3 +246,5 @@ enable-java() {
   gradle_bin=$(find "$HOME/.local/share/gradle" -maxdepth 2 -name 'gradle' -type f | sort -V | tail -1)
   [[ -n "$gradle_bin" ]] && export PATH="$JAVA_HOME/bin:$(dirname "$gradle_bin"):$PATH"
 }
+
+for f in ~/.config/zsh/fns/*(N); do source "$f"; done

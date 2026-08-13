@@ -19,3 +19,4 @@ zstyle ':completion:*' special-dirs true # Complete . and ..
 zstyle ':completion:*' file-list all # Show file information
 zstyle ':completion:*' accept-exact-dirs true # Don't complete already exact dirs
 zstyle ':completion:*' group-name '' # Don't group completion results
+LISTMAX=200
