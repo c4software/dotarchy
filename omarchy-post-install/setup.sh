@@ -73,6 +73,13 @@ sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
 # Install nvim configuration
 cp "$SCRIPT_DIR/configs/nvim/init.lua" ~/.config/nvim/init.lua
 
+# Install pi extension (bigchuck / llama-swap provider)
+mkdir -p ~/.pi/agent/extensions
+cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/bigchuck.ts" ~/.pi/agent/extensions/
+
+# Herdr : Activate zsh in herdr configuration
+[ -f ~/.config/herdr/config.toml ] && sed -i '/^\[terminal\]/a default_shell = "zsh"' ~/.config/herdr/config.toml
+
 # Enable some keyboard stuff (nuphy, apple keyboard key swapping)
 (
   source "$SCRIPT_DIR/keyboard.sh"
