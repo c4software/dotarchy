@@ -23,11 +23,7 @@ hl.gesture({ fingers = 3, direction = "vertical", action = "fullscreen", mode = 
 -- as an additive rule — the stock rule is kept as-is.
 
 -- Bindings — added
-hl.unbind("ALT + TAB")
-o.bind("ALT + TAB", nil, hl.dsp.global("omarchy-alttab:next"), { repeating = true })
-hl.unbind("SUPER + TAB")
-o.bind("SUPER + TAB", nil, hl.dsp.global("omarchy-alttab:next"), { repeating = true })
-hl.layer_rule({ match = { namespace = "omarchy-alttab" }, no_anim = true })
+dofile(os.getenv("HOME") .. "/.config/omarchy/plugins/vbrosseau.alttab/omarchy-plugin/alttab-bindings.lua")
 
 -- Was: unbind SUPER, code:61 / SUPER ALT, code:61 — the Lua defaults now bind
 -- monitor scaling by keysym (SLASH) instead of keycode.
