@@ -56,6 +56,10 @@ grep -q '^require("hypr.customisation")' ~/.config/hypr/hyprland.lua || echo 're
 # Idle : screensaver après 4h, lock après 6h (remplace l'ancien hypridle.conf)
 jq '.idle.screensaver = 14400 | .idle.lock = 21600' ~/.config/omarchy/shell.json > ~/.config/omarchy/shell.json.tmp && mv ~/.config/omarchy/shell.json.tmp ~/.config/omarchy/shell.json
 
+# Sur secteur, capot fermé ne suspend plus (réveil à distance possible)
+sudo cp "$SCRIPT_DIR/configs/logind-lid-remote-wake.conf" /etc/systemd/logind.conf.d/30-lid-remote-wake.conf
+sudo systemctl kill -s HUP systemd-logind
+
 # Uninstall some extra default application
 sudo pacman -Rsnc 1password-beta 1password-cli chromium --noconfirm || true
 
