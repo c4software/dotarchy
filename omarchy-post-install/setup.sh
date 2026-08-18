@@ -84,6 +84,9 @@ cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/bigchuck.ts" ~/.pi/agent/extensio
 # Herdr : Activate zsh in herdr configuration
 [ -f ~/.config/herdr/config.toml ] && sed -i '/^\[terminal\]/a default_shell = "zsh"' ~/.config/herdr/config.toml
 
+# Tmux Enable ZSH
+echo 'set-option -g default-shell /bin/zsh' >> ~/.config/tmux/tmux.conf
+
 # Enable some keyboard stuff (nuphy, apple keyboard key swapping)
 (
   source "$SCRIPT_DIR/keyboard.sh"
