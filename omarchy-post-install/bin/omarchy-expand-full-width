@@ -6,17 +6,18 @@ case "$LAYOUT" in
     scrolling)
         WIN_WIDTH=$(hyprctl activewindow -j | jq -r '.size[0]')
         MON_ID=$(hyprctl activewindow -j | jq -r '.monitor')
-        MON_WIDTH=$(hyprctl monitors -j | jq -r ".[] | select(.id == $MON_ID) | .width")
+        # .size is in logical pixels, monitor .width is physical: divide by scale
+        MON_WIDTH=$(hyprctl monitors -j | jq -r ".[] | select(.id == $MON_ID) | .width / .scale")
 
         IS_FULL=$(awk "BEGIN {print ($WIN_WIDTH / $MON_WIDTH > 0.95) ? 1 : 0}")
 
         if [ "$IS_FULL" = "1" ]; then
-            hyprctl dispatch layoutmsg "colresize 0.5"
+            hyprctl dispatch 'hl.dsp.layout("colresize 0.5")'
         else
-            hyprctl dispatch layoutmsg "colresize 0.98"
+            hyprctl dispatch 'hl.dsp.layout("colresize 0.98")'
         fi
         ;;
     dwindle|master|*)
-        hyprctl dispatch fullscreen 1
+        hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "maximized" })'
         ;;
 esac
