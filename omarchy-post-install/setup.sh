@@ -14,6 +14,10 @@ sudo pacman -Sy --noconfirm zsh zsh-completions
 # Force zsh startup (inspired by omarchy-zsh)
 cp $SCRIPT_DIR/configs/bashrc ~/.bashrc
 
+# ssh-agent : la config zsh (envs) pointe SSH_AUTH_SOCK sur $XDG_RUNTIME_DIR/ssh-agent.socket,
+# il faut donc activer l'unite socket d'OpenSSH (sinon aucun agent, et ForwardAgent est inutile)
+systemctl --user enable --now ssh-agent.socket
+
 # Install try.sh command
 curl -sL https://raw.githubusercontent.com/c4software/try.sh/main/try.sh -o ~/.local/bin/try
 chmod +x ~/.local/bin/try

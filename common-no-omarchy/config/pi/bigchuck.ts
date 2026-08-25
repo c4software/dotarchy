@@ -1,23 +1,39 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-const ENDPOINT = process.env.LLAMASWAP_ENDPOINT ?? "http://bigchuck:8009";
+// Valeurs en dur pour le test — repasser sur process.env avant de committer.
+const ENDPOINT = "http://llmproxy";
+const API_KEY = "unused";
+
+// Albert n'expose pas de cap de génération : on plafonne nous-mêmes.
+const DEFAULT_MAX_TOKENS = 16384;
+const DEFAULT_CONTEXT = 128000;
+
+interface AlbertModel {
+  id: string;
+  type?: string;
+  aliases?: string[];
+  max_context_length?: number | null;
+  owned_by?: string;
+  costs?: { prompt_tokens?: number; completion_tokens?: number };
+}
 
 interface ModelInfo {
   id: string;
   contextWindow: number;
   maxTokens: number;
   reasoning: boolean;
+  costs: { input: number; output: number };
 }
 
-function parseArgs(args: string[]): Map<string, string> {
-  const map = new Map<string, string>();
-  for (let i = 0; i < args.length - 1; i++) {
-    if (args[i].startsWith("--")) {
-      map.set(args[i], args[i + 1]);
-      i++;
-    }
-  }
-  return map;
+/** Number(undefined) donne NaN, pas undefined : ?? ne rattrape rien. */
+function num(value: unknown, fallback: number): number {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+/** Albert ne déclare pas la capacité de raisonnement : heuristique sur l'id. */
+function isReasoning(id: string): boolean {
+  return /(?:^|[\/\-_])(?:r1|qwq|thinking|reasoner)(?:[\-_.]|$)/i.test(id);
 }
 
 export default async function (pi: ExtensionAPI) {
@@ -25,37 +41,58 @@ export default async function (pi: ExtensionAPI) {
 
   try {
     const res = await fetch(`${ENDPOINT}/v1/models`, {
-      signal: AbortSignal.timeout(5000),
+      headers: { Authorization: `Bearer ${API_KEY}` },
+      signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const payload = (await res.json()) as { data: Array<{ id: string; status?: { args?: string[] } }> };
+    const payload = (await res.json()) as { data: AlbertModel[] };
 
-    models = payload.data.map((m) => {
-      const args = m.status?.args ? parseArgs(m.status.args) : new Map();
-      return {
-        id: m.id,
-        contextWindow: Number(args.get("--ctx-size")) ?? 128000,
-        maxTokens: Number(args.get("--n-predict")) ?? 16384,
-        reasoning: args.get("--reasoning") !== "off",
-      };
-    }).sort((a, b) => a.id.localeCompare(b.id));
+    models = payload.data
+      // seuls les text-generation acceptent /v1/chat/completions
+      .filter((m) => m.type === "text-generation")
+      .map((m) => {
+        const contextWindow = num(m.max_context_length, DEFAULT_CONTEXT);
+        return {
+          id: m.id,
+          contextWindow,
+          maxTokens: Math.min(DEFAULT_MAX_TOKENS, contextWindow),
+          reasoning: isReasoning(m.id),
+          costs: {
+            input: num(m.costs?.prompt_tokens, 0),
+            output: num(m.costs?.completion_tokens, 0),
+          },
+        };
+      })
+      .sort((a, b) => a.id.localeCompare(b.id));
   } catch (err) {
-    // bigchuck éteint : on n'enregistre rien plutôt que de bloquer le démarrage
-    console.error(`[llamaswap] découverte impossible : ${err}`);
+    // Albert injoignable ou clé expirée : on n'enregistre rien plutôt que
+    // de bloquer le démarrage
+    console.error(`[albert] découverte impossible : ${err}`);
     return;
   }
 
-  pi.registerProvider("llamaswap", {
-    name: "llama-swap (bigchuck)",
+  if (models.length === 0) {
+    console.error("[albert] aucun modèle text-generation exposé");
+    return;
+  }
+
+  pi.registerProvider("albert", {
+    name: "Albert API (DINUM)",
     baseUrl: `${ENDPOINT}/v1`,
-    apiKey: "llamaswap",
+    apiKey: API_KEY,
     api: "openai-completions",
     models: models.map((m) => ({
       id: m.id,
       name: m.id,
       reasoning: m.reasoning,
       input: ["text"],
-      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+      // Albert facture en unités de budget par million de tokens.
+      cost: {
+        input: m.costs.input,
+        output: m.costs.output,
+        cacheRead: 0,
+        cacheWrite: 0,
+      },
       contextWindow: m.contextWindow,
       maxTokens: m.maxTokens,
     })),
