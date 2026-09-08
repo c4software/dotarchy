@@ -68,5 +68,6 @@ alias p='proj'
 alias claude-local="ANTHROPIC_BASE_URL=http://llmproxy ANTHROPIC_AUTH_TOKEN=valentin ANTHROPIC_DEFAULT_OPUS_MODEL=bigchuck/qwen3.8-27b-mtp-nothink ANTHROPIC_DEFAULT_SONNET_MODEL=bigchuck/qwen3.6-35b-a3b-nothink ANTHROPIC_DEFAULT_HAIKU_MODEL=bigchuck/lfm2.5-2.6b API_TIMEOUT_MS=3000000 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 claude --model bigchuck/qwen3.6-35b-a3b-nothink"
 
 alias pi-safe="pi --no-tools --no-context-files"
-
+alias urldecode='python3 -c "import sys; from urllib.parse import unquote; print(unquote(sys.stdin.read()));"'
 alias mup='MISE_MINIMUM_RELEASE_AGE=0 mise up'
+alias mirror='omarchy-hyprland-monitor-internal-mirror toggle'
