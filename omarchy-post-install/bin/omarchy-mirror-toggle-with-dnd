@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Toggle le clone d'écran, puis aligne le mode "ne pas déranger"
+# sur l'état du clone : clone actif -> notifications silencées,
+# clone inactif -> notifications rétablies.
+
+omarchy-hyprland-monitor-internal-mirror toggle
+
+if omarchy-hyprland-toggle-enabled internal-monitor-mirror; then
+  omarchy-shell -q notifications setDnd on
+else
+  omarchy-shell -q notifications setDnd off
+fi
+
+omarchy-shell -q omarchy.indicators refresh
