@@ -11,5 +11,3 @@ if omarchy-hyprland-toggle-enabled internal-monitor-mirror; then
 else
   omarchy-shell -q notifications setDnd off
 fi
-
-omarchy-shell -q omarchy.indicators refresh
