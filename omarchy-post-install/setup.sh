@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 sudo pacman -Sy --noconfirm wget
 
 # Copy zsh configuration to the HOME config folder
-cp -R $SCRIPT_DIR/../common-no-omarchy/config/zsh/ ~/.config/ 
+cp -R $SCRIPT_DIR/../common-no-omarchy/config/zsh/ ~/.config/
 cp $SCRIPT_DIR/../common-no-omarchy/default/zshrc ~/.zshrc
 
 # Install zsh and zsh-completions
@@ -39,7 +39,7 @@ wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/
 [ -L ~/.config/xkb/rules/base.xml ] || ln -s ~/.config/xkb/rules/evdev.xml ~/.config/xkb/rules/base.xml || true
 
 echo -e "\nConfiguring uhid module to fix BLE mouse issue..."
-echo -e  "# Fix BLE mouse issue\nuhid" | sudo tee /etc/modules-load.d/uhid.conf
+echo -e "# Fix BLE mouse issue\nuhid" | sudo tee /etc/modules-load.d/uhid.conf
 
 # Installation plugin alt-tab
 omarchy plugin add https://github.com/c4software/hyprland-alttab --enable
@@ -55,10 +55,10 @@ echo "Move default configuration for Hyprland"
 cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
 
 # Require customisation.lua from hyprland.lua if not already present
-grep -q '^require("hypr.customisation")' ~/.config/hypr/hyprland.lua || echo 'require("hypr.customisation")' >> ~/.config/hypr/hyprland.lua
+grep -q '^require("hypr.customisation")' ~/.config/hypr/hyprland.lua || echo 'require("hypr.customisation")' >>~/.config/hypr/hyprland.lua
 
 # Idle : screensaver après 4h, lock après 6h (remplace l'ancien hypridle.conf)
-jq '.idle.screensaver = 14400 | .idle.lock = 21600' ~/.config/omarchy/shell.json > ~/.config/omarchy/shell.json.tmp && mv ~/.config/omarchy/shell.json.tmp ~/.config/omarchy/shell.json
+jq '.idle.screensaver = 14400 | .idle.lock = 21600' ~/.config/omarchy/shell.json >~/.config/omarchy/shell.json.tmp && mv ~/.config/omarchy/shell.json.tmp ~/.config/omarchy/shell.json
 
 # Sur secteur, capot fermé ne suspend plus (réveil à distance possible)
 sudo cp "$SCRIPT_DIR/configs/logind-lid-remote-wake.conf" /etc/systemd/logind.conf.d/30-lid-remote-wake.conf
@@ -79,7 +79,7 @@ sudo cp "$SCRIPT_DIR/configs/sddm-autologin.conf" /etc/sddm.conf.d/autologin.con
 sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
 
 # Install nvim configuration
-cp "$SCRIPT_DIR/configs/nvim/init.lua" ~/.config/nvim/init.lua
+cp "$SCRIPT_DIR/../common-no-omarchy/configs/nvim/config/keymaps.lua" ~/.config/nvim/lua/config/keymaps.lua
 
 # Install pi extension (bigchuck / llama-swap provider)
 mkdir -p ~/.pi/agent/extensions
@@ -89,7 +89,7 @@ cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/bigchuck.ts" ~/.pi/agent/extensio
 [ -f ~/.config/herdr/config.toml ] && sed -i '/^\[terminal\]/a default_shell = "zsh"' ~/.config/herdr/config.toml
 
 # Tmux Enable ZSH
-echo 'set-option -g default-shell /bin/zsh' >> ~/.config/tmux/tmux.conf
+echo 'set-option -g default-shell /bin/zsh' >>~/.config/tmux/tmux.conf
 
 # Enable some keyboard stuff (nuphy, apple keyboard key swapping)
 (
