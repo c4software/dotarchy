@@ -79,7 +79,7 @@ sudo cp "$SCRIPT_DIR/configs/sddm-autologin.conf" /etc/sddm.conf.d/autologin.con
 sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
 
 # Install nvim configuration
-cp "$SCRIPT_DIR/../common-no-omarchy/configs/nvim/config/keymaps.lua" ~/.config/nvim/lua/config/keymaps.lua
+cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/config/keymaps.lua" ~/.config/nvim/lua/config/keymaps.lua
 
 # Install pi extension (bigchuck / llama-swap provider)
 mkdir -p ~/.pi/agent/extensions
