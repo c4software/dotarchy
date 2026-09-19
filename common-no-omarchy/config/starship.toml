@@ -1,6 +1,18 @@
 add_newline = false
 command_timeout = 200
-format = "[$directory$git_branch$git_status]($style)$character"
+# user@host uniquement en SSH (groupe conditionnel : rien, pas même l'espace, en local)
+format = "($username$hostname )[$directory$git_branch$git_status]($style)$character"
+
+[username]
+show_always = false
+style_user = "bold cyan"
+style_root = "bold red"
+format = "[$user]($style)"
+
+[hostname]
+ssh_only = true
+style = "bold cyan"
+format = "[@$hostname]($style)"
 
 [character]
 error_symbol = "[✗](bold cyan)"
