@@ -36,14 +36,9 @@ alias ....='cd ../../..'
 alias g='git'
 alias d='docker'
 alias a='omarchy-agent --inline'
-alias c='opencode --auto'
-alias cx='printf "\033[2J\033[3J\033[H" && claude --permission-mode bypassPermissions'
-alias cy='codex -s danger-full-access -a never'
 alias r='rails'
 alias h='herdr'
-alias ic='tdl c'
-alias ix='tdl cx'
-alias icx='tdl c cx'
+alias ic='tdl claude'
 n() { if [ "$#" -eq 0 ]; then nvim .; else nvim "$@"; fi; }
 
 # Git
@@ -71,3 +66,5 @@ alias pi-safe="pi --no-tools --no-context-files"
 alias urldecode='python3 -c "import sys; from urllib.parse import unquote; print(unquote(sys.stdin.read()));"'
 alias mup='MISE_MINIMUM_RELEASE_AGE=0 mise up'
 alias mirror='omarchy-hyprland-monitor-internal-mirror toggle'
+
+alias devbox='ssh devbox'
