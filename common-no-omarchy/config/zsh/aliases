@@ -67,4 +67,4 @@ alias urldecode='python3 -c "import sys; from urllib.parse import unquote; print
 alias mup='MISE_MINIMUM_RELEASE_AGE=0 mise up'
 alias mirror='omarchy-hyprland-monitor-internal-mirror toggle'
 
-alias devbox='ssh devbox'
+alias devbox='ssh dev-box'
