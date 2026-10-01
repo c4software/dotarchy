@@ -96,3 +96,8 @@ echo 'set-option -g default-shell /bin/zsh' >>~/.config/tmux/tmux.conf
   source "$SCRIPT_DIR/keyboard.sh"
   setup
 )
+
+# Docker rootless (à la demande) : docker sans sudo, à côté du démon root d'Omarchy
+if gum confirm --default=false "Installer Docker rootless (docker sans sudo) ?"; then
+  "$SCRIPT_DIR/docker-rootless.sh"
+fi
