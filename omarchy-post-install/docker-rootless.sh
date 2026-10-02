@@ -46,6 +46,15 @@ else
   ok "socket root protégé"
 fi
 
+# Un contexte « rootless » qui vise autre chose (autre socket, hôte SSH) laisserait
+# `docker` sur le mauvais démon : on refuse avant d'installer quoi que ce soit.
+if docker context inspect rootless >/dev/null 2>&1; then
+  context_host=$(docker context inspect rootless --format '{{.Endpoints.docker.Host}}')
+  [[ $context_host == "unix://$sock" ]] \
+    || die "le contexte docker « rootless » pointe vers $context_host : supprime-le (docker context rm rootless) puis relance"
+  ok "contexte rootless existant sur $sock"
+fi
+
 # 2. Paquets -----------------------------------------------------------------
 info "Paquets"
 sudo pacman -S --needed rootlesskit slirp4netns
