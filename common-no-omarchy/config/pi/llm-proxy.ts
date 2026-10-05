@@ -1,8 +1,11 @@
 import type { ExtensionAPI, ProviderModelConfig } from "@earendil-works/pi-coding-agent";
 
-// Valeurs en dur pour le test — repasser sur process.env avant de committer.
-const ENDPOINT = "http://llmproxy";
-const API_KEY = "unused";
+// Adresse et clé du proxy lues dans l'environnement (LLM_PROXY_URL,
+// LLM_PROXY_API_KEY ; LLM_PROXY_KEY accepté aussi, comme dans gufo-media.ts et
+// llm-proxy-web.ts) : rien en dur dans le dépôt. Défauts : le proxy du réseau
+// local, ouvert.
+const ENDPOINT = (process.env.LLM_PROXY_URL ?? "http://llmproxy").replace(/\/+$/, "");
+const API_KEY = process.env.LLM_PROXY_API_KEY ?? process.env.LLM_PROXY_KEY ?? "unused";
 
 // Albert n'expose pas de cap de génération : on plafonne nous-mêmes.
 const DEFAULT_MAX_TOKENS = 16384;
@@ -55,7 +58,7 @@ export default async function (pi: ExtensionAPI) {
 
     models = payload.data
       // seuls les text-generation acceptent /v1/chat/completions
-      .filter((m) => m.type === "text-generation")
+      //.filter((m) => m.type === "text-generation")
       .map((m) => {
         const contextWindow = num(m.max_context_length, DEFAULT_CONTEXT);
         return {
