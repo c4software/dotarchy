@@ -81,9 +81,14 @@ sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
 # Install nvim configuration
 cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/config/keymaps.lua" ~/.config/nvim/lua/config/keymaps.lua
 
-# Install pi extension (bigchuck / llama-swap provider)
-mkdir -p ~/.pi/agent/extensions
-cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/bigchuck.ts" ~/.pi/agent/extensions/
+# Install pi / omp : provider llm-proxy (modèles du proxy) et serveur MCP du
+# proxy (outils web : recherche, lecture de page et de PDF, recherche dans
+# une page). Un mcp.json déjà présent n'est pas écrasé.
+for agent in ~/.pi/agent ~/.omp/agent; do
+  mkdir -p "$agent/extensions"
+  cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/llm-proxy.ts" "$agent/extensions/"
+  [ -f "$agent/mcp.json" ] || cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/mcp.json" "$agent/mcp.json"
+done
 
 # Herdr : Activate zsh in herdr configuration
 [ -f ~/.config/herdr/config.toml ] && sed -i '/^\[terminal\]/a default_shell = "zsh"' ~/.config/herdr/config.toml
