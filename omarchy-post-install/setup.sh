@@ -100,6 +100,12 @@ mkdir -p ~/.codex
 grep -q '^\[mcp_servers\.llmproxy\]' ~/.codex/config.toml 2>/dev/null \
   || cat "$SCRIPT_DIR/../common-no-omarchy/config/codex/mcp-llmproxy.toml" >> ~/.codex/config.toml
 
+# opencode (2.x) : le plugin llm-proxy — provider `llmproxy` (modèles lus sur
+# /v1/models du proxy) et serveur MCP du proxy, outils web intégrés retirés.
+# Il suit le dépôt, comme llm-proxy.ts de pi et omp.
+mkdir -p ~/.config/opencode/plugins
+cp "$SCRIPT_DIR/../common-no-omarchy/config/opencode/plugins/llm-proxy.ts" ~/.config/opencode/plugins/
+
 # Herdr : Activate zsh in herdr configuration
 [ -f ~/.config/herdr/config.toml ] && sed -i '/^\[terminal\]/a default_shell = "zsh"' ~/.config/herdr/config.toml
 
