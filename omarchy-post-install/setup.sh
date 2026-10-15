@@ -90,6 +90,13 @@ for agent in ~/.pi/agent ~/.omp/agent; do
   [ -f "$agent/mcp.json" ] || cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/mcp.json" "$agent/mcp.json"
 done
 
+# Codex : le même serveur MCP du proxy, ajouté à ~/.codex/config.toml s'il
+# n'y est pas — le fichier n'est pas remplacé, Codex y écrit lui-même
+# (projets de confiance, interface).
+mkdir -p ~/.codex
+grep -q '^\[mcp_servers\.llmproxy\]' ~/.codex/config.toml 2>/dev/null \
+  || cat "$SCRIPT_DIR/../common-no-omarchy/config/codex/mcp-llmproxy.toml" >> ~/.codex/config.toml
+
 # Herdr : Activate zsh in herdr configuration
 [ -f ~/.config/herdr/config.toml ] && sed -i '/^\[terminal\]/a default_shell = "zsh"' ~/.config/herdr/config.toml
 

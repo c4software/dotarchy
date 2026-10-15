@@ -1,0 +1,12 @@
+
+# Serveur MCP du proxy llm-proxy : recherche web, lecture de pages et de PDF,
+# recherche dans une page, mémoire persistante, OCR, exécution de code…
+# Ajouté à ~/.codex/config.toml par omarchy-post-install/setup.sh s'il n'y
+# est pas. Clé lue dans LLM_PROXY_API_KEY ("unused" suffit, proxy ouvert).
+[mcp_servers.llmproxy]
+url = "http://llmproxy/mcp"
+bearer_token_env_var = "LLM_PROXY_API_KEY"
+
+# La mémoire est écrite sans demander à chaque fois.
+[mcp_servers.llmproxy.tools.memory]
+approval_mode = "approve"
