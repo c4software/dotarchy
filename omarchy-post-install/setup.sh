@@ -83,11 +83,14 @@ cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/config/keymaps.lua" ~/.config/n
 
 # Install pi / omp : provider llm-proxy (modèles du proxy) et serveur MCP du
 # proxy (outils web : recherche, lecture de page et de PDF, recherche dans
-# une page). Un mcp.json déjà présent n'est pas écrasé.
-for agent in ~/.pi/agent ~/.omp/agent; do
-  mkdir -p "$agent/extensions"
-  cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/llm-proxy.ts" "$agent/extensions/"
-  [ -f "$agent/mcp.json" ] || cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/mcp.json" "$agent/mcp.json"
+# une page, mémoire…). Un mcp.json par agent : pi compte son `timeout` en
+# secondes, omp en millisecondes. Un mcp.json déjà présent n'est pas écrasé.
+for agent in pi omp; do
+  dir=~/.$agent/agent
+  mcp=mcp.json; [ $agent = omp ] && mcp=mcp.omp.json
+  mkdir -p "$dir/extensions"
+  cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/llm-proxy.ts" "$dir/extensions/"
+  [ -f "$dir/mcp.json" ] || cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/$mcp" "$dir/mcp.json"
 done
 
 # Codex : le même serveur MCP du proxy, ajouté à ~/.codex/config.toml s'il

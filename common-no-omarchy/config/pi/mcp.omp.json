@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "llmproxy": {
+      "url": "http://llmproxy/mcp",
+      "headers": { "Authorization": "Bearer ${LLM_PROXY_API_KEY}" },
+      "timeout": 600000
+    }
+  }
+}

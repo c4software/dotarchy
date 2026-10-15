@@ -3,8 +3,9 @@
     "llmproxy": {
       "url": "http://llmproxy/mcp",
       "headers": { "Authorization": "Bearer ${LLM_PROXY_API_KEY}" },
-      "description": "Outils du proxy llm-proxy : recherche web (SearXNG), lecture de pages et de PDF, recherche dans une page",
-      "exposure": "direct"
+      "description": "Outils du proxy llm-proxy : recherche web (SearXNG), lecture de pages et de PDF, recherche dans une page, mémoire, OCR, transcription, exécution de code, images",
+      "exposure": "direct",
+      "timeout": 600
     }
   }
 }

@@ -12,3 +12,6 @@ bearer_token_env_var = "LLM_PROXY_API_KEY"
 # qui ne peut rien demander — refuse chaque appel ; et le web_search de
 # Codex, masqué par celui-ci (même nom), ne cherche plus non plus.
 default_tools_approval_mode = "approve"
+# Certains outils du proxy sont longs (transcription, génération d'image :
+# jusqu'à 7 min côté proxy) ; le défaut de Codex les couperait avant.
+tool_timeout_sec = 600
