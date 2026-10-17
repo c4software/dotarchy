@@ -93,12 +93,29 @@ for agent in pi omp; do
   [ -f "$dir/mcp.json" ] || cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/$mcp" "$dir/mcp.json"
 done
 
-# Codex : le même serveur MCP du proxy, ajouté à ~/.codex/config.toml s'il
-# n'y est pas — le fichier n'est pas remplacé, Codex y écrit lui-même
-# (projets de confiance, interface).
+# Codex : le provider llm-proxy et le même serveur MCP du proxy, ajoutés à
+# ~/.codex/config.toml s'ils n'y sont pas — le fichier n'est pas remplacé,
+# Codex y écrit lui-même (projets de confiance, interface). Sans provider
+# choisi, `model_provider` et un modèle sont posés en tête (clés de premier
+# niveau : avant toute table). Contexte : celui du catalogue du proxy
+# (max_context_length), que Codex ne connaît pas.
 mkdir -p ~/.codex
-grep -q '^\[mcp_servers\.llmproxy\]' ~/.codex/config.toml 2>/dev/null \
+touch ~/.codex/config.toml
+grep -q '^\[model_providers\.llm-proxy\]' ~/.codex/config.toml \
+  || cat "$SCRIPT_DIR/../common-no-omarchy/config/codex/provider-llmproxy.toml" >> ~/.codex/config.toml
+if ! grep -q '^model_provider *=' ~/.codex/config.toml; then
+  printf '%s\n' 'model = "silentchuck/qwen3.8-flash-next"' 'model_context_window = 262144' \
+    'model_provider = "llm-proxy"' '' | cat - ~/.codex/config.toml > ~/.codex/config.toml.new
+  mv ~/.codex/config.toml.new ~/.codex/config.toml
+fi
+grep -q '^\[mcp_servers\.llmproxy\]' ~/.codex/config.toml \
   || cat "$SCRIPT_DIR/../common-no-omarchy/config/codex/mcp-llmproxy.toml" >> ~/.codex/config.toml
+
+# Clé de compte llm-proxy (~/.config/llm-proxy.key, lue par zsh/envs) : à
+# poser maintenant ou plus tard avec llm-proxy-key.
+if [ ! -s ~/.config/llm-proxy.key ] && gum confirm --default=false "Poser la clé de compte llm-proxy ?"; then
+  ~/.local/bin/llm-proxy-key || true
+fi
 
 # opencode (2.x) : le plugin llm-proxy — provider `llmproxy` (modèles lus sur
 # /v1/models du proxy) et serveur MCP du proxy, outils web intégrés retirés.

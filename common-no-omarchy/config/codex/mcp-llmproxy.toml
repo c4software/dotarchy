@@ -3,7 +3,8 @@
 # recherche dans une page, mémoire persistante, OCR, exécution de code…
 # Ajouté à ~/.codex/config.toml par omarchy-post-install/setup.sh (et par
 # dotarchy-sync de dev-box) s'il n'y est pas. Clé lue dans
-# LLM_PROXY_API_KEY ("unused" suffit, proxy ouvert).
+# LLM_PROXY_API_KEY (~/.config/llm-proxy.key, posée par llm-proxy-key ;
+# "unused" suffit, proxy ouvert).
 [mcp_servers.llmproxy]
 url = "http://llmproxy/mcp"
 bearer_token_env_var = "LLM_PROXY_API_KEY"

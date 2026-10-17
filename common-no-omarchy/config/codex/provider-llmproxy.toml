@@ -1,0 +1,12 @@
+# Provider llm-proxy : l'API Responses de Codex, traduite par le proxy vers
+# /v1/chat/completions. Ajouté à ~/.codex/config.toml par
+# omarchy-post-install/setup.sh s'il n'y est pas, avec en tête du fichier
+# `model_provider = "llm-proxy"` et un modèle si aucun provider n'est choisi.
+# Clé lue dans LLM_PROXY_API_KEY (~/.config/llm-proxy.key, posée par
+# llm-proxy-key ; "unused" pour un proxy ouvert) : Codex refuse une variable
+# vide ou absente.
+[model_providers.llm-proxy]
+name = "llm-proxy"
+base_url = "http://llmproxy/v1"
+wire_api = "responses"
+env_key = "LLM_PROXY_API_KEY"

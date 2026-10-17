@@ -4,10 +4,14 @@ export SUDO_EDITOR="$EDITOR"
 export BAT_THEME=ansi
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 export BROWSER="${BROWSER:-omarchy-launch-browser}"
-# Key of llm-proxy, for the llm-proxy.ts extension and the mcp.json of pi and
-# omp. pi refuses a mcp.json header whose variable is unset: "unused" is
-# enough for an open proxy; export the real key before this file otherwise.
+# Key of llm-proxy (account key in ~/.config/llm-proxy.key, mode 600, not
+# versioned), for the llm-proxy.ts extension and the mcp.json of pi and omp,
+# and Codex (env_key, bearer_token_env_var). pi and Codex refuse an unset
+# variable: "unused" is enough for an open proxy. gufo-media.ts reads
+# LLM_PROXY_KEY.
+[ -r ~/.config/llm-proxy.key ] && export LLM_PROXY_API_KEY="$(<~/.config/llm-proxy.key)"
 export LLM_PROXY_API_KEY="${LLM_PROXY_API_KEY:-unused}"
+export LLM_PROXY_KEY="$LLM_PROXY_API_KEY"
 
 export MANROFFOPT="-c"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"

@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# Pose la clé de compte llm-proxy sur le poste : demandée (masquée),
+# vérifiée contre le proxy (GET /v1/models), écrite dans
+# ~/.config/llm-proxy.key (mode 600, hors dépôt). ~/.config/zsh/envs l'exporte
+# dans LLM_PROXY_API_KEY et LLM_PROXY_KEY, que lisent pi, omp (llm-proxy.ts,
+# gufo-media.ts, mcp.json), Codex (env_key, bearer_token_env_var) et
+# opencode. La clé se crée sur la page du proxy : Configuration → Clés.
+#
+#   llm-proxy-key            demande la clé
+#   llm-proxy-key <clé>      la pose sans rien demander
+#   llm-proxy-key --remove   retire la clé (retour à « unused »)
+set -euo pipefail
+
+ENDPOINT="${LLM_PROXY_URL:-http://llmproxy}"
+ENDPOINT="${ENDPOINT%/}"
+KEYFILE="${LLM_PROXY_KEYFILE:-$HOME/.config/llm-proxy.key}"
+
+if [[ "${1:-}" == "--remove" ]]; then
+  rm -f "$KEYFILE"
+  echo "Clé retirée ($KEYFILE). Nouveau terminal : LLM_PROXY_API_KEY=unused."
+  exit 0
+fi
+
+key="${1:-}"
+if [[ -z "$key" ]]; then
+  echo "Clé de compte llm-proxy ($ENDPOINT → Configuration → Clés)"
+  if command -v gum >/dev/null && [[ -t 0 ]]; then
+    key=$(gum input --password --placeholder "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+  else
+    read -rsp "Clé : " key
+    echo
+  fi
+fi
+key="${key//[[:space:]]/}"
+[[ -n "$key" ]] || { echo "Aucune clé saisie." >&2; exit 1; }
+
+code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 \
+  -H "Authorization: Bearer $key" "$ENDPOINT/v1/models" || true)
+case "$code" in
+  200) echo "Clé acceptée par $ENDPOINT." ;;
+  401) echo "Clé refusée par $ENDPOINT (401) : révoquée, mal copiée ou compte en attente." >&2; exit 1 ;;
+  *)
+    echo "Proxy injoignable ou réponse inattendue ($ENDPOINT : ${code:-aucune})." >&2
+    if command -v gum >/dev/null && [[ -t 0 ]]; then
+      gum confirm --default=false "Poser la clé sans vérification ?" || exit 1
+    else
+      exit 1
+    fi
+    ;;
+esac
+
+mkdir -p "$(dirname "$KEYFILE")"
+(umask 077 && printf '%s' "$key" > "$KEYFILE")
+chmod 600 "$KEYFILE"
+echo "Clé écrite dans $KEYFILE (${key:0:8}…)."
+
+# Le TUI de Codex passe par un démon `codex app-server`, lancé une fois et
+# gardé : c'est LUI qui lit env_key, dans l'environnement de son lancement.
+# Avec une ancienne clé, il répond 401 même depuis un nouveau terminal.
+# Arrêté ici, Codex le relance au prochain démarrage avec la nouvelle clé.
+for pid in $(pgrep -f 'app-server-daemon/releases/.*/codex app-server' || true); do
+  if ! tr '\0' '\n' < "/proc/$pid/environ" 2>/dev/null | grep -qxF "LLM_PROXY_API_KEY=$key"; then
+    kill "$pid" 2>/dev/null && echo "Démon Codex (app-server, pid $pid) arrêté : il avait une autre clé. Relancer Codex."
+  fi
+done
+
+grep -q 'llm-proxy.key' "$HOME/.config/zsh/envs" 2>/dev/null \
+  || echo "Attention : ~/.config/zsh/envs ne lit pas $KEYFILE (dotarchy à jour ?)." >&2
+echo "Ouvrir un nouveau terminal (ou : source ~/.config/zsh/envs) pour la prendre en compte."
