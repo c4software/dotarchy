@@ -1,7 +1,12 @@
 # Print at real size (no scaling), one-sided, with printer selection
 # Usage: printreal <file> [pages]   e.g. printreal patron.pdf 1-3,5
 printreal() {
-  [[ -z $1 ]] && { echo "Usage: printreal <file> [pages]"; return 1; }
+  [[ -z $1 ]] && {
+    echo "Usage: printreal <file> [pages]"
+    echo "  e.g. printreal patron.pdf 1           (page 1)"
+    echo "       printreal patron.pdf 2-3,5,7-12  (pages 2-3, 5 and 7-12)"
+    return 1
+  }
   [[ -f $1 ]] || { echo "File not found: $1"; return 1; }
 
   local printer
