@@ -1,6 +1,6 @@
 
 # Serveur MCP du proxy llm-proxy : recherche web, lecture de pages et de PDF,
-# recherche dans une page, mémoire persistante, OCR, exécution de code…
+# recherche dans une page, mémoire persistante, OCR…
 # Ajouté à ~/.codex/config.toml par omarchy-post-install/setup.sh (et par
 # dotarchy-sync de dev-box) s'il n'y est pas. Clé lue dans
 # LLM_PROXY_API_KEY (~/.config/llm-proxy.key, posée par llm-proxy-key ;
@@ -9,10 +9,13 @@
 url = "http://llmproxy/mcp"
 bearer_token_env_var = "LLM_PROXY_API_KEY"
 # Approuvés d'office : ces outils s'exécutent SUR LE PROXY, pas sur le
-# poste (code_execution dans son bac à sable). Sans cela, `codex exec` —
-# qui ne peut rien demander — refuse chaque appel ; et le web_search de
-# Codex, masqué par celui-ci (même nom), ne cherche plus non plus.
+# poste. Sans cela, `codex exec` — qui ne peut rien demander — refuse
+# chaque appel ; et le web_search de Codex, masqué par celui-ci (même
+# nom), ne cherche plus non plus.
 default_tools_approval_mode = "approve"
 # Certains outils du proxy sont longs (transcription, génération d'image :
 # jusqu'à 7 min côté proxy) ; le défaut de Codex les couperait avant.
 tool_timeout_sec = 600
+# Pas d'exécution de code dans le bac du proxy : le modèle la préférait
+# parfois au shell local (exec_command), loin des fichiers du projet.
+disabled_tools = ["code_execution"]
