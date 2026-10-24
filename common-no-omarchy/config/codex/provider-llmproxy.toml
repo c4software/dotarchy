@@ -1,8 +1,9 @@
 # Provider llm-proxy : l'API Responses de Codex, traduite par le proxy vers
 # /v1/chat/completions. Ajouté à ~/.codex/config.toml par
 # omarchy-post-install/setup.sh s'il n'y est pas, avec en tête du fichier
-# `model_provider = "llm-proxy"`, un modèle, le catalogue des modèles du proxy
-# et le raisonnement none si aucun provider n'est choisi.
+# `model_provider = "llm-proxy"`, Flash-Next comme modèle de départ, le
+# catalogue des modèles du proxy (/model propose les autres) et le
+# raisonnement none si aucun provider n'est choisi.
 # Clé lue dans LLM_PROXY_API_KEY (~/.config/llm-proxy.key, posée par
 # llm-proxy-key ; "unused" pour un proxy ouvert) : Codex refuse une variable
 # vide ou absente.
