@@ -98,14 +98,21 @@ done
 # Codex y écrit lui-même (projets de confiance, interface). Sans provider
 # choisi, `model_provider` et un modèle sont posés en tête (clés de premier
 # niveau : avant toute table). Contexte : celui du catalogue du proxy
-# (max_context_length), que Codex ne connaît pas.
+# (max_context_length), que Codex ne connaît pas. Avec eux, le catalogue des
+# modèles du proxy (catalogue-local.json, suit le dépôt) : sans lui, Codex
+# leur refuse tout niveau de raisonnement ; il remplace le catalogue intégré
+# (instructions de base de Codex 0.164.0). Raisonnement low : sans
+# raisonnement, Flash-Next recopie parfois sans fin son dernier appel d'outil
+# (gufo #388).
 mkdir -p ~/.codex
+cp "$SCRIPT_DIR/../common-no-omarchy/config/codex/catalogue-local.json" ~/.codex/
 touch ~/.codex/config.toml
 grep -q '^\[model_providers\.llm-proxy\]' ~/.codex/config.toml \
   || cat "$SCRIPT_DIR/../common-no-omarchy/config/codex/provider-llmproxy.toml" >> ~/.codex/config.toml
 if ! grep -q '^model_provider *=' ~/.codex/config.toml; then
   printf '%s\n' 'model = "silentchuck/qwen3.8-flash-next"' 'model_context_window = 262144' \
-    'model_provider = "llm-proxy"' '' | cat - ~/.codex/config.toml > ~/.codex/config.toml.new
+    'model_provider = "llm-proxy"' "model_catalog_json = \"$HOME/.codex/catalogue-local.json\"" \
+    'model_reasoning_effort = "low"' '' | cat - ~/.codex/config.toml > ~/.codex/config.toml.new
   mv ~/.codex/config.toml.new ~/.codex/config.toml
 fi
 grep -q '^\[mcp_servers\.llmproxy\]' ~/.codex/config.toml \
