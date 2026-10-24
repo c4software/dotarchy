@@ -4,7 +4,7 @@
    "slug": "silentchuck/qwen3.8-flash-next",
    "display_name": "Qwen3.8 Flash-Next",
    "description": "Servi par gufo sur silentchuck, via llm-proxy",
-   "default_reasoning_level": "low",
+   "default_reasoning_level": "none",
    "supported_reasoning_levels": [
     {
      "effort": "none",
@@ -57,7 +57,7 @@
    "slug": "silentchuck/qwen3.8-27b",
    "display_name": "Qwen3.8 27B",
    "description": "Servi par gufo sur silentchuck, via llm-proxy",
-   "default_reasoning_level": "low",
+   "default_reasoning_level": "none",
    "supported_reasoning_levels": [
     {
      "effort": "none",
@@ -109,7 +109,7 @@
    "slug": "silentchuck/deepseek-v4-flash",
    "display_name": "DeepSeek V4 Flash",
    "description": "Servi par gufo sur silentchuck, via llm-proxy",
-   "default_reasoning_level": "low",
+   "default_reasoning_level": "none",
    "supported_reasoning_levels": [
     {
      "effort": "none",
