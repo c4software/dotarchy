@@ -10,5 +10,6 @@ export HISTFILESIZE=20000
 if [[ "$OSTYPE" == "darwin"* ]]; then
   export SSH_AUTH_SOCK="$HOME/.ssh/ssh-agent.socket"
 else
-  export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+  # Garder un agent déjà présent (ForwardAgent via OpenSSH ou Tailscale SSH)
+  [ -S "$SSH_AUTH_SOCK" ] || export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 fi

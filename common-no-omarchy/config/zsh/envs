@@ -2,7 +2,8 @@
 export EDITOR="nvim"
 export SUDO_EDITOR="$EDITOR"
 export BAT_THEME=ansi
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+# Garder un agent déjà présent (ForwardAgent via OpenSSH ou Tailscale SSH)
+[ -S "$SSH_AUTH_SOCK" ] || export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 export BROWSER="${BROWSER:-omarchy-launch-browser}"
 # Key of llm-proxy (account key in ~/.config/llm-proxy.key, mode 600, not
 # versioned), for the llm-proxy.ts extension and the mcp.json of pi and omp,
