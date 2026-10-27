@@ -1,0 +1,23 @@
+# Pick an Android emulator with gum and launch it detached (extra args go to the emulator, e.g. android-emu -no-snapshot-load)
+android-emu() {
+  local emulator="$HOME/Android/Sdk/emulator/emulator"
+  local avds avd
+
+  avds="$("$emulator" -list-avds 2>/dev/null)"
+  if [[ -z "$avds" ]]; then
+    echo "No emulator found"
+    return 1
+  fi
+
+  avd="$(echo "$avds" | gum choose --header "Launch emulator")" || return
+
+  nohup "$emulator" -avd "$avd" "$@" &> /dev/null &!
+  echo "Launching $avd"
+}
+
+enable-java() {
+  export JAVA_HOME=$HOME/.local/share/JetBrains/Toolbox/apps/android-studio/jbr
+  local gradle_bin
+  gradle_bin=$(find "$HOME/.local/share/gradle" -maxdepth 2 -name 'gradle' -type f | sort -V | tail -1)
+  [[ -n "$gradle_bin" ]] && export PATH="$JAVA_HOME/bin:$(dirname "$gradle_bin"):$PATH"
+}

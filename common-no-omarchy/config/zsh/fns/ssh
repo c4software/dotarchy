@@ -1,0 +1,16 @@
+ssh() {
+  if [[ $# -eq 0 ]]; then
+    local selected
+    selected=$(
+      fc -l 1 \
+      | grep -P '^\s*\d+\s+ssh\s+' \
+      | grep -oP '(?<=ssh )([^-]\S+)' \
+      | tac \
+      | awk '!seen[$0]++' \
+      | fzf --prompt="SSH › " --height=40% --border=rounded --pointer="▶"
+    )
+    [[ -n "$selected" ]] && command ssh "$selected"
+  else
+    command ssh "$@"
+  fi
+}

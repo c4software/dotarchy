@@ -1,0 +1,19 @@
+serve() {
+  local port
+  for port in {8888..8899}; do
+    if ! ss -tlnp "sport = :$port" | grep -q LISTEN; then
+      echo "Open port found: $port"
+      python3 ~/Dropbox/Python/dev/log-server/main.py "$port"
+      return
+    fi
+  done
+  echo "No open port found in range 8888–8899"
+}
+
+function killp(){
+	if [[ -n "$1" ]]; then
+		kill $(lsof -ti :$1 -sTCP:LISTEN) || echo "No process found for port $1"
+	else
+		echo "Please specify a port killp 3000"
+	fi
+}

@@ -1,0 +1,9 @@
+copy() {
+  if [ -n "$1" ]; then
+    wl-copy < "$1"
+  else
+    wl-copy
+  fi
+
+  echo "Your selection is now in your clipboard."
+}
