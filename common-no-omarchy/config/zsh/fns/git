@@ -1,0 +1,5 @@
+# Let codex commit pending changes, hiding its output (shown only on failure)
+ai-commit() {
+  gum spin --show-error --title "Commit en cours…" -- codex exec "Commit les modifications en attente" --yolo \
+    && echo "Commit terminé"
+}
