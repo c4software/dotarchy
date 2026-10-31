@@ -85,7 +85,7 @@ sudo cp "$SCRIPT_DIR/configs/sddm-autologin.conf" /etc/sddm.conf.d/autologin.con
 sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
 
 # Install nvim configuration
-cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/config/keymaps.lua" ~/.config/nvim/lua/config/keymaps.lua
+cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/config/keymaps.lua" ~/.config/nvim/lua/config/keymaps.lua
 
 # Install pi / omp : provider llm-proxy (modèles du proxy) et serveur MCP du
 # proxy (outils web : recherche, lecture de page et de PDF, recherche dans
