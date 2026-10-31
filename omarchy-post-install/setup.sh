@@ -18,6 +18,9 @@ cp $SCRIPT_DIR/configs/bashrc ~/.bashrc
 # il faut donc activer l'unite socket d'OpenSSH (sinon aucun agent, et ForwardAgent est inutile)
 systemctl --user enable --now ssh-agent.socket
 
+# ~/.local/bin n'existe pas sur une fresh install Omarchy
+mkdir -p ~/.local/bin
+
 # Install try.sh command
 curl -sL https://raw.githubusercontent.com/c4software/try.sh/main/try.sh -o ~/.local/bin/try
 chmod +x ~/.local/bin/try
@@ -54,7 +57,7 @@ omarchy plugin add https://github.com/c4software/hyprland-alttab --enable
 cp $SCRIPT_DIR/bin/* ~/.local/bin/
 
 # Create a vim alias
-sudo ln -s /usr/bin/nvim /usr/bin/vim
+sudo ln -sf /usr/bin/nvim /usr/bin/vim
 
 # Move default configuration for hyprland
 echo "Move default configuration for Hyprland"
