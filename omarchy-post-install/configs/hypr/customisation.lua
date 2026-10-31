@@ -10,6 +10,7 @@ hl.env("GDK_SCALE", "1")
 hl.config({
 	input = {
 		kb_layout = "bepoDev",
+		kb_variant = "", -- sinon hérité de vconsole.conf (bepo), inconnu de bepoDev
 		kb_options = "lv3:caps_switch", -- ,grp:alts_toggle
 	},
 })

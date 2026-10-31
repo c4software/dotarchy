@@ -38,6 +38,12 @@ wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/
 [ -L ~/.config/xkb/rules/base.lst ] || ln -s ~/.config/xkb/rules/evdev.lst ~/.config/xkb/rules/base.lst || true
 [ -L ~/.config/xkb/rules/base.xml ] || ln -s ~/.config/xkb/rules/evdev.xml ~/.config/xkb/rules/base.xml || true
 
+# Bépo standard hors session (TTY et login SDDM) ; bepoDev reste pour la session.
+# --no-convert : sinon chaque commande localectl écrase le réglage de l'autre.
+# Hyprland hérite de XKBVARIANT : customisation.lua le remet à vide pour bepoDev.
+sudo localectl --no-convert set-keymap fr-bepo
+sudo localectl --no-convert set-x11-keymap fr pc105 bepo terminate:ctrl_alt_bksp
+
 echo -e "\nConfiguring uhid module to fix BLE mouse issue..."
 echo -e "# Fix BLE mouse issue\nuhid" | sudo tee /etc/modules-load.d/uhid.conf
 
