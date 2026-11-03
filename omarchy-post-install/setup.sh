@@ -18,6 +18,14 @@ cp $SCRIPT_DIR/configs/bashrc ~/.bashrc
 # il faut donc activer l'unite socket d'OpenSSH (sinon aucun agent, et ForwardAgent est inutile)
 systemctl --user enable --now ssh-agent.socket
 
+# LocalSearch (ex-Tracker3, tiré par nautilus) : indexeur de fichiers coupé.
+# Il indexe projets, SDK et node_modules (index de plusieurs Go dans
+# ~/.cache/tracker3) et tourne pendant les compilations. La recherche Nautilus
+# marche sans, en parcourant le disque. Réactiver :
+# systemctl --user unmask --now localsearch-3.service
+systemctl --user mask --now localsearch-3.service
+rm -rf ~/.cache/tracker3
+
 # ~/.local/bin n'existe pas sur une fresh install Omarchy
 mkdir -p ~/.local/bin
 
