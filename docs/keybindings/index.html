@@ -374,13 +374,23 @@
 					Previous track
 			
 	
-">
+
+
+  tmux - Status line buttons and Herdr agents
+  
+  #
+  
+
+~/.config/tmux/herdr.conf, sourced at the end of tmux.conf (and appended
+to the Omarchy one by omarchy-post-install), puts two buttons in the status
+line, for a click or a tap (the terminal has to pass the mouse on, as Termius,
+Blink and the desktop terminals do):">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
 <meta name="color-scheme" content="light dark"><meta property="og:url" content="https://c4software.github.io/dotarchy/docs/keybindings/">
 	<meta property="og:site_name" content="Dotarchy">
 	<meta property="og:title" content="Keybindings">
-	<meta property="og:description" content="Niri - Keyboard Shortcuts # Window Management # Shortcut Description Mod &#43; W Close the active window Mod &#43; S Toggle floating mode F11 Maximize column (fullscreen) Mod &#43; F11 Toggle windowed fullscreen Mod &#43; P Center column Mod &#43; Alt &#43; ↑ Maximize column Mod &#43; Alt &#43; ↓ Restore column Mod &#43; Alt &#43; ←/→ Expand column to available width Mod &#43; ←/→ Focus column left/right Mod &#43; ↑/↓ Focus workspace up/down Mod &#43; [1-7] Switch to workspace (bépo layout) Mod &#43; Shift &#43; [1-7] Move column to workspace Mod &#43; Tab Toggle overview mode Alt &#43; Shift &#43; ←/→ Move column left/right Alt &#43; Shift &#43; ↑/↓ Move window up/down in column Mod &#43; Shift &#43; ←/→ Focus column left/right (windows) Mod &#43; Shift &#43; ↑/↓ Focus window up/down (windows) Alt &#43; ←/→ Resize column width (±10%) Alt &#43; ↑/↓ Resize window height (±10%) Mod &#43; Mouse wheel Scroll through workspaces Mod &#43; Shift &#43; Alt &#43; ←/→ Move workspace to other monitor Grouping (Tabbed Windows) # Shortcut Description Mod &#43; G Toggle tabbed display for column Mod &#43; Q Consume window into column/group Mod &#43; H Expel window from column/group Mod &#43; Shift &#43; ↑ Focus previous window in group Mod &#43; Shift &#43; ↓ Focus next window in group Clipboard # Shortcut Description Mod &#43; C Copy Mod &#43; V Paste Mod &#43; X Cut Applications # Shortcut Description Mod &#43; Enter Launch terminal (alacritty) Mod &#43; F Launch file manager (nautilus) Mod &#43; B Launch browser (Chrome) Mod &#43; N Launch Neovim Mod &#43; T Launch btop (system monitor) Mod &#43; D Launch lazydocker Mod &#43; A Launch AI menu Utilities # Shortcut Description Mod &#43; Space Launch application menu (rofi) Mod &#43; Ctrl &#43; E Emoji menu Mod &#43; Alt &#43; Space Omarchy menu Mod &#43; Escape or XF86PowerOff Power menu Mod &#43; K Show keyboard shortcuts Mod &#43; L Lock screen Mod &#43; Shift &#43; L Start screensaver Mod &#43; Shift &#43; Space Toggle top bar (waybar) Mod &#43; Ctrl &#43; Space Next wallpaper Mod &#43; Shift &#43; Ctrl &#43; Space Theme picker Mod &#43; , Dismiss notification Mod &#43; Shift &#43; , Dismiss all notifications Mod &#43; Ctrl &#43; , Toggle Do Not Disturb mode Print Capture menu Alt &#43; Shift &#43; 4 Screenshot Mod &#43; Print Color picker (hyprpicker) Mod &#43; O Toggle Overview Media # Shortcut Description XF86AudioRaiseVolume Increase volume XF86AudioLowerVolume Decrease volume XF86AudioMute Mute/unmute sound XF86AudioMicMute Mute/unmute microphone XF86MonBrightnessUp Increase brightness XF86MonBrightnessDown Decrease brightness Alt &#43; XF86AudioRaiseVolume Increase volume (&#43;1%) Alt &#43; XF86AudioLowerVolume Decrease volume (-1%) Alt &#43; XF86MonBrightnessUp Increase brightness (&#43;1%) Alt &#43; XF86MonBrightnessDown Decrease brightness (-1%) XF86AudioNext Next track XF86AudioPause / XF86AudioPlay Play/pause XF86AudioPrev Previous track">
+	<meta property="og:description" content="Niri - Keyboard Shortcuts # Window Management # Shortcut Description Mod &#43; W Close the active window Mod &#43; S Toggle floating mode F11 Maximize column (fullscreen) Mod &#43; F11 Toggle windowed fullscreen Mod &#43; P Center column Mod &#43; Alt &#43; ↑ Maximize column Mod &#43; Alt &#43; ↓ Restore column Mod &#43; Alt &#43; ←/→ Expand column to available width Mod &#43; ←/→ Focus column left/right Mod &#43; ↑/↓ Focus workspace up/down Mod &#43; [1-7] Switch to workspace (bépo layout) Mod &#43; Shift &#43; [1-7] Move column to workspace Mod &#43; Tab Toggle overview mode Alt &#43; Shift &#43; ←/→ Move column left/right Alt &#43; Shift &#43; ↑/↓ Move window up/down in column Mod &#43; Shift &#43; ←/→ Focus column left/right (windows) Mod &#43; Shift &#43; ↑/↓ Focus window up/down (windows) Alt &#43; ←/→ Resize column width (±10%) Alt &#43; ↑/↓ Resize window height (±10%) Mod &#43; Mouse wheel Scroll through workspaces Mod &#43; Shift &#43; Alt &#43; ←/→ Move workspace to other monitor Grouping (Tabbed Windows) # Shortcut Description Mod &#43; G Toggle tabbed display for column Mod &#43; Q Consume window into column/group Mod &#43; H Expel window from column/group Mod &#43; Shift &#43; ↑ Focus previous window in group Mod &#43; Shift &#43; ↓ Focus next window in group Clipboard # Shortcut Description Mod &#43; C Copy Mod &#43; V Paste Mod &#43; X Cut Applications # Shortcut Description Mod &#43; Enter Launch terminal (alacritty) Mod &#43; F Launch file manager (nautilus) Mod &#43; B Launch browser (Chrome) Mod &#43; N Launch Neovim Mod &#43; T Launch btop (system monitor) Mod &#43; D Launch lazydocker Mod &#43; A Launch AI menu Utilities # Shortcut Description Mod &#43; Space Launch application menu (rofi) Mod &#43; Ctrl &#43; E Emoji menu Mod &#43; Alt &#43; Space Omarchy menu Mod &#43; Escape or XF86PowerOff Power menu Mod &#43; K Show keyboard shortcuts Mod &#43; L Lock screen Mod &#43; Shift &#43; L Start screensaver Mod &#43; Shift &#43; Space Toggle top bar (waybar) Mod &#43; Ctrl &#43; Space Next wallpaper Mod &#43; Shift &#43; Ctrl &#43; Space Theme picker Mod &#43; , Dismiss notification Mod &#43; Shift &#43; , Dismiss all notifications Mod &#43; Ctrl &#43; , Toggle Do Not Disturb mode Print Capture menu Alt &#43; Shift &#43; 4 Screenshot Mod &#43; Print Color picker (hyprpicker) Mod &#43; O Toggle Overview Media # Shortcut Description XF86AudioRaiseVolume Increase volume XF86AudioLowerVolume Decrease volume XF86AudioMute Mute/unmute sound XF86AudioMicMute Mute/unmute microphone XF86MonBrightnessUp Increase brightness XF86MonBrightnessDown Decrease brightness Alt &#43; XF86AudioRaiseVolume Increase volume (&#43;1%) Alt &#43; XF86AudioLowerVolume Decrease volume (-1%) Alt &#43; XF86MonBrightnessUp Increase brightness (&#43;1%) Alt &#43; XF86MonBrightnessDown Decrease brightness (-1%) XF86AudioNext Next track XF86AudioPause / XF86AudioPlay Play/pause XF86AudioPrev Previous track tmux - Status line buttons and Herdr agents # ~/.config/tmux/herdr.conf, sourced at the end of tmux.conf (and appended to the Omarchy one by omarchy-post-install), puts two buttons in the status line, for a click or a tap (the terminal has to pass the mouse on, as Termius, Blink and the desktop terminals do):">
 	<meta property="og:locale" content="en_us">
 	<meta property="og:type" content="article">
 		<meta property="article:section" content="docs">
@@ -390,7 +400,7 @@
 <link rel="canonical" href="https://c4software.github.io/dotarchy/docs/keybindings/">
 <link rel="stylesheet" href="/dotarchy/book.min.8cccde2f1e7e4a5ea6c3869ce8a1df6c4204e7f83a0a84f40fdcf0f11db2c78c.css" integrity="sha256-jMzeLx5&#43;Sl6mw4ac6KHfbEIE5/g6CoT0D9zw8R2yx4w=" crossorigin="anonymous">
   <script defer src="/dotarchy/fuse.min.js"></script>
-  <script defer src="/dotarchy/en.search.min.b0ac518f1e005869c944c3bc468ea0ed270a7bf7b226659ab868aec23d8390ff.js" integrity="sha256-sKxRjx4AWGnJRMO8Ro6g7ScKe/eyJmWauGiuwj2DkP8=" crossorigin="anonymous"></script>
+  <script defer src="/dotarchy/en.search.min.e5e12df9bee6fe13c65a7115bee69b656198c80d1559955041618eb480897744.js" integrity="sha256-5eEt&#43;b7m/hPGWnEVvuabZWGYyA0VWZVQQWGOtICJd0Q=" crossorigin="anonymous"></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -582,6 +592,7 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#media">Media</a></li>
       </ul>
     </li>
+    <li><a href="#tmux---status-line-buttons-and-herdr-agents">tmux - Status line buttons and Herdr agents</a></li>
   </ul>
 </nav>
 
@@ -965,6 +976,45 @@ https://github.com/alex-shpak/hugo-book
 			</tr>
 	</tbody>
 </table>
+<h2 id="tmux---status-line-buttons-and-herdr-agents">
+  tmux - Status line buttons and Herdr agents
+  
+  <a class="anchor" href="#tmux---status-line-buttons-and-herdr-agents">#</a>
+  
+</h2>
+<p><code>~/.config/tmux/herdr.conf</code>, sourced at the end of <code>tmux.conf</code> (and appended
+to the Omarchy one by <code>omarchy-post-install</code>), puts two buttons in the status
+line, for a click or a tap (the terminal has to pass the mouse on, as Termius,
+Blink and the desktop terminals do):</p>
+<table>
+	<thead>
+			<tr>
+					<th>Button / key</th>
+					<th>Action</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>+</code> (left)</td>
+					<td>New window in the directory of the current pane</td>
+			</tr>
+			<tr>
+					<td><code>agents N</code> (right)</td>
+					<td>Menu of the live Herdr agents, hidden when there are none</td>
+			</tr>
+			<tr>
+					<td><code>Prefix + a</code></td>
+					<td>The same menu</td>
+			</tr>
+	</tbody>
+</table>
+<p>The agents are the terminals of <code>herdr-core</code>, which runs the terminals of
+herdr-app (the Herdr desktop app) on this machine or on one it reaches over
+SSH. Each line of the menu opens the agent in a tmux window of its own (● when
+it has one, ○ when not); picking it again closes that window. Closing it, or
+<code>Ctrl + \</code> inside it, only detaches tmux: the agent keeps running and
+herdr-app still shows it. <code>~/.config/tmux/herdr list</code> and <code>toggle &lt;t&gt;</code> do the
+same from the shell.</p>
 </article>
  
       
@@ -1039,6 +1089,7 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#media">Media</a></li>
       </ul>
     </li>
+    <li><a href="#tmux---status-line-buttons-and-herdr-agents">tmux - Status line buttons and Herdr agents</a></li>
   </ul>
 </nav>
 
