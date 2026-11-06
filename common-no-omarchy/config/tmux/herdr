@@ -6,12 +6,13 @@
 # included. Used by herdr.conf, next to this file.
 #
 #   herdr                 in tmux: the menu; outside: the picker of herdr-core
-#   herdr menu [client] [mouse]
-#                         the tmux menu of the agents, one line each: picking a
+#   herdr menu [client]   the tmux menu of the agents, one line each: picking a
 #                         line opens the agent in a window of its own, picking
-#                         it again closes that window (prefix + a); with mouse,
-#                         it opens under the status line on the right, where
-#                         the agents button is
+#                         it again closes that window
+#   herdr prepare [mouse] the same menu as a tmux command, in the option
+#                         @herdr_menu, for herdr.conf (prefix + a, the agents
+#                         button); with mouse, it opens under the status line
+#                         on the right, where the button is
 #   herdr toggle <t>      open or close the window of terminal <t> (t7)
 #   herdr list            the live terminals, and whether a window is open
 #   herdr count           the number of live terminals, nothing when there are
@@ -73,13 +74,12 @@ toggle() {
   tmux set-option -w -t "$win" @hc "$t"
 }
 
-menu() {
-  local client="${1:-}" from="${2:-}" n=0 key mark label addr agent where status
-  local -a items=() target=() place=(-x C -y C)
-  [ -n "$client" ] && target=(-c "$client")
-  # From the button: under the status line, on the right where the button
-  # is; -O keeps it open on a release without an item picked.
-  [ "$from" = mouse ] && place=(-O -x R -y S)
+# The lines of the menu, three words each (label, key, command), in ITEMS.
+# Returns 1 when there is no live terminal.
+ITEMS=()
+build_items() {
+  local n=0 key mark label addr agent where status
+  ITEMS=()
   while IFS=$'\t' read -r addr agent where status; do
     [ -n "$addr" ] || continue
     n=$((n + 1))
@@ -89,13 +89,50 @@ menu() {
     [ -n "$(find_window "$addr")" ] && mark="●"
     # A # in a label would be read as a tmux format
     label="$mark $agent · $where ($status)"
-    items+=("${label//#/##}" "$key" "run-shell '$SELF toggle $addr'")
+    ITEMS+=("${label//#/##}" "$key" "run-shell '$SELF toggle $addr'")
   done < <(terminals)
-  if [ "$n" -eq 0 ]; then
+  [ "$n" -gt 0 ]
+}
+
+TITLE='#[align=centre] Herdr agents (● open) '
+
+menu() {
+  local client="${1:-}"
+  local -a target=()
+  [ -n "$client" ] && target=(-c "$client")
+  if ! build_items; then
     tmux display-message "${target[@]}" "No live Herdr terminal"
     return 0
   fi
-  tmux display-menu "${target[@]}" -T '#[align=centre] Herdr agents (● open) ' "${place[@]}" "${items[@]}"
+  tmux display-menu "${target[@]}" -T "$TITLE" -x C -y C "${ITEMS[@]}"
+}
+
+# One word of a tmux command, in double quotes.
+tmux_word() {
+  local w="${1//\\/\\\\}"
+  w="${w//\"/\\\"}"
+  w="${w//\$/\\\$}"
+  printf '"%s"' "$w"
+}
+
+# The menu as a tmux command in @herdr_menu, for herdr.conf to run with
+# run-shell -C. tmux only lets the mouse pick a line in a menu that the key
+# binding of the click opens itself, with the click as its event; a menu that
+# a shell opens through tmux display-menu takes the keyboard only.
+prepare() {
+  local from="${1:-}" cmd w
+  local -a place=(-x C -y C)
+  # From the button: under the status line, on the right where the button is
+  [ "$from" = mouse ] && place=(-x R -y S)
+  if [ -z "$HC" ]; then
+    cmd="display-message $(tmux_word "herdr-core not available: herdr-app installs it on the machines it uses")"
+  elif ! build_items; then
+    cmd="display-message $(tmux_word "No live Herdr terminal")"
+  else
+    cmd="display-menu -T $(tmux_word "$TITLE") ${place[*]}"
+    for w in "${ITEMS[@]}"; do cmd+=" $(tmux_word "$w")"; done
+  fi
+  tmux set -g @herdr_menu "$cmd"
 }
 
 # Prints nothing for zero, so that the agents button, shown when the output
@@ -124,7 +161,8 @@ case "${1:-}" in
     need_hc
     if [ -n "${TMUX:-}" ]; then menu; else exec "$HC"; fi
     ;;
-  menu) need_hc; menu "${2:-}" "${3:-}" ;;
+  menu) need_hc; menu "${2:-}" ;;
+  prepare) prepare "${2:-}" ;;
   toggle)
     need_hc
     [ -n "${2:-}" ] || { echo "usage: herdr toggle <terminal>" >&2; exit 2; }
@@ -132,6 +170,6 @@ case "${1:-}" in
     ;;
   list) need_hc; list ;;
   count) count ;;
-  -h|--help) sed -n '2,22p' "$0" | sed 's/^# \?//' ;;
-  *) echo "unknown command: $1 (menu, toggle, list, count)" >&2; exit 2 ;;
+  -h|--help) sed -n '2,23p' "$0" | sed 's/^# \?//' ;;
+  *) echo "unknown command: $1 (menu, prepare, toggle, list, count)" >&2; exit 2 ;;
 esac
