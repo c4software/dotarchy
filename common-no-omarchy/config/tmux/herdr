@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+# The terminals of herdr-core in tmux windows. herdr-core runs the terminals
+# of herdr-app (the Herdr desktop app), on this machine or on one added to it
+# as an SSH machine (herdr-app installs herdr-core in ~/.local/bin there).
+# They outlive the app, so they can be reached from any SSH client, a phone
+# included. Used by herdr.conf, next to this file.
+#
+#   herdr                 in tmux: the menu; outside: the picker of herdr-core
+#   herdr menu [client] [mouse]
+#                         the tmux menu of the agents, one line each: picking a
+#                         line opens the agent in a window of its own, picking
+#                         it again closes that window (prefix + a); with mouse,
+#                         it opens under the status line on the right, where
+#                         the agents button is
+#   herdr toggle <t>      open or close the window of terminal <t> (t7)
+#   herdr list            the live terminals, and whether a window is open
+#   herdr count           the number of live terminals, nothing when there are
+#                         none or herdr-core is missing (the agents button)
+#
+# Closing a window only detaches tmux from the terminal: the agent keeps
+# running in herdr-core, and herdr-app still shows it. Ctrl+\ inside the
+# window detaches too.
+set -euo pipefail
+
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+
+HC=""
+if [ -x "$HOME/.local/bin/herdr-core" ]; then
+  HC="$HOME/.local/bin/herdr-core"
+elif command -v herdr-core >/dev/null 2>&1; then
+  HC="$(command -v herdr-core)"
+fi
+
+# Stops when herdr-core is missing. From tmux the message goes to the status
+# line, and the exit code stays 0: prefix + a runs through run-shell, which
+# shows any output, or a non-zero exit code, in a pane view to close with q.
+need_hc() {
+  [ -n "$HC" ] && return 0
+  if [ -n "${TMUX:-}" ] && tmux display-message \
+      "herdr-core not available: herdr-app installs it on the machines it uses" 2>/dev/null; then
+    exit 0
+  fi
+  echo "herdr-core not available on this machine." >&2
+  echo "  herdr-app installs it on the machines it uses (herdr-core machine add)." >&2
+  exit 1
+}
+
+# Live terminals of herdr-core, one per line: address, agent, where, status.
+terminals() {
+  "$HC" ls | jq -r '.terminals[]
+    | [.address, (.agent // "shell"), (.where // .cwd // ""), (.status // .state // "")]
+    | @tsv'
+}
+
+# The tmux window that shows terminal $1, tagged with the window option @hc.
+find_window() {
+  tmux list-windows -a -F '#{window_id} #{@hc}' 2>/dev/null \
+    | awk -v t="$1" '$2 == t { print $1; exit }' || true
+}
+
+toggle() {
+  local t="$1" name win
+  [[ "$t" =~ ^[A-Za-z0-9_/-]+$ ]] || { echo "not a terminal address: $t" >&2; exit 2; }
+  win="$(find_window "$t")"
+  if [ -n "$win" ]; then
+    tmux kill-window -t "$win"
+    return 0
+  fi
+  name="$("$HC" ls | jq -r --arg t "$t" '.terminals[] | select(.address == $t) | (.agent // "shell")')"
+  [ -n "$name" ] || { tmux display-message "No live Herdr terminal $t"; exit 0; }
+  name="$(printf '%s-%s' "$name" "$t" | tr -c 'A-Za-z0-9._-' '-')"
+  win="$(tmux new-window -P -F '#{window_id}' -n "$name" "$HC attach $t")"
+  tmux set-option -w -t "$win" @hc "$t"
+}
+
+menu() {
+  local client="${1:-}" from="${2:-}" n=0 key mark label addr agent where status
+  local -a items=() target=() place=(-x C -y C)
+  [ -n "$client" ] && target=(-c "$client")
+  # From the button: under the status line, on the right where the button
+  # is; -O keeps it open on a release without an item picked.
+  [ "$from" = mouse ] && place=(-O -x R -y S)
+  while IFS=$'\t' read -r addr agent where status; do
+    [ -n "$addr" ] || continue
+    n=$((n + 1))
+    key=""
+    [ "$n" -le 9 ] && key="$n"
+    mark="○"
+    [ -n "$(find_window "$addr")" ] && mark="●"
+    # A # in a label would be read as a tmux format
+    label="$mark $agent · $where ($status)"
+    items+=("${label//#/##}" "$key" "run-shell '$SELF toggle $addr'")
+  done < <(terminals)
+  if [ "$n" -eq 0 ]; then
+    tmux display-message "${target[@]}" "No live Herdr terminal"
+    return 0
+  fi
+  tmux display-menu "${target[@]}" -T '#[align=centre] Herdr agents (● open) ' "${place[@]}" "${items[@]}"
+}
+
+# Prints nothing for zero, so that the agents button, shown when the output
+# is not empty, hides. Never fails: tmux calls it every few seconds and would
+# show an error in place of the button.
+count() {
+  local n
+  [ -n "$HC" ] || return 0
+  n="$("$HC" ls 2>/dev/null | jq -r '.terminals | length' 2>/dev/null)" || return 0
+  [ "${n:-0}" -gt 0 ] 2>/dev/null && echo "$n"
+  return 0
+}
+
+list() {
+  local addr agent where status open
+  while IFS=$'\t' read -r addr agent where status; do
+    [ -n "$addr" ] || continue
+    open=""
+    [ -n "$(find_window "$addr")" ] && open="  [window open]"
+    printf '%-5s %-12s %s (%s)%s\n' "$addr" "$agent" "$where" "$status" "$open"
+  done < <(terminals)
+}
+
+case "${1:-}" in
+  "")
+    need_hc
+    if [ -n "${TMUX:-}" ]; then menu; else exec "$HC"; fi
+    ;;
+  menu) need_hc; menu "${2:-}" "${3:-}" ;;
+  toggle)
+    need_hc
+    [ -n "${2:-}" ] || { echo "usage: herdr toggle <terminal>" >&2; exit 2; }
+    toggle "$2"
+    ;;
+  list) need_hc; list ;;
+  count) count ;;
+  -h|--help) sed -n '2,22p' "$0" | sed 's/^# \?//' ;;
+  *) echo "unknown command: $1 (menu, toggle, list, count)" >&2; exit 2 ;;
+esac

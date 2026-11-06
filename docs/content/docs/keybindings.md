@@ -110,3 +110,24 @@ weight: 7
 | `XF86AudioNext`                    | Next track                |
 | `XF86AudioPause` / `XF86AudioPlay` | Play/pause                |
 | `XF86AudioPrev`                    | Previous track            |
+
+## tmux - Status line buttons and Herdr agents
+
+`~/.config/tmux/herdr.conf`, sourced at the end of `tmux.conf` (and appended
+to the Omarchy one by `omarchy-post-install`), puts two buttons in the status
+line, for a click or a tap (the terminal has to pass the mouse on, as Termius,
+Blink and the desktop terminals do):
+
+| Button / key        | Action                                                                 |
+| ------------------- | ---------------------------------------------------------------------- |
+| `+` (left)          | New window in the directory of the current pane                        |
+| `agents N` (right)  | Menu of the live Herdr agents, hidden when there are none              |
+| `Prefix + a`        | The same menu                                                          |
+
+The agents are the terminals of `herdr-core`, which runs the terminals of
+herdr-app (the Herdr desktop app) on this machine or on one it reaches over
+SSH. Each line of the menu opens the agent in a tmux window of its own (● when
+it has one, ○ when not); picking it again closes that window. Closing it, or
+`Ctrl + \` inside it, only detaches tmux: the agent keeps running and
+herdr-app still shows it. `~/.config/tmux/herdr list` and `toggle <t>` do the
+same from the shell.
