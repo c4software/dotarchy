@@ -9,9 +9,9 @@ hl.env("GDK_SCALE", "1")
 -- Input
 hl.config({
 	input = {
-		kb_layout = "bepoDev",
-		kb_variant = "", -- sinon hérité de vconsole.conf (bepo), inconnu de bepoDev
-		kb_options = "lv3:caps_switch", -- ,grp:alts_toggle
+		kb_layout = "bepoDev,us,fr",
+		kb_variant = ",,ergol", -- sinon hérité de vconsole.conf (bepo), inconnu de bepoDev
+		kb_options = "lv3:caps_switch,grp:alts_toggle",
 	},
 })
 
@@ -45,6 +45,25 @@ o.bind("ALT + SHIFT + DOWN", nil, hl.dsp.window.resize({ x = 0, y = 50, relative
 
 hl.unbind("ALT + SHIFT + code:13")
 o.bind("ALT + SHIFT + code:13", nil, "omarchy-menu summon capture")
+
+-- Console Quake : la stock (qconsole.lua) l'amorce avec omarchy-agent via un
+-- hook workspace.created qu'on ne peut pas désenregistrer. On intercepte donc
+-- hl.exec_cmd pour lancer tmux à la place, uniquement pour ce cas précis.
+local stock_exec_cmd = hl.exec_cmd
+hl.exec_cmd = function(cmd, opts, ...)
+	if cmd == "omarchy-agent" and opts and type(opts.workspace) == "string" and opts.workspace:find("^special:qconsole") then
+		cmd = "omarchy-launch-terminal-tmux"
+	end
+	return stock_exec_cmd(cmd, opts, ...)
+end
+
+-- Console Quake sur Super + $ (Super + ~ est peu accessible en bépo).
+o.bind("SUPER + dollar", "Toggle Quake console", hl.dsp.workspace.toggle_special("qconsole"))
+o.bind(
+	"SUPER + SHIFT + dollar",
+	"Move window to Quake console",
+	hl.dsp.window.move({ workspace = "special:qconsole", follow = false })
+)
 
 -- Redimensionner en tirant les bordures, en tiling comme en floating (comme upstream).
 hl.config({ general = { resize_on_border = true, extend_border_grab_area = 8 } })
