@@ -1071,7 +1071,7 @@ watch() {
       while IFS=$'\t' read -r addr agent where status; do
         # On the desktop too: blocked, done or failed, once per change
         if [ -z "$first" ] && [ "${was[$addr]:-}" != "$status" ]; then
-          desktop_notify "$agent" "$where" "$status" "${kind[$addr]:-}"
+          desktop_notify "$addr" "$agent" "$where" "$status" "${kind[$addr]:-}"
         fi
         was[$addr]="$status"
         [ "$status" = blocked ] || continue
@@ -1100,10 +1100,11 @@ notify() {
   done < <(tm list-clients -F '#{client_name} #{window_id}' 2>/dev/null)
 }
 
-# A desktop notification (notify-send) for agent $1 in $2, now $3: not
-# when herdr-app runs (it has its own), nor when notify-send is missing.
+# A desktop notification (notify-send) for agent $2 (terminal $1) in $3,
+# now $4: not when herdr-app runs (it has its own), nor when notify-send is
+# missing. A click on it goes to the agent (herdr focus).
 desktop_notify() {
-  local agent="$1" where="$2" status="$3" k="$4" body urgency=normal
+  local addr="$1" agent="$2" where="$3" status="$4" k="$5" body urgency=normal
   case "$status" in
     blocked) body="needs you${k:+ ($k)}"; urgency=critical ;;
     # Every answer of an agent ends in done: only when asked for
@@ -1113,7 +1114,45 @@ desktop_notify() {
   esac
   command -v notify-send >/dev/null 2>&1 || return 0
   pgrep -x herdr-app >/dev/null 2>&1 && return 0
-  notify-send -a Herdr -u "$urgency" "$agent · $where" "$body" 2>/dev/null || true
+  # In the background (notify-send waits for the click), without the lock
+  # of watch (fd 9)
+  (
+    act="$(notify-send -a Herdr -u "$urgency" -A default=Open "$agent · $where" "$body" 2>/dev/null)" || exit 0
+    [ "$act" = default ] && exec "$SELF" focus "$addr"
+  ) 9>&- </dev/null >/dev/null 2>&1 &
+  return 0
+}
+
+# Goes to agent $1 from outside tmux (a click on a notification): the tmux
+# client used last shows its window (opened when needed), and the terminal
+# window of that client comes to the front in Hyprland.
+focus() {
+  local t="$1" client cpid win pid addr
+  check_addr "$t"
+  read -r _ client cpid < <(tmux list-clients -F '#{client_activity} #{client_name} #{client_pid}' 2>/dev/null | sort -rn | head -1) || true
+  [ -n "${client:-}" ] || return 0
+  win="$(find_window "$t")"
+  if [ -z "$win" ]; then
+    open_t "$t"
+    win="$(find_window "$t")"
+  fi
+  if [ -n "$win" ]; then
+    tmux switch-client -c "$client" -t "$(tmux display -p -t "$win" '#{session_id}')" \; \
+      select-window -t "$win" \; select-pane -t "$win" 2>/dev/null || true
+  fi
+  # The terminal of the client: the first parent of it that is a Hyprland
+  # window
+  command -v hyprctl >/dev/null 2>&1 || return 0
+  pid="$cpid"
+  while [ -n "$pid" ] && [ "$pid" -gt 1 ]; do
+    addr="$(hyprctl clients -j 2>/dev/null | jq -r --argjson p "$pid" '.[] | select(.pid == $p) | .address' | head -1)"
+    if [ -n "$addr" ]; then
+      hyprctl dispatch focuswindow "address:$addr" >/dev/null 2>&1 || true
+      return 0
+    fi
+    pid="$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')"
+  done
+  return 0
 }
 
 watch_stop() {
@@ -1183,6 +1222,7 @@ case "${1:-}" in
   side-lines) side_lines ;;
   side-act) side_act "${2:-}" ;;
   side-pos) side_pos ;;
+  focus) [ -n "${2:-}" ] || { echo "usage: herdr focus <terminal>" >&2; exit 2; }; need_hc; focus "$2" ;;
   side-new) side_new ;;
   goto-pane)
     [[ "${2:-}" =~ ^%[0-9]+$ ]] || exit 2
