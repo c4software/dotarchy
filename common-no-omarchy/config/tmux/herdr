@@ -570,7 +570,9 @@ side_lines() {
       | [ (.status.state // ""),
           .address,
           (.status.app // .foreground.name // .argv[0] // "shell"),
-          ((.labels.where // "" | split(" / ") | first) // ""),
+          # The title of the conversation, or else the folder
+          (if (.title // "") != "" then .title
+           else ((.labels.where // "" | split(" / ") | first) // "") end),
           (.cwd // ""),
           (.status_ms // .created_ms // 0) ] | @tsv' 2>/dev/null \
     | while IFS=$'\t' read -r state addr app name cwd ms; do
