@@ -12,8 +12,9 @@
 #                         first line (or ctrl-n) starts a new agent
 #   herdr sidebar toggle  a pane on the right, the height of the window, that
 #                         lists the agents like the Agents panel of herdr-app
-#                         (grouped by machine, status, age); it follows the
-#                         current window. herdr sidebar: what runs in it
+#                         (grouped by machine, status, age); one per window,
+#                         made when the window is shown. herdr sidebar: what
+#                         runs in it
 #   herdr here <prog> [a] run an agent typed in a tmux pane in herdr-core,
 #                         attached to the pane (the zsh functions of fns/herdr)
 #   herdr adopt <t>       show terminal <t>, started without Herdr, in
@@ -264,6 +265,7 @@ tick() {
   [ "$what" = lines ] && extra="+refresh-preview"
   local last now fails=0
   last="$(date +%s)"
+  [ "$what" = side-lines ] && [ -n "${TMUX_PANE:-}" ] && tmux set -p -t "$TMUX_PANE" @herdr_side_port "$port"
   while sleep 2; do
     now="$(date +%s)"
     # Two seconds that lasted much longer: the machine slept. The sidebar can
@@ -275,6 +277,13 @@ tick() {
       exit 0
     fi
     last="$now"
+    if [ "$what" = side-lines ] && [ -n "${TMUX_PANE:-}" ]; then
+      # Another fzf in this pane since (it started again): this tick ends
+      [ "$(tmux show -pqv -t "$TMUX_PANE" @herdr_side_port 2>/dev/null)" = "$port" ] || exit 0
+      # A sidebar off screen does not ask herdr-core: it is refreshed when its
+      # window is shown again (herdr sidebar ensure)
+      [ "$(tmux display -p -t "$TMUX_PANE" '#{&&:#{window_active},#{session_attached}}' 2>/dev/null)" = 1 ] || continue
+    fi
     # fzf gone (its port closed): this tick ends. One slow answer is not
     # enough, after a wake-up herdr-core can take a few seconds.
     if curl -fsS -m 2 -XPOST "localhost:$port" \
@@ -681,88 +690,76 @@ side_act() {
 side_new() {
   local p dir client
   p="$(tmux display -p -t "$(tmux display -p '#{window_id}')" '#{pane_id}')"
-  [ "$p" = "$(tmux show -gqv @herdr_side_pane)" ] && p="$(tmux display -p -t '{last}' '#{pane_id}' 2>/dev/null || echo "$p")"
+  [[ "$(tmux display -p -t "$p" '#{pane_start_command}')" == *"$SELF sidebar"* ]] \
+    && p="$(tmux display -p -t '{last}' '#{pane_id}' 2>/dev/null || echo "$p")"
   dir="$(tmux display -p -t "$p" '#{pane_current_path}')"
   client="$(tmux list-clients -t "$(tmux display -p '#{session_id}')" -F '#{client_name}' | head -1)"
   tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% -d "$dir" \
     -T "#[align=centre] New agent " "$SELF new"
 }
 
-side_pane() {
-  local p
-  p="$(tmux show -gqv @herdr_side_pane)"
-  [ -n "$p" ] && tmux display -p -t "$p" '#{pane_id}' 2>/dev/null || true
-}
+# The sidebar is one pane per window, on its right, the full height: none
+# moves from a window to another. Each one is made when its window is shown
+# (hooks of herdr.conf: herdr sidebar ensure) while @herdr_side_on says that
+# it is wanted, and only the ones on screen refresh (see tick).
 
-# Sidebar panes that @herdr_side_pane does not name any more (left by an
-# older race): they go.
-side_kill_strays() {
-  local keep id
-  keep="$(side_pane)"
-  tmux list-panes -a -F '#{pane_id} #{pane_start_command}' \
+# The sidebar panes of window $1, or of every window
+side_in() {
+  local -a scope=(-a)
+  local id cmd
+  [ -n "${1:-}" ] && scope=(-t "$1")
+  tmux list-panes "${scope[@]}" -F '#{pane_id} #{pane_start_command}' 2>/dev/null \
     | while read -r id cmd; do
-        if [[ "$cmd" == *"$SELF sidebar"* ]] && [ "$id" != "$keep" ]; then
-          side_log "strays: kill $id (keep ${keep:-none})"
-          tmux kill-pane -t "$id" || true
-        fi
+        if [[ "$cmd" == *"$SELF sidebar"* ]]; then echo "$id"; fi
       done || true
-  return 0
 }
 
 # The hooks of herdr.conf run in the background and several of them come at
-# once (Ctrl+D in the last pane beside the sidebar: pane-exited, then
-# session-window-changed when the window closes). Without a lock both see no
-# sidebar and both open one. One at a time, per tmux server.
+# once (a new window: after-new-window, then session-window-changed). Without
+# a lock both see no sidebar and both make one. One at a time, per server.
 side_lock() {
   local sock="${TMUX:-}"; sock="${sock%%,*}"
   exec 8>"${XDG_RUNTIME_DIR:-/tmp}/herdr-tmux-side-$(id -u)-$(printf '%s' "$sock" | md5sum | cut -c1-8)"
   flock -w 5 8 || true
 }
 
-# prefix + a or the agents button: shows or hides it. @herdr_side_on says
-# that it is wanted, so that it comes back after it had to close.
+# prefix + a or the agents button: every sidebar shows or goes.
 side_toggle() {
-  local p
-  p="$(side_pane)"
-  if [ -n "$p" ]; then
-    tmux set -gu @herdr_side_on \; set -gu @herdr_side_pane
-    tmux kill-pane -t "$p"
-    side_kill_strays
+  local id
+  if [ -n "$(tmux show -gqv @herdr_side_on)" ]; then
+    tmux set -gu @herdr_side_on
+    for id in $(side_in); do tmux kill-pane -t "$id" 2>/dev/null || true; done
+    side_log "toggle: off"
     return 0
   fi
   tmux set -g @herdr_side_on 1
-  side_open "${1:-}"
+  side_log "toggle: on"
+  # In the window of every client, the others get theirs when shown
+  for id in $( { echo "${1:-}"; tmux list-clients -F '#{window_id}' 2>/dev/null; } | sort -u); do
+    side_ensure "$id"
+  done
 }
 
-side_open() {
-  local p
-  # Already there (a hook of the same change came first): no second one
-  [ -n "$(side_pane)" ] && return 0
-  side_kill_strays
-  p="$(tmux split-window -hf -d -l "$(side_width)" -P -F '#{pane_id}' ${1:+-t "$1"} "$SELF sidebar")"
-  tmux set -g @herdr_side_pane "$p"
-  side_log "open: $p in ${1:-current window}"
-}
-
-# Hook of herdr.conf: the sidebar goes to window $1 when it is shown (and
-# comes back there when it is wanted but had to close).
-side_follow() {
-  local p win="${1:-}" shown err
-  # The hooks run in the background and can end out of order (a quick change
-  # of session, then of window): the window to follow is the one the last
-  # active client shows now, not the one of the hook, which can be old.
-  shown="$(tmux list-clients -F '#{client_activity} #{window_id}' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2)"
-  [ -n "$shown" ] && win="$shown"
+# Hook of herdr.conf, when window $1 is shown: its sidebar, made when it has
+# none (only one: the others, left by a join-pane, go), refreshed at once
+# when it has one.
+side_ensure() {
+  local win="${1:-}" first="" id port
   [ -n "$win" ] || return 0
-  p="$(side_pane)"
-  if [ -z "$p" ]; then
-    [ -n "$(tmux show -gqv @herdr_side_on)" ] && side_open "$win"
+  [ -n "$(tmux show -gqv @herdr_side_on)" ] || return 0
+  for id in $(side_in "$win"); do
+    if [ -z "$first" ]; then first="$id"; continue; fi
+    side_log "ensure: second sidebar $id in $win goes"
+    tmux kill-pane -t "$id" 2>/dev/null || true
+  done
+  if [ -n "$first" ]; then
+    port="$(tmux show -pqv -t "$first" @herdr_side_port 2>/dev/null)"
+    [[ "$port" =~ ^[0-9]+$ ]] && { curl -fsS -m 1 -XPOST "localhost:$port" \
+      -d "reload-sync($SELF side-lines)" >/dev/null 2>&1 || true; }
     return 0
   fi
-  side_kill_strays
-  [ "$(tmux display -p -t "$p" '#{window_id}')" = "$win" ] && return 0
-  err="$(tmux join-pane -hf -d -l "$(side_width)" -s "$p" -t "$win" 2>&1)" \
-    || side_log "follow: join-pane $p -> $win (hook ${1:-}) failed: $err"
+  id="$(tmux split-window -hf -d -l "$(side_width)" -P -F '#{pane_id}' -t "$win" "$SELF sidebar" 2>&1)" \
+    && side_log "ensure: $id in $win" || side_log "ensure: no sidebar in $win: $id"
   return 0
 }
 
@@ -775,32 +772,28 @@ side_log() {
   return 0
 }
 
-# Hook of herdr.conf, when a pane ends: the sidebar alone in its window
-# closes, so that the window closes as it would without it, and the session
-# with its last window (tmux ends with its last session). It comes back in the
-# window tmux shows then, if there is one.
+# Hook of herdr.conf, when a pane ends: a window with only its sidebar left
+# closes, as it would without it (and the session with its last window).
 side_alone() {
-  local p sess win
-  p="$(side_pane)"
-  [ -n "$p" ] || return 0
-  [ "$(tmux display -p -t "$p" '#{window_panes}')" = 1 ] || return 0
-  sess="$(tmux display -p -t "$p" '#{session_id}')"
-  tmux set -gu @herdr_side_pane
-  side_log "alone: kill $p"
-  tmux kill-pane -t "$p"
-  win="$(tmux display -p -t "$sess" '#{window_id}' 2>/dev/null)" || return 0
-  [ -n "$(tmux show -gqv @herdr_side_on)" ] && side_open "$win"
+  local win
+  tmux list-panes -a -F '#{window_id} #{pane_start_command}' 2>/dev/null \
+    | awk -v side="$SELF sidebar" '{ n[$1]++; if (index($0, side)) s[$1]++ }
+        END { for (w in n) if (n[w] == s[w]) print w }' \
+    | while read -r win; do
+        side_log "alone: window $win with only its sidebar closes"
+        tmux kill-window -t "$win" 2>/dev/null || true
+      done || true
   return 0
 }
 
-# Hook of herdr.conf, after a split: when the sidebar was split (it is not the
-# full height of its window any more, or not on its right edge), the new pane
-# goes beside the pane on the left of the sidebar, the same way (-v or -h),
-# and a shell there starts again in the folder of that pane. The sidebar gets
-# its height and width back.
+# Hook of herdr.conf, after a split in window $1: when its sidebar was split
+# (it is not the full height of the window any more, or not on its right
+# edge), the new pane goes beside the pane on the left of the sidebar, the
+# same way (-v or -h), and a shell there starts again in the folder of that
+# pane. The sidebar gets its height and width back.
 side_unsplit() {
   local p win sl sw sh ww wh act n="" nl="" id l t w col target="" orient
-  p="$(side_pane)"
+  p="$(side_in "${1:-}" | head -1)"
   [ -n "$p" ] || return 0
   read -r win sl sw sh ww wh < <(tmux display -p -t "$p" \
     '#{window_id} #{pane_left} #{pane_width} #{pane_height} #{window_width} #{window_height}')
@@ -1016,9 +1009,9 @@ case "${1:-}" in
   sidebar)
     case "${2:-}" in
       toggle) side_lock; side_toggle "${3:-}" ;;
-      follow) side_lock; side_follow "${3:-}" ;;
+      ensure) side_lock; side_ensure "${3:-}" ;;
       alone) side_lock; side_alone ;;
-      unsplit) side_lock; side_unsplit ;;
+      unsplit) side_lock; side_unsplit "${3:-}" ;;
       *) sidebar ;;
     esac ;;
   side-lines) side_lines ;;
