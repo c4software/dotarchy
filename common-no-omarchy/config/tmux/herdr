@@ -884,6 +884,26 @@ side_toggle() {
   done
 }
 
+# prefix + a in window $1: hidden, the sidebars show and this one gets the
+# focus; shown, it gets the focus; already focused, they all go.
+side_key() {
+  local win="${1:-}" p
+  [ -n "$win" ] || return 0
+  if [ -n "$(tmux show -gqv @herdr_side_on)" ]; then
+    p="$(side_in "$win" | head -1)"
+    if [ -n "$p" ] && [ "$(tmux display -p -t "$win" '#{pane_id}')" = "$p" ]; then
+      side_toggle "$win"
+      return 0
+    fi
+    [ -n "$p" ] || side_ensure "$win"
+  else
+    side_toggle "$win"
+  fi
+  p="$(side_in "$win" | head -1)"
+  [ -n "$p" ] && tmux select-pane -t "$p"
+  return 0
+}
+
 # Hook of herdr.conf, when window $1 is shown: its sidebar, made when it has
 # none (only one: the others, left by a join-pane, go), refreshed at once
 # when it has one.
@@ -1275,6 +1295,7 @@ case "${1:-}" in
   sidebar)
     case "${2:-}" in
       toggle) side_lock; side_toggle "${3:-}" ;;
+      key) side_lock; side_key "${3:-}" ;;
       ensure) side_lock; side_ensure "${3:-}" ;;
       alone) side_lock; side_alone ;;
       unsplit) side_lock; side_unsplit "${3:-}" ;;
