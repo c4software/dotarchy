@@ -35,13 +35,49 @@ o.bind("ALT + UP", "Full width", "omarchy-expand-full-width")
 o.bind("ALT + DOWN", "Full width", "omarchy-expand-full-width")
 o.window({ fullscreen = 1 }, { border_color = "rgb(FF0000) rgb(880808)" })
 
-o.bind("ALT + LEFT", "Previous workspace", hl.dsp.focus({ workspace = "e-1" }))
-o.bind("ALT + RIGHT", "Next workspace", hl.dsp.focus({ workspace = "e+1" }))
+-- Bureau précédent/suivant parmi les 10 de l'écran actif (vides compris),
+-- avec bouclage 10 → 1. Passe par o.workspaces pour respecter les blocs par écran.
+local function relative_slot(delta)
+	local ws = hl.get_active_workspace()
+	if not ws or ws.special or ws.id <= 0 then
+		return nil
+	end
+	local slots = o.workspaces.slots
+	return ((ws.id - 1) % slots + delta) % slots + 1
+end
+
+-- Actions pré-construites une fois (o.workspaces enregistre chaque action créée).
+local focus_slot, move_slot = {}, {}
+for slot = 1, o.workspaces.slots do
+	focus_slot[slot] = o.workspaces.focus(slot)
+	move_slot[slot] = o.workspaces.move_window(slot)
+end
+
+local function focus_relative(delta)
+	return function()
+		local slot = relative_slot(delta)
+		if slot then
+			focus_slot[slot]()
+		end
+	end
+end
+
+local function move_relative(delta)
+	return function()
+		local slot = relative_slot(delta)
+		if slot then
+			move_slot[slot]()
+		end
+	end
+end
+
+o.bind("ALT + LEFT", "Previous workspace", focus_relative(-1))
+o.bind("ALT + RIGHT", "Next workspace", focus_relative(1))
 -- Remplace les stock « Move window to group on left/right ».
 hl.unbind("SUPER + ALT + LEFT")
 hl.unbind("SUPER + ALT + RIGHT")
-o.bind("SUPER + ALT + LEFT", "Move window to previous workspace", hl.dsp.window.move({ workspace = "e-1", follow = true }))
-o.bind("SUPER + ALT + RIGHT", "Move window to next workspace", hl.dsp.window.move({ workspace = "e+1", follow = true }))
+o.bind("SUPER + ALT + LEFT", "Move window to previous workspace", move_relative(-1))
+o.bind("SUPER + ALT + RIGHT", "Move window to next workspace", move_relative(1))
 
 o.bind("ALT + SHIFT + RIGHT", nil, hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
 o.bind("ALT + SHIFT + LEFT", nil, hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true })
