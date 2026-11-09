@@ -793,6 +793,50 @@ side_alone() {
   return 0
 }
 
+# Hook of herdr.conf, after a split: when the sidebar was split (it is not the
+# full height of its window any more, or not on its right edge), the new pane
+# goes beside the pane on the left of the sidebar, the same way (-v or -h),
+# and a shell there starts again in the folder of that pane. The sidebar gets
+# its height and width back.
+side_unsplit() {
+  local p win sl sw sh ww wh act n="" nl="" id l t w col target="" orient
+  p="$(side_pane)"
+  [ -n "$p" ] || return 0
+  read -r win sl sw sh ww wh < <(tmux display -p -t "$p" \
+    '#{window_id} #{pane_left} #{pane_width} #{pane_height} #{window_width} #{window_height}')
+  [ "$sh" = "$wh" ] && [ $(( sl + sw )) = "$ww" ] && return 0
+  # The new pane: in the column of the sidebar (below it, or on its right),
+  # the active one when there are several
+  act="$(tmux display -p -t "$win" '#{pane_id}')"
+  while read -r id l; do
+    [ "$id" = "$p" ] && continue
+    [ "$l" -ge "$sl" ] || continue
+    if [ -z "$n" ] || [ "$id" = "$act" ]; then n="$id" nl="$l"; fi
+  done < <(tmux list-panes -t "$win" -F '#{pane_id} #{pane_left}')
+  [ -n "$n" ] || return 0
+  if [ "$nl" = "$sl" ]; then orient=-v; else orient=-h; fi
+  # The pane on the left of the column of the sidebar, the top one
+  col=$(( nl < sl ? nl : sl ))
+  while read -r id l t w; do
+    if [ "$id" != "$p" ] && [ "$id" != "$n" ] && [ $(( l + w + 1 )) = "$col" ]; then
+      target="$id"; break
+    fi
+  done < <(tmux list-panes -t "$win" -F '#{pane_id} #{pane_left} #{pane_top} #{pane_width}' | sort -k3,3n)
+  side_log "unsplit: $n out of the sidebar $p ($orient, beside ${target:-nothing})"
+  if [ -n "$target" ]; then
+    tmux join-pane "$orient" -d -s "$n" -t "$target"
+    # A shell started by the split: again, in the folder of the pane beside
+    [ -z "$(tmux display -p -t "$n" '#{pane_start_command}')" ] \
+      && tmux respawn-pane -k -t "$n" -c "$(tmux display -p -t "$target" '#{pane_current_path}')"
+  else
+    # The sidebar was alone in its window: it goes back on the right, full
+    tmux join-pane -hf -d -s "$p" -t "$n"
+  fi
+  tmux resize-pane -t "$p" -x "$(side_width)" 2>/dev/null || true
+  tmux select-pane -t "$n"
+  return 0
+}
+
 # --- Palette (Ctrl+Shift+P) -----------------------------------------------
 
 # The windows of every session, then the agents (like the sidebar), in a
@@ -974,6 +1018,7 @@ case "${1:-}" in
       toggle) side_lock; side_toggle "${3:-}" ;;
       follow) side_lock; side_follow "${3:-}" ;;
       alone) side_lock; side_alone ;;
+      unsplit) side_lock; side_unsplit ;;
       *) sidebar ;;
     esac ;;
   side-lines) side_lines ;;
