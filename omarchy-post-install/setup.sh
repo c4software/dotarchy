@@ -159,6 +159,10 @@ cp "$SCRIPT_DIR/../common-no-omarchy/config/opencode/plugins/llm-proxy.ts" ~/.co
 # Tmux Enable ZSH
 echo 'set-option -g default-shell /bin/zsh' >>~/.config/tmux/tmux.conf
 
+# Tmux : Ctrl+T sans prefix ouvre un onglet dans le dossier du panneau courant
+grep -q 'bind -n C-t new-window' ~/.config/tmux/tmux.conf \
+  || echo 'bind -n C-t new-window -c "#{pane_current_path}"' >>~/.config/tmux/tmux.conf
+
 # Tmux : boutons + et agents de la barre de statut, menu des agents Herdr
 # (herdr.conf et son script, sourcés à la fin de la config d'Omarchy)
 cp "$SCRIPT_DIR/../common-no-omarchy/config/tmux/herdr.conf" "$SCRIPT_DIR/../common-no-omarchy/config/tmux/herdr" ~/.config/tmux/
