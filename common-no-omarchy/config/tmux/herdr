@@ -262,9 +262,29 @@ tick() {
   local port="$1" what="${2:-lines}" extra=""
   [[ "$port" =~ ^[0-9]+$ ]] || exit 0
   [ "$what" = lines ] && extra="+refresh-preview"
+  local last now fails=0
+  last="$(date +%s)"
   while sleep 2; do
-    curl -fsS -m 2 -XPOST "localhost:$port" \
-      -d "reload-sync($SELF $what)$extra" >/dev/null 2>&1 || exit 0
+    now="$(date +%s)"
+    # Two seconds that lasted much longer: the machine slept. The sidebar can
+    # come back from it stuck (no answer, odd characters): it starts again,
+    # same pane, which ends this tick too (fzf starts a new one).
+    if [ "$what" = side-lines ] && [ $(( now - last )) -gt 30 ] && [ -n "${TMUX_PANE:-}" ]; then
+      side_log "tick: woke up after $(( now - last )) s, sidebar $TMUX_PANE started again"
+      tmux respawn-pane -k -t "$TMUX_PANE" "$SELF sidebar"
+      exit 0
+    fi
+    last="$now"
+    # fzf gone (its port closed): this tick ends. One slow answer is not
+    # enough, after a wake-up herdr-core can take a few seconds.
+    if curl -fsS -m 2 -XPOST "localhost:$port" \
+      -d "reload-sync($SELF $what)$extra" >/dev/null 2>&1; then
+      fails=0
+    else
+      fails=$(( fails + 1 ))
+      [ "$fails" -ge 3 ] && exit 0
+      continue
+    fi
     [ "$what" = side-lines ] && side_heal
   done
 }
@@ -626,6 +646,7 @@ side_panes() {
 
 # What runs in the sidebar pane: the list, again when fzf ends.
 sidebar() {
+  local rc
   printf '\033]2;Agents\033\\'
   while :; do
     SHELL=/bin/bash fzf --ansi --no-sort --track --id-nth=1 \
@@ -640,7 +661,8 @@ sidebar() {
       --bind "left-click:transform:$SELF side-act {1}" \
       --bind "ctrl-x:execute-silent([ {1} = new ] || [ {1} = - ] || [[ {1} == pane:* ]] || $SELF close {1})+reload-sync($SELF side-lines)" \
       --bind 'esc:ignore' \
-      < /dev/null || true
+      < /dev/null && rc=0 || rc=$?
+    side_log "sidebar ${TMUX_PANE:-}: fzf ended (rc $rc), started again"
     sleep 0.5
   done
 }
