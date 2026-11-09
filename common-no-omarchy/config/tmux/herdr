@@ -433,12 +433,50 @@ pick_folder() {
     proj_pick "$m" || rc=$?
     [ "$rc" = 2 ] || return "$rc"
   fi
-  read -r -e -i "${cur/#$home/\~}" -p "Folder${m:+ on $m}: " name || return 1
-  case "$name" in
-    "~"|"") name="$home" ;;
-    "~/"*) name="$home/${name#\~/}" ;;
-  esac
-  printf '%s\n' "$name"
+  browse_folder "$m" "$home" "$cur"
+}
+
+# The folders in folder $2, on machine $1 (here when empty): one per line,
+# hidden ones last
+list_dirs() {
+  local m="$1" d="$2" cmd
+  cmd='cd "$1" 2>/dev/null || exit 0; for f in */ .[!.]*/; do [ -d "$f" ] && printf "%s\n" "${f%/}"; done; true'
+  if [ -z "$m" ]; then
+    bash -c "$cmd" _ "$d"
+  else
+    "$HC" exec --on "$m" --timeout 5 "bash -c '$cmd' _ $(printf '%q' "$d")" 2>/dev/null || true
+  fi
+}
+
+# A folder picked by walking the tree (instead of typing it), on machine $1,
+# from $3: enter goes in, .. up, . or ctrl-o takes it, ctrl-h goes home;
+# typing filters the folders of the one shown.
+browse_folder() {
+  local m="$1" home="$2" dir="${3:-$2}" out key sel
+  while :; do
+    out="$( { printf '.\t\033[1;32m.\033[0m  use %s\n' "${dir/#$home/\~}"
+              [ "$dir" != / ] && printf '..\t\033[2m..\033[0m\n'
+              list_dirs "$m" "$dir" | while IFS= read -r f; do printf '%s\t%s/\n' "$f" "$f"; done
+            } | fzf --ansi --delimiter=$'\t' --with-nth=2 --layout=reverse --gutter=' ' \
+                  --no-sort --expect=ctrl-o,ctrl-h --no-preview \
+                  --prompt="${dir/#$home/\~}/ › " \
+                  --header="Folder${m:+ on $m} · enter: go in · . or ctrl-o: use it · ctrl-h: home · esc: cancel")" \
+      || return 1
+    key="$(head -1 <<<"$out")"
+    sel="$(sed -n 2p <<<"$out")"; sel="${sel%%$'\t'*}"
+    case "$key" in
+      ctrl-h) dir="$home"; continue ;;
+      ctrl-o)
+        case "$sel" in .|"") ;; ..) dir="$(dirname "$dir")" ;; *) dir="${dir%/}/$sel" ;; esac
+        printf '%s\n' "$dir"; return 0 ;;
+    esac
+    case "$sel" in
+      .) printf '%s\n' "$dir"; return 0 ;;
+      ..) dir="$(dirname "$dir")" ;;
+      "") ;;
+      *) dir="${dir%/}/$sel" ;;
+    esac
+  done
 }
 
 # Runs in the popup (from its first line): the tmux folder of the pane is
@@ -449,7 +487,7 @@ new_agent() {
   local key here=""
   pick="$(choices | fzf --delimiter=$'\t' --with-nth=3 --layout=reverse --gutter=' ' \
     --prompt='new agent › ' --expect=ctrl-o --no-preview \
-    --header="enter: in a project (p) · ctrl-o: in ${PWD/#$HOME/\~} · esc: cancel")" \
+    --header="enter: in a project (p) · ctrl-o: pick a folder (from ${PWD/#$HOME/\~}) · esc: cancel")" \
     || return 0
   key="$(head -1 <<<"$pick")"
   pick="$(tail -1 <<<"$pick")"
