@@ -837,6 +837,82 @@ side_unsplit() {
   return 0
 }
 
+# --- Status line (second line of the status bar) --------------------------
+
+# The icon of an agent in tmux styles (icon gives the same in ANSI)
+tmux_icon() {
+  case "$1" in
+    claude*)   printf '#[fg=colour173]✻' ;;
+    codex*)    printf '#[fg=white]◎' ;;
+    pi)        printf '#[fg=magenta]π' ;;
+    omp*)      printf '#[fg=cyan]◆' ;;
+    opencode*) printf '#[fg=yellow]⌬' ;;
+    *)         printf '#[fg=brightblack]›' ;;
+  esac
+}
+
+# The agents in one line, for status-format[1]: + (new agent), then each
+# agent, the ones that need you first; the one of window $1 (the window the
+# client shows) stands out. A click goes to it: the ranges are user|hN, N
+# the place of its address in @herdr_sl (a range name is short).
+status_line() {
+  local cur="${1:-}" here w hc i=0 line state addr app name cwd mach g sel
+  local -a map=()
+  local -A win_of=()
+  [ -n "$HC" ] || return 0
+  here="$(hostname)"
+  while read -r w hc; do
+    [ -n "$hc" ] && win_of[$hc]="$w"
+  done < <(tmux list-panes -a -F '#{window_id} #{@hc}' 2>/dev/null)
+  line="#[range=user|hnew]#[fg=green bold] + #[norange default]"
+  while IFS=$'\t' read -r _ state addr app name cwd; do
+    [ -n "$addr" ] || continue
+    [ -n "$name" ] || name="$(basename "$cwd")"
+    [[ "$addr" == */* ]] && { mach="${addr%%/*}"; [ "$mach" != "$here" ] && name="$name@$mach"; }
+    case "$state" in
+      blocked) g='#[fg=red bold]⚠' ;; error) g='#[fg=red]✗' ;;
+      done) g='#[fg=yellow]✓' ;; working) g='#[fg=blue]●' ;;
+      idle) g='#[fg=brightblack]○' ;; *) g='' ;;
+    esac
+    sel=''; [ -n "$cur" ] && [ "${win_of[$addr]:-}" = "$cur" ] && sel='#[bold underscore]'
+    map+=("$addr"); i=$(( i + 1 ))
+    line+="#[range=user|h$i] $(tmux_icon "$app") #[default]$sel${name//#/##}#[nobold nounderscore] $g #[norange default]"
+  done < <(full | jq -r '
+      select(.state == "live")
+      | [ (.status.state // ""), .address,
+          (.status.app // .foreground.name // .argv[0] // "shell"),
+          ((.labels.where // "" | split(" / ") | first) // ""),
+          (.cwd // ""), (.status_ms // .created_ms // 0) ] | @tsv' 2>/dev/null \
+    | while IFS=$'\t' read -r state addr app name cwd ms; do
+        printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(rank "$state")$(printf '%015d' $(( 999999999999999 - ms )))" \
+          "$state" "$addr" "$app" "$name" "$cwd"
+      done | sort | cut -f1-6)
+  # The agents started by hand in a tmux pane
+  while IFS=$'\t' read -r w app cwd _; do
+    [ -n "$w" ] || continue
+    sel=''; [ "$(tmux display -p -t "$w" '#{window_id}')" = "$cur" ] && sel='#[bold underscore]'
+    map+=("pane:$w"); i=$(( i + 1 ))
+    name="$(basename "$cwd")"
+    line+="#[range=user|h$i] $(tmux_icon "$app") #[default]$sel${name//#/##}#[nobold nounderscore] #[norange default]"
+  done <<<"$(tmux_agents)"
+  tmux set -g @herdr_sl "${map[*]}"
+  printf '%s\n' "$line"
+}
+
+# A click on agent N of the status line
+status_click() {
+  local id
+  [[ "${1:-}" =~ ^[0-9]+$ ]] || return 0
+  read -ra ids <<<"$(tmux show -gqv @herdr_sl)"
+  id="${ids[$(( $1 - 1 ))]:-}"
+  case "$id" in
+    "") ;;
+    pane:%*) id="${id#pane:}"
+             tmux switch-client -t "$(tmux display -p -t "$id" '#{session_id}')" \; select-window -t "$id" \; select-pane -t "$id" ;;
+    *) need_hc; open_t "$id" ;;
+  esac
+}
+
 # --- Palette (Ctrl+Shift+P) -----------------------------------------------
 
 # The windows of every session, then the agents (like the sidebar), in a
@@ -1013,6 +1089,8 @@ case "${1:-}" in
     ;;
   popup) popup ;;
   palette) palette ;;
+  status-line) status_line "${2:-}" ;;
+  status-click) status_click "${2:-}" ;;
   sidebar)
     case "${2:-}" in
       toggle) side_lock; side_toggle "${3:-}" ;;
