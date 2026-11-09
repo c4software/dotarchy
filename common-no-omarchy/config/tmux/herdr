@@ -489,17 +489,23 @@ browse_folder() {
 
 # Runs in the popup (from its first line): the tmux folder of the pane is
 # the working directory there (display-popup -d).
+# $1: project (the picker of p), folder (walk the tree from the current
+# one), or nothing: enter for a project, ctrl-o for a folder.
 new_agent() {
-  local pick m a dir out addr err home
+  local mode="${1:-}" pick m a dir out addr err home hdr
   local -a cmd=()
   local key here=""
+  case "$mode" in
+    project) hdr="enter: then the project (p) · esc: cancel" ;;
+    folder) hdr="enter: then the folder (from ${PWD/#$HOME/\~}) · esc: cancel" ;;
+    *) hdr="enter: in a project (p) · ctrl-o: pick a folder (from ${PWD/#$HOME/\~}) · esc: cancel" ;;
+  esac
   pick="$(choices | fzf --delimiter=$'\t' --with-nth=3 --layout=reverse --gutter=' ' \
-    --prompt='new agent › ' --expect=ctrl-o --no-preview \
-    --header="enter: in a project (p) · ctrl-o: pick a folder (from ${PWD/#$HOME/\~}) · esc: cancel")" \
+    --prompt="new ${mode:+$mode }agent › " --expect=ctrl-o --no-preview --header="$hdr")" \
     || return 0
   key="$(head -1 <<<"$pick")"
   pick="$(tail -1 <<<"$pick")"
-  [ "$key" = ctrl-o ] && here=1
+  { [ "$key" = ctrl-o ] || [ "$mode" = folder ]; } && here=1
   IFS=$'\t' read -r m a _ <<<"$pick"
   [ "$m" = . ] && m=""
   # ~ is the home of the machine that runs it
@@ -665,7 +671,8 @@ side_lines() {
   [ -n "${st[idle]:-}" ] && hdr+=" \033[2m○${st[idle]}\033[0m"
   [ -n "$hc_ok" ] || hdr+=" \033[2;31mherdr-core not answering\033[0m"
   printf -- '-\t%b\n' "$hdr"
-  printf 'new\t \033[1;32m+\033[0m New agent\n'
+  printf 'new-proj\t \033[1;32m+\033[0m New project agent\n'
+  printf 'new-dir\t \033[1;32m+\033[0m New folder agent\n'
   [ -n "$rows$panes" ] || { printf -- '-\t\n-\t\033[2m No agent\033[0m\n'; return 0; }
   side_panes "$panes" "$cols"
   [ -n "$rows" ] || return 0
@@ -771,7 +778,7 @@ sidebar() {
       --bind "enter:transform:$SELF side-act {1}" \
       --bind "double-click:transform:$SELF side-act {1}" \
       --bind "left-click:transform:$SELF side-act {1}" \
-      --bind "ctrl-x:execute-silent([ {1} = new ] || [ {1} = - ] || [[ {1} == pane:* ]] || $SELF close {1})+reload-sync($SELF side-lines)" \
+      --bind "ctrl-x:execute-silent([[ {1} == new* ]] || [ {1} = - ] || [[ {1} == pane:* ]] || $SELF close {1})+reload-sync($SELF side-lines)" \
       --bind 'esc:execute-silent(tmux select-pane -l)' \
       < /dev/null && rc=0 || rc=$?
     side_log "sidebar ${TMUX_PANE:-}: fzf ended (rc $rc), started again"
@@ -812,7 +819,8 @@ side_act() {
     -) echo ignore ;;
     # In the background: the popup stays open while the agent is chosen, the
     # sidebar must not wait for it
-    new) echo "execute-silent($SELF side-new $c >/dev/null 2>&1 </dev/null &)" ;;
+    new-proj) echo "execute-silent($SELF side-new project $c >/dev/null 2>&1 </dev/null &)" ;;
+    new-dir) echo "execute-silent($SELF side-new folder $c >/dev/null 2>&1 </dev/null &)" ;;
     pane:%*) echo "execute-silent(HERDR_CLIENT=$c $SELF goto-pane ${1#pane:})" ;;
     *) echo "execute-silent(HERDR_CLIENT=$c $SELF open $1)+reload-sync($SELF side-lines)" ;;
   esac
@@ -830,15 +838,16 @@ side_client() {
 # The new agent window, from the sidebar: in the folder of the pane beside.
 # The popup of a new agent, on client $1 (see side_client), in the folder of
 # the pane beside the sidebar (the one active before it)
+# $1: project or folder (see new_agent)
 side_new() {
-  local client="${1:-}" win p dir
+  local mode="${1:-}" client="${2:-}" win p dir
   win="$(tmux display -p -t "${TMUX_PANE:-}" '#{window_id}')"
   p="$(tmux list-panes -t "$win" -F '#{pane_last} #{pane_id} #{pane_start_command}' \
     | grep -v -- "$SELF sidebar" | sort -rn | head -1 | cut -d' ' -f2)" || true
   dir="$(tmux display -p -t "${p:-$win}" '#{pane_current_path}')"
   [ -n "$client" ] || client="$(side_client)"
   tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% -d "$dir" \
-    -T "#[align=centre] New agent " "$SELF new"
+    -T "#[align=centre] New ${mode:+$mode }agent " "$SELF new $mode"
 }
 
 # The sidebar is one pane per window, on its right, the full height: none
@@ -1109,7 +1118,8 @@ palette() {
             tmux switch-client -t "$(tmux display -p -t "$id" '#{session_id}')" \; select-window -t "$id" ;;
     pane:%*) id="${id#pane:}"
              tmux switch-client -t "$(tmux display -p -t "$id" '#{session_id}')" \; select-window -t "$id" \; select-pane -t "$id" ;;
-    new) need_hc; new_agent ;;
+    new-proj) need_hc; new_agent project ;;
+    new-dir) need_hc; new_agent folder ;;
     -|"") ;;
     *) open_t "$id" ;;
   esac
@@ -1307,7 +1317,7 @@ case "${1:-}" in
   side-act) side_act "${2:-}" ;;
   side-pos) side_pos ;;
   focus) [ -n "${2:-}" ] || { echo "usage: herdr focus <terminal>" >&2; exit 2; }; need_hc; focus "$2" ;;
-  side-new) side_new "${2:-}" ;;
+  side-new) side_new "${2:-}" "${3:-}" ;;
   goto-pane)
     [[ "${2:-}" =~ ^%[0-9]+$ ]] || exit 2
     tmux switch-client ${HERDR_CLIENT:+-c "$HERDR_CLIENT"} -t "$(tmux display -p -t "$2" '#{session_id}')" \; select-window -t "$2" \; select-pane -t "$2"
@@ -1315,7 +1325,7 @@ case "${1:-}" in
   app-names) shift; app_names "$@" ;;
   here) shift; [ $# -gt 0 ] || { echo "usage: herdr here <program> [args]" >&2; exit 2; }; here "$@" ;;
   adopt) need_hc; [ -n "${2:-}" ] || { echo "usage: herdr adopt <terminal>" >&2; exit 2; }; adopt "$2" ;;
-  new) need_hc; new_agent ;;
+  new) need_hc; new_agent "${2:-}" ;;
   has) has ;;
   lines) lines ;;
   tick) tick "${2:-}" "${3:-}" ;;
