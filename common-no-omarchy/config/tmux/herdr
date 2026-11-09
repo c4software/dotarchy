@@ -448,27 +448,69 @@ pick_folder() {
 # hidden ones last
 list_dirs() {
   local m="$1" d="$2" cmd
-  cmd='cd "$1" 2>/dev/null || exit 0; for f in */ .[!.]*/; do [ -d "$f" ] && printf "%s\n" "${f%/}"; done; true'
+  # name, then the branch when it is a git repository (git when detached)
+  cmd='cd "$1" 2>/dev/null || exit 0
+for f in */ .[!.]*/; do
+  [ -d "$f" ] || continue
+  b=""
+  if [ -f "$f.git/HEAD" ]; then
+    read -r h < "$f.git/HEAD"; b="${h#ref: refs/heads/}"; [ "$b" = "$h" ] && b=git
+  elif [ -e "$f.git" ]; then b=git; fi
+  printf "%s\t%s\n" "${f%/}" "$b"
+done; true'
   if [ -z "$m" ]; then
     bash -c "$cmd" _ "$d"
   else
-    "$HC" exec --on "$m" --timeout 5 "bash -c '$cmd' _ $(printf '%q' "$d")" 2>/dev/null || true
+    "$HC" exec --on "$m" --timeout 5 "bash -c $(printf '%q' "$cmd") _ $(printf '%q' "$d")" 2>/dev/null || true
+  fi
+}
+
+# The preview of the folder browser: what folder $3 of $2 (on machine $1)
+# holds, its git state first when it is a repository
+dir_preview() {
+  local m="$1" base="$2" name="$3" path cmd
+  case "$name" in
+    .) path="$base" ;; ..) path="$(dirname "$base")" ;; *) path="${base%/}/$name" ;;
+  esac
+  cmd='cd "$1" 2>/dev/null || { echo "(not readable)"; exit 0; }
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  b="$(git branch --show-current 2>/dev/null)"; n="$(git status --porcelain 2>/dev/null | wc -l)"
+  printf "\033[33m %s\033[0m" "${b:-detached}"
+  [ "$n" -gt 0 ] && printf "  \033[31m%s changed\033[0m" "$n" || printf "  \033[32mclean\033[0m"
+  printf "\n\033[2m%s\033[0m\n\n" "$(git log -1 --format="%h %s (%cr)" 2>/dev/null)"
+fi
+ls -A --group-directories-first --color=always -1 . 2>/dev/null'
+  if [ -z "$m" ]; then
+    bash -c "$cmd" _ "$path"
+  else
+    "$HC" exec --on "$m" --timeout 5 "bash -c $(printf '%q' "$cmd") _ $(printf '%q' "$path")" 2>/dev/null || true
   fi
 }
 
 # A folder picked by walking the tree (instead of typing it), on machine $1,
 # from $3: enter goes in, .. up, . or ctrl-o takes it, ctrl-h goes home;
-# typing filters the folders of the one shown.
+# typing filters the folders of the one shown. Git repositories show their
+# branch, hidden folders are dim, the right side shows what the folder holds.
 browse_folder() {
-  local m="$1" home="$2" dir="${3:-$2}" out key sel
+  local m="$1" home="$2" dir="${3:-$2}" out key sel f b
   while :; do
-    out="$( { printf '.\t\033[1;32m.\033[0m  use %s\n' "${dir/#$home/\~}"
-              [ "$dir" != / ] && printf '..\t\033[2m..\033[0m\n'
-              list_dirs "$m" "$dir" | while IFS= read -r f; do printf '%s\t%s/\n' "$f" "$f"; done
+    out="$( { printf '.\t \033[1;32m✓ use %s\033[0m\n' "${dir/#$home/\~}"
+              [ "$dir" != / ] && printf '..\t \033[2m↑ ..\033[0m\n'
+              list_dirs "$m" "$dir" | while IFS=$'\t' read -r f b; do
+                if [ -n "$b" ]; then
+                  printf '%s\t \033[33m\033[0m %s/ \033[2;33m %s\033[0m\n' "$f" "$f" "$b"
+                elif [[ "$f" == .* ]]; then
+                  printf '%s\t \033[2m %s/\033[0m\n' "$f" "$f"
+                else
+                  printf '%s\t \033[34m\033[0m %s/\n' "$f" "$f"
+                fi
+              done
             } | fzf --ansi --delimiter=$'\t' --with-nth=2 --layout=reverse --gutter=' ' \
-                  --no-sort --expect=ctrl-o,ctrl-h --no-preview \
+                  --no-sort --expect=ctrl-o,ctrl-h --info=inline-right \
+                  --preview "$SELF dir-preview $(printf '%q' "$m") $(printf '%q' "$dir") {1}" \
+                  --preview-window='right,50%,border-left' \
                   --prompt="${dir/#$home/\~}/ › " \
-                  --header="Folder${m:+ on $m} · enter: go in · . or ctrl-o: use it · ctrl-h: home · esc: cancel")" \
+                  --header=$'\033[2menter\033[0m go in · \033[2m. or ctrl-o\033[0m use it · \033[2mctrl-h\033[0m home · \033[2mesc\033[0m cancel'"${m:+ · on $m}")" \
       || return 1
     key="$(head -1 <<<"$out")"
     sel="$(sed -n 2p <<<"$out")"; sel="${sel%%$'\t'*}"
@@ -1316,6 +1358,7 @@ case "${1:-}" in
   side-lines) side_lines ;;
   side-act) side_act "${2:-}" ;;
   side-pos) side_pos ;;
+  dir-preview) dir_preview "${2:-}" "${3:-}" "${4:-.}" ;;
   focus) [ -n "${2:-}" ] || { echo "usage: herdr focus <terminal>" >&2; exit 2; }; need_hc; focus "$2" ;;
   side-new) side_new "${2:-}" "${3:-}" ;;
   goto-pane)
