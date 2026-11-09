@@ -37,6 +37,11 @@ o.window({ fullscreen = 1 }, { border_color = "rgb(FF0000) rgb(880808)" })
 
 o.bind("ALT + LEFT", "Previous workspace", hl.dsp.focus({ workspace = "e-1" }))
 o.bind("ALT + RIGHT", "Next workspace", hl.dsp.focus({ workspace = "e+1" }))
+-- Remplace les stock « Move window to group on left/right ».
+hl.unbind("SUPER + ALT + LEFT")
+hl.unbind("SUPER + ALT + RIGHT")
+o.bind("SUPER + ALT + LEFT", "Move window to previous workspace", hl.dsp.window.move({ workspace = "e-1", follow = true }))
+o.bind("SUPER + ALT + RIGHT", "Move window to next workspace", hl.dsp.window.move({ workspace = "e+1", follow = true }))
 
 o.bind("ALT + SHIFT + RIGHT", nil, hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
 o.bind("ALT + SHIFT + LEFT", nil, hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true })

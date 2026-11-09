@@ -6,15 +6,41 @@
 # included. Used by herdr.conf, next to this file.
 #
 #   herdr                 in tmux: the menu; outside: the picker of herdr-core
+#   herdr popup           the agents in a floating window (tmux display-popup,
+#                         fzf): the ones that need you first, the screen of the
+#                         selected one beside; refreshed every 2 seconds. Its
+#                         first line (or ctrl-n) starts a new agent
+#   herdr sidebar toggle  a pane on the right, the height of the window, that
+#                         lists the agents like the Agents panel of herdr-app
+#                         (grouped by machine, status, age); it follows the
+#                         current window. herdr sidebar: what runs in it
+#   herdr here <prog> [a] run an agent typed in a tmux pane in herdr-core,
+#                         attached to the pane (the zsh functions of fns/herdr)
+#   herdr adopt <t>       show terminal <t>, started without Herdr, in
+#                         herdr-app too (a space for its folder, a tab)
+#   herdr new             start an agent: which one and on which machine (this
+#                         one or one of herdr-core), its folder (with the
+#                         project picker of p there, or ctrl-o: the current
+#                         one), then start it and open it in a tmux window. herdr-app shows it
+#                         too: a space for its folder, a tab for it. The agents offered are
+#                         the ones installed among HERDR_AGENTS (the tmux
+#                         option @herdr_agents): claude codex pi omp opencode
+#   herdr watch [socket]  follows herdr-core and, when an agent asks for an
+#                         action (status blocked), shows a message on every
+#                         tmux client and the count in @herdr_blocked (the ⚠
+#                         of the agents button); one per tmux server, started
+#                         by herdr.conf. watch restart: after an update
 #   herdr menu [client]   the tmux menu of the agents, one line each: picking a
 #                         line opens the agent in a window of its own, picking
 #                         it again closes that window
 #   herdr prepare [mouse] the same menu as a tmux command, in the option
-#                         @herdr_menu, for herdr.conf (prefix + a, the agents
-#                         button); with mouse, it opens under the status line
+#                         @herdr_menu, for herdr.conf (prefix + Alt+a, formerly the
+#                         agents button); with mouse, it opens under the status line
 #                         on the right, where the button is
 #   herdr toggle <t>      open or close the window of terminal <t> (t7)
+#   herdr open|close <t>  open (or go to) the window of terminal <t>, close it
 #   herdr list            the live terminals, and whether a window is open
+#   herdr has             1 when herdr-core is here (the agents button shows)
 #   herdr count           the number of live terminals, nothing when there are
 #                         none or herdr-core is missing (the agents button)
 #
@@ -49,29 +75,69 @@ need_hc() {
 # Live terminals of herdr-core, one per line: address, agent, where, status.
 terminals() {
   "$HC" ls | jq -r '.terminals[]
-    | [.address, (.agent // "shell"), (.where // .cwd // ""), (.status // .state // "")]
+    | [.address, (.agent // "shell"), (.where // .cwd // ""), (.status // "")]
     | @tsv'
 }
 
-# The tmux window that shows terminal $1, tagged with the window option @hc.
+# Every terminal with all its fields (status_ms, labels...), one JSON per
+# line: hc ls prints a summary only.
+full() {
+  printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"hello","params":{}}' \
+    '{"jsonrpc":"2.0","id":2,"method":"terminal.list","params":{}}' \
+    | timeout 5 "$HC" connect 2>/dev/null \
+    | jq -c 'select(.id == 2) | .result.terminals[]'
+}
+
+# The tmux pane that shows terminal $1, tagged with the option @hc: of its
+# window (opened by herdr open) or of the pane itself (herdr here).
 find_window() {
-  tmux list-windows -a -F '#{window_id} #{@hc}' 2>/dev/null \
+  tmux list-panes -a -F '#{pane_id} #{@hc}' 2>/dev/null \
     | awk -v t="$1" '$2 == t { print $1; exit }' || true
 }
 
-toggle() {
+check_addr() {
+  [[ "$1" =~ ^[A-Za-z0-9_/-]+$ ]] || { echo "not a terminal address: $1" >&2; exit 2; }
+}
+
+# Opens the window of terminal $1, or goes to it when it is open already.
+open_t() {
   local t="$1" name win
-  [[ "$t" =~ ^[A-Za-z0-9_/-]+$ ]] || { echo "not a terminal address: $t" >&2; exit 2; }
+  check_addr "$t"
   win="$(find_window "$t")"
   if [ -n "$win" ]; then
-    tmux kill-window -t "$win"
+    tmux switch-client -t "$(tmux display-message -p -t "$win" '#{session_id}')" \; select-window -t "$win" \; select-pane -t "$win"
     return 0
   fi
-  name="$("$HC" ls | jq -r --arg t "$t" '.terminals[] | select(.address == $t) | (.agent // "shell")')"
+  # Named like the sidebar shows it: agent·space, @machine when not here
+  # (claude·llm-proxy@dev-box)
+  name="$(full | jq -r --arg t "$t" 'select(.address == $t and .state == "live")
+    | [ (.status.app // .foreground.name // .argv[0] // "shell" | sub("-code$"; "")),
+        ((.labels.where // "" | split(" / ") | first) // ""),
+        (.cwd // "") ] | @tsv' | head -1)"
   [ -n "$name" ] || { tmux display-message "No live Herdr terminal $t"; exit 0; }
-  name="$(printf '%s-%s' "$name" "$t" | tr -c 'A-Za-z0-9._-' '-')"
+  local app space cwd
+  IFS=$'\t' read -r app space cwd <<<"$name"
+  [ -n "$space" ] || space="$(basename "${cwd:-?}")"
+  name="$app·$space"
+  [[ "$t" == */* ]] && name="$name@${t%%/*}"
+  name="${name//#/##}"
   win="$(tmux new-window -P -F '#{window_id}' -n "$name" "$HC attach $t")"
   tmux set-option -w -t "$win" @hc "$t"
+}
+
+# Only a window opened by herdr open: a pane of herdr here is yours.
+close_t() {
+  local win
+  check_addr "$1"
+  win="$(find_window "$1")"
+  [ -n "$win" ] || return 0
+  [ -n "$(tmux show -pqv -t "$win" @hc)" ] && return 0
+  tmux kill-window -t "$win"
+}
+
+toggle() {
+  check_addr "$1"
+  if [ -n "$(find_window "$1")" ]; then close_t "$1"; else open_t "$1"; fi
 }
 
 # The lines of the menu, three words each (label, key, command), in ITEMS.
@@ -89,6 +155,7 @@ build_items() {
     [ -n "$(find_window "$addr")" ] && mark="●"
     # A # in a label would be read as a tmux format
     label="$mark $agent · $where ($status)"
+    [ "$status" = blocked ] && label="$mark ⚠ $agent · $where (needs you)"
     ITEMS+=("${label//#/##}" "$key" "run-shell '$SELF toggle $addr'")
   done < <(terminals)
   [ "$n" -gt 0 ]
@@ -135,6 +202,608 @@ prepare() {
   tmux set -g @herdr_menu "$cmd"
 }
 
+# --- Floating window ------------------------------------------------------
+
+# Rank of a status: the agents that need you first.
+rank() {
+  case "$1" in
+    blocked) echo 0 ;; error) echo 1 ;; done) echo 2 ;; working) echo 3 ;;
+    idle) echo 4 ;; *) echo 5 ;;
+  esac
+}
+
+# The lines of the popup: address, tab, then what fzf shows (in colour).
+lines() {
+  local addr agent where status mark word colour
+  [ -n "$HC" ] || return 0
+  printf 'new\t\033[1;32m+ new agent\033[0m\n'
+  while IFS=$'\t' read -r addr agent where status; do
+    [ -n "$addr" ] || continue
+    mark="○"
+    [ -n "$(find_window "$addr")" ] && mark="●"
+    case "$status" in
+      blocked) colour='1;31' word='⚠ needs you' ;;
+      error)   colour='31'   word='✗ error' ;;
+      done)    colour='33'   word='✓ done' ;;
+      working) colour='34'   word='… working' ;;
+      idle)    colour='2'    word='idle' ;;
+      *)       colour='2'    word='shell' ;;
+    esac
+    printf '%s\t%s\t%s \033[%sm%-12s\033[0m %-12s %s\n' \
+      "$(rank "$status")" "$addr" "$mark" "$colour" "$word" "$agent" "$where"
+  done < <(terminals 2>/dev/null) | sort -t $'\t' -k1,1n -s | cut -f2-
+  return 0
+}
+
+# Runs inside the popup (herdr.conf opens it with display-popup -E).
+popup() {
+  if [ -z "$HC" ]; then
+    echo "herdr-core not available: herdr-app installs it on the machines it uses"
+    read -rsn1 -t 5 || true
+    return 0
+  fi
+  SHELL=/bin/bash exec fzf --ansi --no-sort --track --id-nth=1 \
+    --delimiter=$'\t' --with-nth=2 --listen \
+    --layout=reverse --border=none --info=inline-right --prompt='agent › ' \
+    --header='enter: open · ctrl-n: new agent · ctrl-x: close its window · ctrl-r: refresh · esc' \
+    --preview="[ {1} = new ] && echo 'Start an agent here or on another machine.' || $HC read {1} 2>/dev/null | tail -n \$FZF_PREVIEW_LINES" \
+    --preview-window='right,60%,border-left,<110(down,55%,border-top)' \
+    --bind "start:reload-sync($SELF lines)+execute-silent($SELF tick \$FZF_PORT lines </dev/null >/dev/null 2>&1 &)" \
+    --bind "ctrl-r:reload-sync($SELF lines)+refresh-preview" \
+    --bind "enter:transform:[ {1} = new ] && echo 'become($SELF new)' || echo 'execute-silent($SELF open {1})+abort'" \
+    --bind "ctrl-n:become($SELF new)" \
+    --bind "ctrl-x:execute-silent([ {1} = new ] || $SELF close {1})+reload-sync($SELF lines)" \
+    < /dev/null
+}
+
+# Refreshes a list every 2 seconds through the fzf API, until fzf ends:
+# $2 is the command of this script that prints it (lines, side-lines).
+tick() {
+  local port="$1" what="${2:-lines}" extra=""
+  [[ "$port" =~ ^[0-9]+$ ]] || exit 0
+  [ "$what" = lines ] && extra="+refresh-preview"
+  while sleep 2; do
+    curl -fsS -m 2 -XPOST "localhost:$port" \
+      -d "reload-sync($SELF $what)$extra" >/dev/null 2>&1 || exit 0
+    [ "$what" = side-lines ] && side_heal
+  done
+}
+
+# --- New agent ------------------------------------------------------------
+
+AGENTS="${HERDR_AGENTS:-$(tmux show -gqv @herdr_agents 2>/dev/null || true)}"
+AGENTS="${AGENTS:-claude codex pi omp opencode}"
+
+# The agents to offer, one per line: machine (. here: read with a tab as
+# separator skips an empty first field), agent, label.
+choices() {
+  local a m found
+  for a in $AGENTS; do
+    command -v "$a" >/dev/null 2>&1 && printf '.\t%s\t%-10s here (%s)\n' "$a" "$a" "$(hostname)"
+  done
+  printf '.\tshell\t%-10s here (%s)\n' shell "$(hostname)"
+  while read -r m; do
+    [ -n "$m" ] || continue
+    found="$("$HC" exec --on "$m" --timeout 5 \
+      "for a in $AGENTS; do command -v \$a >/dev/null 2>&1 && echo \$a; done" 2>/dev/null)" || continue
+    for a in $found; do printf '%s\t%s\t%-10s on %s\n' "$m" "$a" "$a" "$m"; done
+    printf '%s\tshell\t%-10s on %s\n' "$m" shell "$m"
+  done < <("$HC" machine ls 2>/dev/null | jq -r '.machines[] | select(.state == "connected") | .name')
+}
+
+# The herdr-app labels of a new terminal on machine $1 ("" here) in folder
+# $2, in SPACE, TAB and SPACE_NEW (1 when herdr-app has no space for it yet,
+# to name it). The space is the one herdr-app already has for that folder,
+# else one of our own with an id made from the machine and the folder, so
+# that the next agents there join it. Ids are local to the machine.
+APP_JSON=""
+app_labels() {
+  local m="$1" dir="$2" own found
+  own="sp$(printf '%s' "$m:$dir" | md5sum | cut -c1-32)"
+  TAB="tb$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+  SPACE="$own" SPACE_NEW=1
+  command -v herdr-app >/dev/null 2>&1 || return 0
+  APP_JSON="$(timeout 3 herdr-app ls 2>/dev/null)" || { APP_JSON=""; return 0; }
+  found="$(jq -r --arg m "$m" --arg d "$dir" --arg b "$(basename "$dir")" --arg own "$own" '
+    [.spaces[] | select((.machine // "") == $m)] as $s
+    | (first($s[] | select((.id | split("/") | last) == $own))
+       // first($s[] | select(.folder == $d and $d != ""))
+       // first($s[] | select(.name == $b))
+       // {}) | .id // empty' <<<"$APP_JSON" 2>/dev/null || true)"
+  if [ -n "$found" ]; then SPACE="${found##*/}"; SPACE_NEW=""; fi
+}
+
+# Names the tab (the agent) and a new space (its folder) in herdr-app, when
+# it runs here. It sees the terminal within a second or so.
+app_names() {
+  local m="$1" dir="$2" a="$3" TAB="$4" SPACE="$5" SPACE_NEW="${6:-}" pre="" i name
+  [ -n "$m" ] && pre="$m/"
+  name="$(basename "$dir")"
+  [ "$dir" = "$HOME" ] && name="~"
+  for i in 1 2 3 4 5 6; do
+    herdr-app do tab.rename --id "$pre$TAB" --name "$a" >/dev/null 2>&1 && break
+    sleep 0.5
+  done
+  [ -z "$SPACE_NEW" ] || herdr-app do space.rename --id "$pre$SPACE" --name "$name" >/dev/null 2>&1 || true
+}
+
+# Starts argv ($4...) on machine $1 in folder $2 with the herdr-app labels,
+# its name in herdr-app $3. Prints what hc run printed (JSON).
+start() {
+  local m="$1" dir="$2" a="$3" out
+  shift 3
+  local -a on=()
+  [ -n "$m" ] && on=(--on "$m")
+  app_labels "$m" "$dir"
+  out="$("$HC" run --bg --json --keep "${on[@]}" --cwd "$dir" \
+    --label "herdr.space=$SPACE" --label "herdr.tab=$TAB" \
+    --label "where=$( [ "$dir" = "$HOME" ] && echo '~' || basename "$dir") / $a" \
+    ${1:+-- "$@"} 2>&1)" || true
+  # A herdr-core updated while it ran keeps its old holder and starts
+  # nothing ("holder build ... differs"): a restart fixes it, done here
+  # when that core runs no terminal
+  if [ -z "$m" ] && grep -q 'differs from core build' <<<"$out" \
+      && [ "$("$HC" server status 2>/dev/null | jq -r '.live // 1')" = 0 ]; then
+    # Without the variables of an agent that would run this: the terminals
+    # of the core inherit its environment (a claude started there would take
+    # itself for a sub-session of that agent)
+    env $(env | sed -n 's/^\(CLAUDE[A-Z_]*\|CLAUDECODE\|AI_AGENT[A-Z_]*\)=.*/-u \1/p') \
+      "$HC" server restart >/dev/null 2>&1 || true
+    sleep 1
+    out="$("$HC" run --bg --json --keep --cwd "$dir" \
+      --label "herdr.space=$SPACE" --label "herdr.tab=$TAB" \
+      --label "where=$(basename "$dir") / $a" ${1:+-- "$@"} 2>&1)" || true
+  fi
+  printf '%s\n' "$out"
+  # In its own session: the popup that started it may close first
+  if [ -n "$APP_JSON" ] && jq -e '.address' <<<"$out" >/dev/null 2>&1; then
+    setsid -f "$SELF" app-names "$m" "$dir" "$a" "$TAB" "$SPACE" "$SPACE_NEW" </dev/null >/dev/null 2>&1
+  fi
+  return 0
+}
+
+# The project picker of p (~/.local/bin/proj, the script behind the alias
+# p -> proj) on machine $1, its own UI: it prints the folder picked (enter)
+# or made (ctrl-n, a git URL typed clones). Here it runs in this terminal;
+# on another machine in a terminal of herdr-core there, attached here for
+# the time of the pick, its answer kept in a file (ssh -t does not do: a box
+# reached through a container has no /dev/tty for it). Returns 1 when
+# nothing is picked, 2 when p is not there.
+proj_pick() {
+  local m="$1" t f out
+  if [ -z "$m" ]; then
+    [ -x "$HOME/.local/bin/proj" ] || return 2
+    out="$(bash "$HOME/.local/bin/proj")" || return 1
+  else
+    "$HC" exec --on "$m" '[ -x ~/.local/bin/proj ]' >/dev/null 2>&1 || return 2
+    f="/tmp/herdr-proj-$$-$RANDOM"
+    t="$("$HC" run --bg --json --rm --no-parent --on "$m" \
+      -- bash -c "bash ~/.local/bin/proj > $f" 2>/dev/null | jq -r '.address // empty')"
+    [ -n "$t" ] || return 2
+    "$HC" attach "$t" </dev/tty >/dev/tty 2>&1 || true
+    out="$("$HC" exec --on "$m" "cat $f 2>/dev/null; rm -f $f" 2>/dev/null)" || true
+  fi
+  out="$(printf '%s\n' "$out" | tail -1)"
+  [ -n "$out" ] || return 1
+  printf '%s\n' "$out"
+}
+
+# The folder of the new agent on machine $1 (home $2): the one of p, or $3
+# (the current one) when the agent was picked with ctrl-o or p is not
+# there, to change by hand then. Prints it.
+pick_folder() {
+  local m="$1" home="$2" cur="$3" here="$4" name rc=0
+  if [ -z "$here" ]; then
+    proj_pick "$m" || rc=$?
+    [ "$rc" = 2 ] || return "$rc"
+  fi
+  read -r -e -i "${cur/#$home/\~}" -p "Folder${m:+ on $m}: " name || return 1
+  case "$name" in
+    "~"|"") name="$home" ;;
+    "~/"*) name="$home/${name#\~/}" ;;
+  esac
+  printf '%s\n' "$name"
+}
+
+# Runs in the popup (from its first line): the tmux folder of the pane is
+# the working directory there (display-popup -d).
+new_agent() {
+  local pick m a dir out addr err home
+  local -a cmd=()
+  local key here=""
+  pick="$(choices | fzf --delimiter=$'\t' --with-nth=3 --layout=reverse --gutter=' ' \
+    --prompt='new agent › ' --expect=ctrl-o --no-preview \
+    --header="enter: in a project (p) · ctrl-o: in ${PWD/#$HOME/\~} · esc: cancel")" \
+    || return 0
+  key="$(head -1 <<<"$pick")"
+  pick="$(tail -1 <<<"$pick")"
+  [ "$key" = ctrl-o ] && here=1
+  IFS=$'\t' read -r m a _ <<<"$pick"
+  [ "$m" = . ] && m=""
+  # ~ is the home of the machine that runs it
+  home="$HOME"
+  [ -n "$m" ] && home="$("$HC" exec --on "$m" 'printf %s "$HOME"' 2>/dev/null || true)"
+  if [ -n "$m" ]; then dir="$home"; else dir="$PWD"; fi
+  dir="$(pick_folder "$m" "$home" "$dir" "$here")" || return 0
+  [ -n "$dir" ] || return 0
+  # A shell: the one of tmux here, else the one of that machine (no argv)
+  if [ "$a" = shell ]; then
+    [ -n "$m" ] || cmd=("$(tmux show -gv default-shell 2>/dev/null || echo "${SHELL:-/bin/sh}")")
+  else
+    cmd=("$a")
+  fi
+  [ "$a" = codex ] && cmd+=(--no-daemon)
+  out="$(start "$m" "$dir" "$a" "${cmd[@]}")"
+  addr="$(jq -r '.address // empty' <<<"$out" 2>/dev/null | head -1 || true)"
+  if [ -z "$addr" ]; then
+    err="$(jq -r '.error.message // empty' <<<"$out" 2>/dev/null || true)"
+    echo; echo "Not started: ${err:-$out}"
+    jq -r '.error.hint // empty' <<<"$out" 2>/dev/null || true
+    read -rsn1 -p "(a key to close)" || true
+    return 0
+  fi
+  open_t "$addr"
+}
+
+# herdr here <program> [args]: what the zsh functions of the agents run in
+# a tmux pane (zsh fns/herdr). The program runs in a terminal of herdr-core,
+# attached to this pane: the sidebar, the notifications and herdr-app see
+# it. Quiet: nothing more than the program itself shows. Ctrl+\ detaches
+# (it keeps running there); it ends, the pane is back to the shell. Without
+# herdr-core, it runs as before.
+here() {
+  local a="$1" out t rc=0 where
+  if [ -z "${TMUX:-}" ] || [ -z "$HC" ]; then exec "$@"; fi
+  [ "$a" = codex ] && set -- "$@" --no-daemon
+  app_labels "" "$PWD"
+  where="$(basename "$PWD")"; [ "$PWD" = "$HOME" ] && where="~"
+  out="$("$HC" run --bg --json --keep --rm --no-parent --cwd "$PWD" \
+    --label "herdr.space=$SPACE" --label "herdr.tab=$TAB" \
+    --label "where=$where / $a" -- "$@" 2>/dev/null)" || true
+  t="$(jq -r '.address // empty' <<<"$out" 2>/dev/null || true)"
+  [ -n "$t" ] || exec "$@"
+  if [ -n "$APP_JSON" ]; then
+    setsid -f "$SELF" app-names "" "$PWD" "$a" "$TAB" "$SPACE" "$SPACE_NEW" </dev/null >/dev/null 2>&1
+  fi
+  tmux set -p -t "${TMUX_PANE:-}" @hc "$t" 2>/dev/null || true
+  "$HC" attach "$t" 2>/dev/null || rc=$?
+  tmux set -pu -t "${TMUX_PANE:-}" @hc 2>/dev/null || true
+  return "$rc"
+}
+
+# Gives terminal $1, started without Herdr, the labels of herdr-app.
+adopt() {
+  local t="$1" rec m dir a
+  check_addr "$t"
+  rec="$(full | jq -c --arg t "$t" 'select(.address == $t or .address == ("*/" + $t))' | head -1)"
+  [ -n "$rec" ] || { echo "No terminal $t" >&2; exit 1; }
+  if jq -e '.labels["herdr.space"]' <<<"$rec" >/dev/null; then
+    echo "$t is in herdr-app already"; return 0
+  fi
+  m=""; [[ "$t" == */* ]] && m="${t%%/*}"
+  dir="$(jq -r '.cwd' <<<"$rec")"
+  a="$(jq -r '.status.app // .foreground.name // .argv[0] // "shell"' <<<"$rec")"
+  app_labels "$m" "$dir"
+  "$HC" label "$t" "herdr.space=$SPACE" "herdr.tab=$TAB" >/dev/null
+  "$HC" keep "$t" >/dev/null 2>&1 || true
+  [ -z "$APP_JSON" ] || app_names "$m" "$dir" "$a" "$TAB" "$SPACE" "$SPACE_NEW"
+  echo "$t: in herdr-app now"
+}
+
+# --- Sidebar --------------------------------------------------------------
+
+SIDE_W=25
+
+# A coloured glyph for the program of an agent.
+icon() {
+  case "$1" in
+    claude*)   printf '\033[38;5;173m✻' ;;
+    codex*)    printf '\033[37m◎' ;;
+    pi)        printf '\033[35mπ' ;;
+    omp*)      printf '\033[36m◆' ;;
+    opencode*) printf '\033[33m⌬' ;;
+    *)         printf '\033[2m›' ;;
+  esac
+  printf '\033[0m'
+}
+
+# The age of a time in ms since the epoch, like herdr-app: <1m, 5m, 2h, 3d.
+age() {
+  local s=$(( $(date +%s) - ${1:-0} / 1000 ))
+  if   [ "$s" -lt 60 ];    then echo "<1m"
+  elif [ "$s" -lt 3600 ];  then echo "$((s / 60))m"
+  elif [ "$s" -lt 86400 ]; then echo "$((s / 3600))h"
+  else echo "$((s / 86400))d"; fi
+}
+
+# The lines of the sidebar: id (address, new, or - for a heading), then what
+# fzf shows. Grouped by status, the ones that need you first.
+side_lines() {
+  local cols rk addr app name mach ms state open key
+  # The width of the sidebar pane itself
+  cols="$(tmux display -p -t "${TMUX_PANE:-}" '#{pane_width}' 2>/dev/null || true)"
+  [[ "$cols" =~ ^[0-9]+$ ]] || cols="${FZF_COLUMNS:-$SIDE_W}"
+  local cur="" n w glyph here
+  here="$(hostname)"
+  [ -n "$HC" ] || { printf -- '-\t\033[2m herdr-core not available\033[0m\n'; return 0; }
+  printf 'new\t \033[1;32m+\033[0m New agent\n'
+  local -A count=() needs=()
+  local rows
+  # One group per machine, this one first; in each, the agents that need you
+  # first, then the most recent
+  rows="$(full | jq -r '
+      select(.state == "live")
+      | [ (.status.state // ""),
+          .address,
+          (.status.app // .foreground.name // .argv[0] // "shell"),
+          ((.labels.where // "" | split(" / ") | first) // ""),
+          (.cwd // ""),
+          (.status_ms // .created_ms // 0) ] | @tsv' 2>/dev/null \
+    | while IFS=$'\t' read -r state addr app name cwd ms; do
+        [ -n "$name" ] || name="$(basename "$cwd")"
+        if [[ "$addr" == */* ]]; then mach="${addr%%/*}" key="1$mach"; else mach="$here" key="0"; fi
+        printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$key" "$(rank "$state")" "$mach" "$state" "$addr" "$app" "$name" "$ms"
+      done | sort -t $'\t' -k1,1 -k2,2n -k8,8nr)"
+  local panes
+  panes="$(tmux_agents)"
+  [ -n "$rows$panes" ] || { printf -- '-\t\n-\t\033[2m No agent\033[0m\n'; return 0; }
+  side_panes "$panes" "$cols"
+  [ -n "$rows" ] || return 0
+  while IFS=$'\t' read -r key rk mach state addr app name ms; do
+    count[$mach]=$(( ${count[$mach]:-0} + 1 ))
+    [ "$state" = blocked ] && needs[$mach]=$(( ${needs[$mach]:-0} + 1 ))
+  done <<<"$rows"
+  while IFS=$'\t' read -r key rk mach state addr app name ms; do
+    if [ "$mach" != "$cur" ]; then
+      cur="$mach"
+      printf -- '-\t\n-\t \033[1m%s\033[0m \033[2m%s\033[0m' "$mach" "${count[$mach]}"
+      [ -z "${needs[$mach]:-}" ] || printf ' \033[1;31m⚠%s\033[0m' "${needs[$mach]}"
+      printf '\n'
+    fi
+    case "$state" in
+      blocked) glyph='\033[1;31m⚠' ;; error) glyph='\033[31m✗' ;;
+      done) glyph='\033[33m✓' ;; working) glyph='\033[34m●' ;;
+      idle) glyph='\033[2m○' ;; *) glyph=' ' ;;
+    esac
+    open=""; [ -n "$(find_window "$addr")" ] && open='\033[1m'
+    # icon, name, then age and status on the right
+    w=$(( cols - 11 ))
+    [ "$w" -lt 4 ] && w=4
+    n="$name"; [ "${#n}" -gt "$w" ] && n="${n:0:$((w - 1))}…"
+    printf '%s\t %s %b%-*s\033[0m \033[2m%3s\033[0m %b\033[0m\n' \
+      "$addr" "$(icon "$app")" "$open" "$w" "$n" "$(age "$ms")" "$glyph"
+  done <<<"$rows"
+}
+
+# The sidebar takes the mouse back: out of copy mode, and with the mouse
+# reporting of fzf on again when the terminal lost it (a drag on it then puts
+# tmux in copy mode, and no click reaches fzf any more).
+# Its width too: the last one that was right (yours when you resize it) is
+# kept in @herdr_side_w; when a window shrinks, tmux takes the columns from
+# the pane on the right, the sidebar, which gets it back.
+side_heal() {
+  local p="${TMUX_PANE:-}" mode any tty w
+  [ -n "$p" ] || return 0
+  read -r mode any tty w < <(tmux display -p -t "$p" '#{pane_in_mode} #{mouse_any_flag} #{pane_tty} #{pane_width}' 2>/dev/null) || return 0
+  [ "$mode" = 1 ] && tmux send-keys -t "$p" -X cancel 2>/dev/null
+  [ "$any" = 0 ] && [ -w "$tty" ] && printf '\033[?1000h\033[?1002h\033[?1006h' > "$tty"
+  if [ "${w:-0}" -lt 10 ]; then
+    tmux resize-pane -t "$p" -x "$(side_width)" 2>/dev/null
+  elif [ "$w" != "$(tmux show -gqv @herdr_side_w)" ]; then
+    tmux set -g @herdr_side_w "$w"
+  fi
+  return 0
+}
+
+side_width() {
+  local w
+  w="$(tmux show -gqv @herdr_side_w 2>/dev/null)"
+  [[ "$w" =~ ^[0-9]+$ ]] && [ "$w" -ge 10 ] && echo "$w" || echo "$SIDE_W"
+}
+
+# The agents started by hand in a tmux pane (not in herdr-core): pane,
+# program, folder, window. herdr-core and herdr-app don't know them.
+tmux_agents() {
+  local re
+  re="^($(tr ' ' '|' <<<"$AGENTS"))\$"
+  tmux list-panes -a -F "#{pane_id}	#{pane_current_command}	#{pane_current_path}	#{session_name}:#{window_index}" 2>/dev/null \
+    | awk -F '\t' -v re="$re" '$2 ~ re'
+}
+
+# Their group in the sidebar, first: a click goes to the pane.
+side_panes() {
+  local panes="$1" cols="$2" id cmd path win n w
+  [ -n "$panes" ] || return 0
+  printf -- '-\t\n-\t \033[1mtmux\033[0m \033[2m%s\033[0m\n' "$(grep -c . <<<"$panes")"
+  w=$(( cols - 11 ))
+  [ "$w" -lt 4 ] && w=4
+  while IFS=$'\t' read -r id cmd path win; do
+    n="$(basename "$path")"; [ "${#n}" -gt "$w" ] && n="${n:0:$((w - 1))}…"
+    printf 'pane:%s\t %s %-*s \033[2m%3s\033[0m  \n' "$id" "$(icon "$cmd")" "$w" "$n" "$win" 
+  done <<<"$panes"
+}
+
+# What runs in the sidebar pane: the list, again when fzf ends.
+sidebar() {
+  printf '\033]2;Agents\033\\'
+  while :; do
+    SHELL=/bin/bash fzf --ansi --no-sort --track --id-nth=1 \
+      --delimiter=$'\t' --with-nth=2 --listen --no-input \
+      --layout=reverse --info=hidden --no-scrollbar --border=none \
+      --pointer=" " --gutter=" " --header=" Agents" --header-first \
+      --color='bg+:236,gutter:-1,header:bold' \
+      --bind "start:reload-sync($SELF side-lines)+execute-silent($SELF tick \$FZF_PORT side-lines </dev/null >/dev/null 2>&1 &)" \
+      --bind "resize:reload-sync($SELF side-lines)" \
+      --bind "enter:transform:$SELF side-act {1}" \
+      --bind "double-click:transform:$SELF side-act {1}" \
+      --bind "left-click:transform:$SELF side-act {1}" \
+      --bind "ctrl-x:execute-silent([ {1} = new ] || [ {1} = - ] || [[ {1} == pane:* ]] || $SELF close {1})+reload-sync($SELF side-lines)" \
+      --bind 'esc:ignore' \
+      < /dev/null || true
+    sleep 0.5
+  done
+}
+
+# What enter does on a line of the sidebar, as fzf actions.
+side_act() {
+  case "$1" in
+    -) echo ignore ;;
+    new) echo "execute-silent($SELF side-new)" ;;
+    pane:%*) echo "execute-silent($SELF goto-pane ${1#pane:})" ;;
+    *) echo "execute-silent($SELF open $1)+reload-sync($SELF side-lines)" ;;
+  esac
+}
+
+# The new agent window, from the sidebar: in the folder of the pane beside.
+side_new() {
+  local p dir client
+  p="$(tmux display -p -t "$(tmux display -p '#{window_id}')" '#{pane_id}')"
+  [ "$p" = "$(tmux show -gqv @herdr_side_pane)" ] && p="$(tmux display -p -t '{last}' '#{pane_id}' 2>/dev/null || echo "$p")"
+  dir="$(tmux display -p -t "$p" '#{pane_current_path}')"
+  client="$(tmux list-clients -t "$(tmux display -p '#{session_id}')" -F '#{client_name}' | head -1)"
+  tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% -d "$dir" \
+    -T "#[align=centre] New agent " "$SELF new"
+}
+
+side_pane() {
+  local p
+  p="$(tmux show -gqv @herdr_side_pane)"
+  [ -n "$p" ] && tmux display -p -t "$p" '#{pane_id}' 2>/dev/null || true
+}
+
+# prefix + a or the agents button: shows or hides it. @herdr_side_on says
+# that it is wanted, so that it comes back after it had to close.
+side_toggle() {
+  local p
+  p="$(side_pane)"
+  if [ -n "$p" ]; then
+    tmux set -gu @herdr_side_on \; set -gu @herdr_side_pane
+    tmux kill-pane -t "$p"
+    return 0
+  fi
+  tmux set -g @herdr_side_on 1
+  side_open "${1:-}"
+}
+
+side_open() {
+  local p
+  p="$(tmux split-window -hf -d -l "$(side_width)" -P -F '#{pane_id}' ${1:+-t "$1"} "$SELF sidebar")"
+  tmux set -g @herdr_side_pane "$p"
+}
+
+# Hook of herdr.conf: the sidebar goes to window $1 when it is shown (and
+# comes back there when it is wanted but had to close).
+side_follow() {
+  local p win="${1:-}"
+  [ -n "$win" ] || return 0
+  p="$(side_pane)"
+  if [ -z "$p" ]; then
+    [ -n "$(tmux show -gqv @herdr_side_on)" ] && side_open "$win"
+    return 0
+  fi
+  [ "$(tmux display -p -t "$p" '#{window_id}')" = "$win" ] && return 0
+  tmux join-pane -hf -d -l "$(side_width)" -s "$p" -t "$win" 2>/dev/null || true
+}
+
+# Hook of herdr.conf, when a pane ends: the sidebar alone in its window
+# closes, so that the window closes as it would without it, and the session
+# with its last window (tmux ends with its last session). It comes back in the
+# window tmux shows then, if there is one.
+side_alone() {
+  local p sess win
+  p="$(side_pane)"
+  [ -n "$p" ] || return 0
+  [ "$(tmux display -p -t "$p" '#{window_panes}')" = 1 ] || return 0
+  sess="$(tmux display -p -t "$p" '#{session_id}')"
+  tmux set -gu @herdr_side_pane
+  tmux kill-pane -t "$p"
+  win="$(tmux display -p -t "$sess" '#{window_id}' 2>/dev/null)" || return 0
+  [ -n "$(tmux show -gqv @herdr_side_on)" ] && side_open "$win"
+  return 0
+}
+
+# --- Notifications --------------------------------------------------------
+
+WATCH_LOCK="${XDG_RUNTIME_DIR:-/tmp}/herdr-tmux-watch-$(id -u)"
+
+# Follows herdr-core events. On each change it reads the blocked terminals,
+# puts their number in @herdr_blocked and shows a message on every tmux
+# client for the ones that just got blocked (except on a client that already
+# shows that agent). Ends with the tmux server.
+watch() {
+  local sock="${1:-}"
+  local restart=""
+  [ "$sock" = restart ] && { restart=1; sock="${2:-}"; }
+  [ -n "$HC" ] || return 0
+  [ -n "$sock" ] || sock="$(tmux display-message -p '#{socket_path}' 2>/dev/null)" || return 0
+  # restart: tmux starts the new one, detached from the shell that asks
+  if [ -n "$restart" ]; then
+    watch_stop
+    sleep 1
+    tmux -S "$sock" run-shell -b "$SELF watch '$sock'"
+    return 0
+  fi
+  local lock="$WATCH_LOCK-$(printf '%s' "$sock" | md5sum | cut -c1-8)"
+  exec 9>"$lock"
+  flock -n 9 || return 0
+  echo $$ > "$lock.pid"
+  export TMUX_SOCK="$sock"
+  tm() { tmux -S "$TMUX_SOCK" "$@"; }
+  local -A prev=() now=() kind=()
+  local line type t k addr agent where status first=1
+  while tm has-session 2>/dev/null; do
+    while IFS= read -r line; do
+      tm has-session 2>/dev/null || return 0
+      IFS=$'\t' read -r type t k < <(jq -r '[.params.type // "snapshot", .params.terminal // "", .params.data.status.kind // ""] | @tsv' <<<"$line" 2>/dev/null) || continue
+      [ "$type" = heartbeat ] && continue
+      [ -n "$k" ] && kind[$t]="$k"
+      now=()
+      while IFS=$'\t' read -r addr agent where status; do
+        [ "$status" = blocked ] || continue
+        now[$addr]=1
+        [ -n "$first" ] || [ -n "${prev[$addr]:-}" ] && continue
+        notify "$addr" "$agent" "$where" "${kind[$addr]:-}"
+      done < <(terminals 2>/dev/null)
+      first=""
+      prev=()
+      for addr in "${!now[@]}"; do prev[$addr]=1; done
+      if [ "${#now[@]}" -gt 0 ]; then tm set -g @herdr_blocked "${#now[@]}"; else tm set -gu @herdr_blocked; fi
+      tm refresh-client -S 2>/dev/null || true
+    done < <("$HC" events --json 2>/dev/null 9>&-)
+    sleep 5 9>&-   # herdr-core restarted or unreachable: follow it again
+  done
+}
+
+notify() {
+  local addr="$1" agent="$2" where="$3" k="$4" msg client win
+  msg="⚠ $agent · $where needs you${k:+ ($k)} · prefix+a"
+  msg="${msg//#/##}"
+  win="$(tm list-panes -a -F '#{window_id} #{@hc}' 2>/dev/null | awk -v t="$addr" '$2 == t { print $1; exit }')"
+  while read -r client cwin; do
+    [ -n "$win" ] && [ "$cwin" = "$win" ] && continue
+    tm display-message -c "$client" -d 10000 "$msg" 2>/dev/null || true
+  done < <(tm list-clients -F '#{client_name} #{window_id}' 2>/dev/null)
+}
+
+watch_stop() {
+  local f pid kids
+  for f in "$WATCH_LOCK"-*.pid; do
+    [ -e "$f" ] || continue
+    # The watcher first, then its children (hc events): the other way, it
+    # would start its sleep before following herdr-core again
+    pid="$(cat "$f")"
+    kids="$(pgrep -P "$pid" 2>/dev/null || true)"
+    kill "$pid" 2>/dev/null || true
+    [ -z "$kids" ] || kill $kids 2>/dev/null || true
+    rm -f "$f"
+  done
+}
+
+has() {
+  [ -n "$HC" ] && echo 1
+  return 0
+}
+
 # Prints nothing for zero, so that the agents button, shown when the output
 # is not empty, hides. Never fails: tmux calls it every few seconds and would
 # show an error in place of the button.
@@ -163,13 +832,36 @@ case "${1:-}" in
     ;;
   menu) need_hc; menu "${2:-}" ;;
   prepare) prepare "${2:-}" ;;
-  toggle)
+  toggle|open|close)
     need_hc
-    [ -n "${2:-}" ] || { echo "usage: herdr toggle <terminal>" >&2; exit 2; }
-    toggle "$2"
+    [ -n "${2:-}" ] || { echo "usage: herdr $1 <terminal>" >&2; exit 2; }
+    case "$1" in toggle) toggle "$2" ;; open) open_t "$2" ;; close) close_t "$2" ;; esac
     ;;
+  popup) popup ;;
+  sidebar)
+    case "${2:-}" in
+      toggle) side_toggle "${3:-}" ;;
+      follow) side_follow "${3:-}" ;;
+      alone) side_alone ;;
+      *) sidebar ;;
+    esac ;;
+  side-lines) side_lines ;;
+  side-act) side_act "${2:-}" ;;
+  side-new) side_new ;;
+  goto-pane)
+    [[ "${2:-}" =~ ^%[0-9]+$ ]] || exit 2
+    tmux switch-client -t "$(tmux display -p -t "$2" '#{session_id}')" \; select-window -t "$2" \; select-pane -t "$2"
+    ;;
+  app-names) shift; app_names "$@" ;;
+  here) shift; [ $# -gt 0 ] || { echo "usage: herdr here <program> [args]" >&2; exit 2; }; here "$@" ;;
+  adopt) need_hc; [ -n "${2:-}" ] || { echo "usage: herdr adopt <terminal>" >&2; exit 2; }; adopt "$2" ;;
+  new) need_hc; new_agent ;;
+  has) has ;;
+  lines) lines ;;
+  tick) tick "${2:-}" "${3:-}" ;;
+  watch) watch "${2:-}" "${3:-}" ;;
   list) need_hc; list ;;
   count) count ;;
-  -h|--help) sed -n '2,23p' "$0" | sed 's/^# \?//' ;;
-  *) echo "unknown command: $1 (menu, prepare, toggle, list, count)" >&2; exit 2 ;;
+  -h|--help) sed -n '2,/^set -euo/p' "$0" | sed '$d; s/^# \?//' ;;
+  *) echo "unknown command: $1 (popup, sidebar, new, here, adopt, menu, prepare, toggle, open, close, list, count, watch)" >&2; exit 2 ;;
 esac

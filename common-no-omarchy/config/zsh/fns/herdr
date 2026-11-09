@@ -1,0 +1,17 @@
+# The agents typed in a tmux pane run in a terminal of herdr-core, attached
+# to the pane (~/.config/tmux/herdr here): the sidebar of tmux shows their
+# status, the notifications say when they need you, herdr-app shows them.
+# Nothing else changes: same program, same pane, same keys (Ctrl+\ detaches,
+# the agent keeps running in herdr-core). Outside tmux, or without
+# herdr-core, the program runs as before. `command claude` skips it.
+for _herdr_agent in claude codex pi omp opencode; do
+  eval "
+    $_herdr_agent() {
+      if [[ -n \$TMUX && -x ~/.config/tmux/herdr ]] && (( \$+commands[herdr-core] )); then
+        ~/.config/tmux/herdr here $_herdr_agent \"\$@\"
+      else
+        command $_herdr_agent \"\$@\"
+      fi
+    }"
+done
+unset _herdr_agent
