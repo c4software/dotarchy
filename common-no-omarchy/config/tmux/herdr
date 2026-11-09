@@ -114,11 +114,12 @@ open_t() {
   name="$(full | jq -r --arg t "$t" 'select(.address == $t and .state == "live")
     | [ (.status.app // .foreground.name // .argv[0] // "shell" | sub("-code$"; "")),
         ((.labels.where // "" | split(" / ") | first) // ""),
-        (.cwd // "") ] | @tsv' | head -1)"
+        (.cwd // "") ] | map(if . == "" then "-" else . end) | @tsv' | head -1)"
   [ -n "$name" ] || { tmux display-message "No live Herdr terminal $t"; exit 0; }
   local app space cwd
   IFS=$'\t' read -r app space cwd <<<"$name"
-  [ -n "$space" ] || space="$(basename "${cwd:-?}")"
+  [ "$cwd" = - ] && cwd=""
+  { [ -n "$space" ] && [ "$space" != - ]; } || space="$(basename "${cwd:-?}")"
   name="$app·$space"
   [[ "$t" == */* ]] && name="$name@${t%%/*}"
   name="${name//#/##}"
@@ -571,12 +572,16 @@ side_lines() {
           .address,
           (.status.app // .foreground.name // .argv[0] // "shell"),
           # The title of the conversation, or else the folder
-          (if (.title // "") != "" then .title
+          # without the activity glyph agents put first (✳, ⠂…)
+          (if (.title // "") != "" then (.title | sub("^[^\\p{L}\\p{N}]+"; ""))
            else ((.labels.where // "" | split(" / ") | first) // "") end),
           (.cwd // ""),
-          (.status_ms // .created_ms // 0) ] | @tsv' 2>/dev/null \
+          (.status_ms // .created_ms // 0) ]
+      # No empty field: read joins the tabs around one (a status null)
+      | map(tostring | if . == "" then "-" else . end) | @tsv' 2>/dev/null \
     | while IFS=$'\t' read -r state addr app name cwd ms; do
-        [ -n "$name" ] || name="$(basename "$cwd")"
+        [ "$cwd" = - ] && cwd=""
+        { [ -n "$name" ] && [ "$name" != - ]; } || name="$(basename "${cwd:-?}")"
         if [[ "$addr" == */* ]]; then mach="${addr%%/*}" key="1$mach"; else mach="$here" key="0"; fi
         printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$key" "$(rank "$state")" "$mach" "$state" "$addr" "$app" "$name" "$ms"
       done | sort -t $'\t' -k1,1 -k2,2n -k8,8nr)"
