@@ -97,6 +97,8 @@ sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
 
 # Install nvim configuration
 cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/config/keymaps.lua" ~/.config/nvim/lua/config/keymaps.lua
+# Fichiers cachés (.env, .gitignore, …) visibles par défaut dans Neo-tree et le picker Snacks
+cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/plugins/neo-tree-dotfiles.lua" "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/plugins/snacks-picker-hidden.lua" ~/.config/nvim/lua/plugins/
 
 # Install pi / omp : provider llm-proxy (modèles du proxy) et serveur MCP du
 # proxy (outils web : recherche, lecture de page et de PDF, recherche dans
