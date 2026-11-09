@@ -521,7 +521,8 @@ age() {
 side_lines() {
   local cols rk addr app name mach ms state open key
   # The width of the sidebar pane itself
-  cols="$(tmux display -p -t "${TMUX_PANE:-}" '#{pane_width}' 2>/dev/null || true)"
+  # (or SIDE_COLS: the palette, a popup)
+  cols="${SIDE_COLS:-$(tmux display -p -t "${TMUX_PANE:-}" '#{pane_width}' 2>/dev/null || true)}"
   [[ "$cols" =~ ^[0-9]+$ ]] || cols="${FZF_COLUMNS:-$SIDE_W}"
   local cur="" n w glyph here
   here="$(hostname)"
@@ -671,6 +672,31 @@ side_pane() {
   [ -n "$p" ] && tmux display -p -t "$p" '#{pane_id}' 2>/dev/null || true
 }
 
+# Sidebar panes that @herdr_side_pane does not name any more (left by an
+# older race): they go.
+side_kill_strays() {
+  local keep id
+  keep="$(side_pane)"
+  tmux list-panes -a -F '#{pane_id} #{pane_start_command}' \
+    | while read -r id cmd; do
+        if [[ "$cmd" == *"$SELF sidebar"* ]] && [ "$id" != "$keep" ]; then
+          side_log "strays: kill $id (keep ${keep:-none})"
+          tmux kill-pane -t "$id" || true
+        fi
+      done || true
+  return 0
+}
+
+# The hooks of herdr.conf run in the background and several of them come at
+# once (Ctrl+D in the last pane beside the sidebar: pane-exited, then
+# session-window-changed when the window closes). Without a lock both see no
+# sidebar and both open one. One at a time, per tmux server.
+side_lock() {
+  local sock="${TMUX:-}"; sock="${sock%%,*}"
+  exec 8>"${XDG_RUNTIME_DIR:-/tmp}/herdr-tmux-side-$(id -u)-$(printf '%s' "$sock" | md5sum | cut -c1-8)"
+  flock -w 5 8 || true
+}
+
 # prefix + a or the agents button: shows or hides it. @herdr_side_on says
 # that it is wanted, so that it comes back after it had to close.
 side_toggle() {
@@ -679,6 +705,7 @@ side_toggle() {
   if [ -n "$p" ]; then
     tmux set -gu @herdr_side_on \; set -gu @herdr_side_pane
     tmux kill-pane -t "$p"
+    side_kill_strays
     return 0
   fi
   tmux set -g @herdr_side_on 1
@@ -687,22 +714,43 @@ side_toggle() {
 
 side_open() {
   local p
+  # Already there (a hook of the same change came first): no second one
+  [ -n "$(side_pane)" ] && return 0
+  side_kill_strays
   p="$(tmux split-window -hf -d -l "$(side_width)" -P -F '#{pane_id}' ${1:+-t "$1"} "$SELF sidebar")"
   tmux set -g @herdr_side_pane "$p"
+  side_log "open: $p in ${1:-current window}"
 }
 
 # Hook of herdr.conf: the sidebar goes to window $1 when it is shown (and
 # comes back there when it is wanted but had to close).
 side_follow() {
-  local p win="${1:-}"
+  local p win="${1:-}" shown err
+  # The hooks run in the background and can end out of order (a quick change
+  # of session, then of window): the window to follow is the one the last
+  # active client shows now, not the one of the hook, which can be old.
+  shown="$(tmux list-clients -F '#{client_activity} #{window_id}' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2)"
+  [ -n "$shown" ] && win="$shown"
   [ -n "$win" ] || return 0
   p="$(side_pane)"
   if [ -z "$p" ]; then
     [ -n "$(tmux show -gqv @herdr_side_on)" ] && side_open "$win"
     return 0
   fi
+  side_kill_strays
   [ "$(tmux display -p -t "$p" '#{window_id}')" = "$win" ] && return 0
-  tmux join-pane -hf -d -l "$(side_width)" -s "$p" -t "$win" 2>/dev/null || true
+  err="$(tmux join-pane -hf -d -l "$(side_width)" -s "$p" -t "$win" 2>&1)" \
+    || side_log "follow: join-pane $p -> $win (hook ${1:-}) failed: $err"
+  return 0
+}
+
+# What went wrong with the sidebar, for a later look:
+# $XDG_RUNTIME_DIR/herdr-sidebar.log (the last 200 lines are kept)
+side_log() {
+  local f="${XDG_RUNTIME_DIR:-/tmp}/herdr-sidebar.log"
+  printf '%s %s\n' "$(date '+%F %T')" "$*" >>"$f"
+  [ "$(wc -l <"$f")" -gt 400 ] && { tail -200 "$f" >"$f.tmp" && mv "$f.tmp" "$f"; }
+  return 0
 }
 
 # Hook of herdr.conf, when a pane ends: the sidebar alone in its window
@@ -716,10 +764,70 @@ side_alone() {
   [ "$(tmux display -p -t "$p" '#{window_panes}')" = 1 ] || return 0
   sess="$(tmux display -p -t "$p" '#{session_id}')"
   tmux set -gu @herdr_side_pane
+  side_log "alone: kill $p"
   tmux kill-pane -t "$p"
   win="$(tmux display -p -t "$sess" '#{window_id}' 2>/dev/null)" || return 0
   [ -n "$(tmux show -gqv @herdr_side_on)" ] && side_open "$win"
   return 0
+}
+
+# --- Palette (Ctrl+Shift+P) -----------------------------------------------
+
+# The windows of every session, then the agents (like the sidebar), in a
+# popup with a search: enter goes there. The current window is not in it.
+palette_lines() {
+  local cur cols id sess idx hc
+  local -A agent_win=() where=()
+  cur="$(tmux display -p '#{window_id}')"
+  # The windows that show an agent: the agent line stands for them (with
+  # where it is at the end), not a second line. @hc: opened by herdr open,
+  # or herdr here; tmux_agents: started by hand in a pane.
+  while IFS=$'\t' read -r id sess idx hc; do
+    [ -n "$hc" ] || continue
+    agent_win[$id]=1; where[$hc]="$sess:$idx"
+  done < <(tmux list-panes -a -F "#{window_id}	#{session_name}	#{window_index}	#{@hc}")
+  while IFS=$'\t' read -r id _ _ _; do
+    [ -n "$id" ] || continue
+    read -r hc sess < <(tmux display -p -t "$id" '#{window_id} #{session_name}:#{window_index}')
+    agent_win[$hc]=1; where[pane:$id]="$sess"
+  done <<<"$(tmux_agents)"
+  tmux list-windows -a -F "#{window_id}	#{session_name}	#{window_index}	#{window_name}	#{pane_current_path}	#{window_activity}" \
+    | sort -t $'\t' -k6,6nr \
+    | while IFS=$'\t' read -r id sess idx name path _; do
+        [ "$id" = "$cur" ] && continue
+        [ -n "${agent_win[$id]:-}" ] && continue
+        printf 'win:%s\t \033[34m□\033[0m %s \033[2m%s:%s\033[0m  \033[2m%s\033[0m\n' \
+          "$id" "$name" "$sess" "$idx" "${path/#$HOME/\~}"
+      done
+  [ -n "$HC" ] || return 0
+  cols="$(tput cols 2>/dev/null || echo 80)"; [ "$cols" -gt 70 ] && cols=70
+  # The agents, without the headings (one line per machine) of the sidebar,
+  # and the window that shows each one, when there is one
+  SIDE_COLS="$cols" side_lines | grep -v $'^-\t' \
+    | while IFS=$'\t' read -r id line; do
+        if [ -n "${where[$id]:-}" ]; then
+          printf '%s\t%s \033[2m%s\033[0m\n' "$id" "$line" "${where[$id]}"
+        else
+          printf '%s\t%s\n' "$id" "$line"
+        fi
+      done || true
+}
+
+palette() {
+  local sel id
+  sel="$(palette_lines | fzf --ansi --delimiter=$'\t' --with-nth=2 --no-sort \
+    --layout=reverse --info=hidden --gutter=' ' --prompt='› ' \
+    --header='windows and agents · enter: go · esc: cancel')" || return 0
+  id="${sel%%$'\t'*}"
+  case "$id" in
+    win:@*) id="${id#win:}"
+            tmux switch-client -t "$(tmux display -p -t "$id" '#{session_id}')" \; select-window -t "$id" ;;
+    pane:%*) id="${id#pane:}"
+             tmux switch-client -t "$(tmux display -p -t "$id" '#{session_id}')" \; select-window -t "$id" \; select-pane -t "$id" ;;
+    new) need_hc; new_agent ;;
+    -|"") ;;
+    *) open_t "$id" ;;
+  esac
 }
 
 # --- Notifications --------------------------------------------------------
@@ -838,11 +946,12 @@ case "${1:-}" in
     case "$1" in toggle) toggle "$2" ;; open) open_t "$2" ;; close) close_t "$2" ;; esac
     ;;
   popup) popup ;;
+  palette) palette ;;
   sidebar)
     case "${2:-}" in
-      toggle) side_toggle "${3:-}" ;;
-      follow) side_follow "${3:-}" ;;
-      alone) side_alone ;;
+      toggle) side_lock; side_toggle "${3:-}" ;;
+      follow) side_lock; side_follow "${3:-}" ;;
+      alone) side_lock; side_alone ;;
       *) sidebar ;;
     esac ;;
   side-lines) side_lines ;;
