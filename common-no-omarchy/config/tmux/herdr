@@ -699,6 +699,7 @@ sidebar() {
       --color='bg+:236,gutter:-1,header:bold' \
       --bind "start:reload-sync($SELF side-lines)+execute-silent($SELF tick \$FZF_PORT side-lines </dev/null >/dev/null 2>&1 &)" \
       --bind "resize:reload-sync($SELF side-lines)" \
+      --bind "load:transform:$SELF side-pos" \
       --bind "enter:transform:$SELF side-act {1}" \
       --bind "double-click:transform:$SELF side-act {1}" \
       --bind "left-click:transform:$SELF side-act {1}" \
@@ -708,6 +709,21 @@ sidebar() {
     side_log "sidebar ${TMUX_PANE:-}: fzf ended (rc $rc), started again"
     sleep 0.5
   done
+}
+
+# fzf action after a load of the sidebar list: when its window was just
+# shown (@herdr_side_goto, set by ensure, and at start), the cursor goes on
+# the agent of the window (marked ▸). Each sidebar has its own cursor: without
+# it, the one of the window you go to stays where you left it.
+side_pos() {
+  local p="${TMUX_PANE:-}" n
+  [ -n "$p" ] || return 0
+  [ "$(tmux show -pqv -t "$p" @herdr_side_goto 2>/dev/null)" = 0 ] && return 0
+  tmux set -p -t "$p" @herdr_side_goto 0 2>/dev/null || true
+  # Its place in the list: the line of ▸, less the header (--header-lines=1)
+  n="$(side_lines | grep -n '▸' | head -1 | cut -d: -f1)" || true
+  [[ "$n" =~ ^[0-9]+$ ]] && [ "$n" -gt 1 ] && echo "pos($(( n - 1 )))"
+  return 0
 }
 
 # What enter does on a line of the sidebar, as fzf actions.
@@ -788,6 +804,8 @@ side_ensure() {
   done
   if [ -n "$first" ]; then
     side_fit "$first"
+    # Its cursor goes on the agent of the window, after the refresh (load)
+    tmux set -p -t "$first" @herdr_side_goto 1 2>/dev/null || true
     port="$(tmux show -pqv -t "$first" @herdr_side_port 2>/dev/null)"
     [[ "$port" =~ ^[0-9]+$ ]] && { curl -fsS -m 1 -XPOST "localhost:$port" \
       -d "reload-sync($SELF side-lines)" >/dev/null 2>&1 || true; }
@@ -1109,6 +1127,7 @@ case "${1:-}" in
     esac ;;
   side-lines) side_lines ;;
   side-act) side_act "${2:-}" ;;
+  side-pos) side_pos ;;
   side-new) side_new ;;
   goto-pane)
     [[ "${2:-}" =~ ^%[0-9]+$ ]] || exit 2
