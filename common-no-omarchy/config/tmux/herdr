@@ -76,7 +76,10 @@ need_hc() {
 # Live terminals of herdr-core, one per line: address, agent, where, status.
 terminals() {
   "$HC" ls | jq -r '.terminals[]
-    | [.address, (.agent // "shell"), (.where // .cwd // ""), (.status // "")]
+    # No empty field (read joins the tabs around one)
+    | [.address, (.agent // "shell"),
+       (.where // .cwd // "?" | if . == "" then "?" else . end),
+       (.status // "none" | if . == "" then "none" else . end)]
     | @tsv'
 }
 
@@ -114,7 +117,7 @@ open_t() {
   name="$(full | jq -r --arg t "$t" 'select(.address == $t and .state == "live")
     | [ (.status.app // .foreground.name // .argv[0] // "shell" | sub("-code$"; "")),
         ((.labels.where // "" | split(" / ") | first) // ""),
-        (.cwd // "") ] | map(if . == "" then "-" else . end) | @tsv' | head -1)"
+        (.cwd // "") ] | map(if . == "" then "-" else . end) | @tsv' | head -1 || true)"
   [ -n "$name" ] || { tmux display-message "No live Herdr terminal $t"; exit 0; }
   local app space cwd
   IFS=$'\t' read -r app space cwd <<<"$name"
@@ -269,6 +272,11 @@ tick() {
   [ "$what" = side-lines ] && [ -n "${TMUX_PANE:-}" ] && tmux set -p -t "$TMUX_PANE" @herdr_side_port "$port"
   while sleep 2; do
     now="$(date +%s)"
+    # Another fzf in this pane since (it started again): this tick ends
+    if [ "$what" = side-lines ] && [ -n "${TMUX_PANE:-}" ] \
+      && [ "$(tmux show -pqv -t "$TMUX_PANE" @herdr_side_port 2>/dev/null)" != "$port" ]; then
+      exit 0
+    fi
     # Two seconds that lasted much longer: the machine slept. The sidebar can
     # come back from it stuck (no answer, odd characters): it starts again,
     # same pane, which ends this tick too (fzf starts a new one).
@@ -279,8 +287,6 @@ tick() {
     fi
     last="$now"
     if [ "$what" = side-lines ] && [ -n "${TMUX_PANE:-}" ]; then
-      # Another fzf in this pane since (it started again): this tick ends
-      [ "$(tmux show -pqv -t "$TMUX_PANE" @herdr_side_port 2>/dev/null)" = "$port" ] || exit 0
       # A sidebar off screen does not ask herdr-core: it is refreshed when its
       # window is shown again (herdr sidebar ensure)
       [ "$(tmux display -p -t "$TMUX_PANE" '#{&&:#{window_active},#{session_attached}}' 2>/dev/null)" = 1 ] || continue
@@ -537,6 +543,13 @@ icon() {
   printf '\033[0m'
 }
 
+# $1 padded with spaces to $2 characters (printf %-*s counts bytes: an
+# accent or … would push the columns after it)
+pad() {
+  local n=$(( $2 - ${#1} ))
+  printf '%s%*s' "$1" "$(( n > 0 ? n : 0 ))" ""
+}
+
 # The age of a time in ms since the epoch, like herdr-app: <1m, 5m, 2h, 3d.
 age() {
   local s=$(( $(date +%s) - ${1:-0} / 1000 ))
@@ -566,7 +579,11 @@ side_lines() {
   local rows
   # One group per machine, this one first; in each, the agents that need you
   # first, then the most recent
-  rows="$(full | jq -r '
+  # herdr-core down or slow (timeout): an empty list, said in the header,
+  # not a sidebar left blank (set -e would end here)
+  local data hc_ok=1
+  data="$(full 2>/dev/null)" || { hc_ok=""; data=""; }
+  rows="$(printf '%s\n' "$data" | jq -r '
       select(.state == "live")
       | [ (.status.state // ""),
           .address,
@@ -584,7 +601,7 @@ side_lines() {
         { [ -n "$name" ] && [ "$name" != - ]; } || name="$(basename "${cwd:-?}")"
         if [[ "$addr" == */* ]]; then mach="${addr%%/*}" key="1$mach"; else mach="$here" key="0"; fi
         printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$key" "$(rank "$state")" "$mach" "$state" "$addr" "$app" "$name" "$ms"
-      done | sort -t $'\t' -k1,1 -k2,2n -k8,8nr)"
+      done | sort -t $'\t' -k1,1 -k2,2n -k8,8nr || true)"
   local panes
   panes="$(tmux_agents)"
   # Header: the number of agents in each state, the ones that need you first
@@ -600,6 +617,7 @@ side_lines() {
   [ -n "${st[working]:-}" ] && hdr+=" \033[34m●${st[working]}\033[0m"
   [ -n "${st[done]:-}" ] && hdr+=" \033[33m✓${st[done]}\033[0m"
   [ -n "${st[idle]:-}" ] && hdr+=" \033[2m○${st[idle]}\033[0m"
+  [ -n "$hc_ok" ] || hdr+=" \033[2;31mherdr-core not answering\033[0m"
   printf -- '-\t%b\n' "$hdr"
   printf 'new\t \033[1;32m+\033[0m New agent\n'
   [ -n "$rows$panes" ] || { printf -- '-\t\n-\t\033[2m No agent\033[0m\n'; return 0; }
@@ -633,8 +651,8 @@ side_lines() {
     w=$(( cols - 11 ))
     [ "$w" -lt 4 ] && w=4
     n="$name"; [ "${#n}" -gt "$w" ] && n="${n:0:$((w - 1))}…"
-    printf '%s\t%b%s %b%-*s\033[0m \033[2m%3s\033[0m %b\033[0m\n' \
-      "$addr" "$mark" "$(icon "$app")" "$open" "$w" "$n" "$(age "$ms")" "$glyph"
+    printf '%s\t%b%s %b%s\033[0m \033[2m%3s\033[0m %b\033[0m\n' \
+      "$addr" "$mark" "$(icon "$app")" "$open" "$(pad "$n" "$w")" "$(age "$ms")" "$glyph"
   done <<<"$rows"
 }
 
@@ -651,7 +669,10 @@ side_heal() {
   [ "$any" = 0 ] && [ -w "$tty" ] && printf '\033[?1000h\033[?1002h\033[?1006h' > "$tty"
   # The same width in every window: tmux gives the sidebar the columns a
   # closed pane or a larger window leaves, it gives them back
-  [ "${w:-0}" != "$(side_width)" ] && tmux resize-pane -t "$p" -x "$(side_width)" 2>/dev/null
+  if [ "${w:-0}" != "$(side_width)" ]; then
+    side_fitting
+    tmux resize-pane -t "$p" -x "$(side_width)" 2>/dev/null || true
+  fi
   return 0
 }
 
@@ -683,15 +704,16 @@ side_panes() {
     if [ -n "${SIDE_WIN:-}" ] && [ "$(tmux display -p -t "$id" '#{window_id}')" = "$SIDE_WIN" ]; then
       mark='\033[1;36m▸\033[0m'
     fi
-    printf 'pane:%s\t%b%s %-*s \033[2m%3s\033[0m  \n' "$id" "$mark" "$(icon "$cmd")" "$w" "$n" "$win"
+    printf 'pane:%s\t%b%s %s \033[2m%3s\033[0m  \n' "$id" "$mark" "$(icon "$cmd")" "$(pad "$n" "$w")" "$win"
   done <<<"$panes"
 }
 
 # What runs in the sidebar pane: the list, again when fzf ends.
 sidebar() {
-  local rc
+  local rc start quick=0
   printf '\033]2;Agents\033\\'
   while :; do
+    start=$SECONDS
     SHELL=/bin/bash fzf --ansi --no-sort --track --id-nth=1 \
       --delimiter=$'\t' --with-nth=2 --listen --no-input \
       --layout=reverse --info=hidden --no-scrollbar --border=none \
@@ -707,6 +729,14 @@ sidebar() {
       --bind 'esc:execute-silent(tmux select-pane -l)' \
       < /dev/null && rc=0 || rc=$?
     side_log "sidebar ${TMUX_PANE:-}: fzf ended (rc $rc), started again"
+    # fzf that cannot start (too old for these options, pane too small): not
+    # twice a second for ever
+    if [ $(( SECONDS - start )) -lt 2 ]; then quick=$(( quick + 1 )); else quick=0; fi
+    if [ "$quick" -ge 5 ]; then
+      printf '\n fzf does not start (rc %s):\n fzf 0.6x or newer?\n' "$rc"
+      side_log "sidebar ${TMUX_PANE:-}: fzf does not start, sidebar stops"
+      exec sleep infinity
+    fi
     sleep 0.5
   done
 }
@@ -776,7 +806,8 @@ side_lock() {
 # prefix + a or the agents button: every sidebar shows or goes.
 side_toggle() {
   local id
-  if [ -n "$(tmux show -gqv @herdr_side_on)" ]; then
+  # On, but no sidebar left (all closed by hand): it shows again
+  if [ -n "$(tmux show -gqv @herdr_side_on)" ] && [ -n "$(side_in)" ]; then
     tmux set -gu @herdr_side_on
     for id in $(side_in); do tmux kill-pane -t "$id" 2>/dev/null || true; done
     side_log "toggle: off"
@@ -820,17 +851,31 @@ side_ensure() {
 side_fit() {
   local w
   w="$(tmux display -p -t "$1" '#{pane_width}' 2>/dev/null)" || return 0
-  [ "$w" = "$(side_width)" ] || tmux resize-pane -t "$1" -x "$(side_width)" 2>/dev/null || true
+  if [ "$w" != "$(side_width)" ]; then
+    side_fitting
+    tmux resize-pane -t "$1" -x "$(side_width)" 2>/dev/null || true
+  fi
   return 0
+}
+
+# Our own resizes (to the width of every sidebar, maybe less in a narrow
+# window) are not yours: side_resized does not record them
+side_fitting() {
+  tmux set -g @herdr_side_fitting "$(date +%s)" 2>/dev/null || true
 }
 
 # Hook of herdr.conf, after a resize-pane in window $1 (a drag on a border is
 # one): the width of its sidebar, when it changed, is the one of every
 # sidebar from now on.
 side_resized() {
-  local p w
+  local p w t
+  t="$(tmux show -gqv @herdr_side_fitting 2>/dev/null)"
+  [ $(( $(date +%s) - ${t:-0} )) -lt 2 ] && return 0
   p="$(side_in "${1:-}" | head -1)"
   [ -n "$p" ] || return 0
+  # A drag sends one resize per move, in background hooks that may end out
+  # of order: the width once it stopped
+  sleep 0.4
   w="$(tmux display -p -t "$p" '#{pane_width}' 2>/dev/null)" || return 0
   [[ "$w" =~ ^[0-9]+$ ]] && [ "$w" -ge 10 ] || return 0
   [ "$w" = "$(side_width)" ] && return 0
@@ -894,7 +939,16 @@ side_unsplit() {
     [ "$l" -ge "$sl" ] || continue
     if [ -z "$n" ] || [ "$id" = "$act" ]; then n="$id" nl="$l"; fi
   done < <(tmux list-panes -t "$win" -F '#{pane_id} #{pane_left}')
-  [ -n "$n" ] || return 0
+  if [ -z "$n" ]; then
+    # A split across the whole window (split-window -f): nothing in the
+    # column of the sidebar, which goes back on the right, full height
+    id="$(tmux list-panes -t "$win" -F '#{pane_id}' | grep -vx -- "$p" | head -1)" || true
+    [ -n "$id" ] || return 0
+    side_log "unsplit: sidebar $p back to the full height (split across the window)"
+    side_fitting
+    tmux join-pane -hf -d -l "$(side_width)" -s "$p" -t "$id" 2>/dev/null || true
+    return 0
+  fi
   if [ "$nl" = "$sl" ]; then orient=-v; else orient=-h; fi
   # The pane on the left of the column of the sidebar, the top one
   col=$(( nl < sl ? nl : sl ))
@@ -913,6 +967,7 @@ side_unsplit() {
     # The sidebar was alone in its window: it goes back on the right, full
     tmux join-pane -hf -d -s "$p" -t "$n"
   fi
+  side_fitting
   tmux resize-pane -t "$p" -x "$(side_width)" 2>/dev/null || true
   tmux select-pane -t "$n"
   return 0
@@ -1009,9 +1064,9 @@ watch() {
   while tm has-session 2>/dev/null; do
     while IFS= read -r line; do
       tm has-session 2>/dev/null || return 0
-      IFS=$'\t' read -r type t k < <(jq -r '[.params.type // "snapshot", .params.terminal // "", .params.data.status.kind // ""] | @tsv' <<<"$line" 2>/dev/null) || continue
+      IFS=$'\t' read -r type t k < <(jq -r '[.params.type // "snapshot", .params.terminal // "-", .params.data.status.kind // "-"] | map(if . == "" then "-" else . end) | @tsv' <<<"$line" 2>/dev/null) || continue
       [ "$type" = heartbeat ] && continue
-      [ -n "$k" ] && kind[$t]="$k"
+      [ "$k" != - ] && [ "$t" != - ] && kind[$t]="$k"
       now=()
       while IFS=$'\t' read -r addr agent where status; do
         # On the desktop too: blocked, done or failed, once per change
