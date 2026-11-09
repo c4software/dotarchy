@@ -315,9 +315,9 @@ AGENTS="${AGENTS:-claude codex pi omp opencode}"
 choices() {
   local a m found
   for a in $AGENTS; do
-    command -v "$a" >/dev/null 2>&1 && printf '.\t%s\t%-10s here (%s)\n' "$a" "$a" "$(hostname)"
+    command -v "$a" >/dev/null 2>&1 && printf '.\t%s\t%-10s here (%s)\n' "$a" "$a" "$(uname -n)"
   done
-  printf '.\tshell\t%-10s here (%s)\n' shell "$(hostname)"
+  printf '.\tshell\t%-10s here (%s)\n' shell "$(uname -n)"
   while read -r m; do
     [ -n "$m" ] || continue
     found="$("$HC" exec --on "$m" --timeout 5 \
@@ -568,7 +568,7 @@ side_lines() {
   cols="${SIDE_COLS:-$(tmux display -p -t "${TMUX_PANE:-}" '#{pane_width}' 2>/dev/null || true)}"
   [[ "$cols" =~ ^[0-9]+$ ]] || cols="${FZF_COLUMNS:-$SIDE_W}"
   local cur="" n w glyph here
-  here="$(hostname)"
+  here="$(uname -n)"
   # The window of this sidebar: its agent is marked ▸ (not in the palette)
   SIDE_WIN=""
   [ -z "${SIDE_COLS:-}" ] && [ -n "${TMUX_PANE:-}" ] \
