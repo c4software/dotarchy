@@ -109,7 +109,7 @@ open_t() {
   check_addr "$t"
   win="$(find_window "$t")"
   if [ -n "$win" ]; then
-    tmux switch-client -t "$(tmux display-message -p -t "$win" '#{session_id}')" \; select-window -t "$win" \; select-pane -t "$win"
+    tmux switch-client ${HERDR_CLIENT:+-c "$HERDR_CLIENT"} -t "$(tmux display-message -p -t "$win" '#{session_id}')" \; select-window -t "$win" \; select-pane -t "$win"
     return 0
   fi
   # Named like the sidebar shows it: agent·space, @machine when not here
@@ -126,7 +126,15 @@ open_t() {
   name="$app·$space"
   [[ "$t" == */* ]] && name="$name@${t%%/*}"
   name="${name//#/##}"
-  win="$(tmux new-window -P -F '#{window_id}' -n "$name" "$HC attach $t")"
+  # In the session of the client that asked (a click in a sidebar)
+  local -a where=()
+  local sess
+  if [ -n "${HERDR_CLIENT:-}" ]; then
+    # (display -p -c does not give the session of that client)
+    sess="$(tmux list-clients -F '#{client_name} #{session_id}' | awk -v c="$HERDR_CLIENT" '$1 == c { print $2 }')"
+    [ -n "$sess" ] && where=(-t "$sess:")
+  fi
+  win="$(tmux new-window "${where[@]}" -P -F '#{window_id}' -n "$name" "$HC attach $t")"
   tmux set-option -w -t "$win" @hc "$t"
 }
 
@@ -795,23 +803,40 @@ side_pos() {
 }
 
 # What enter does on a line of the sidebar, as fzf actions.
+# The client is the one that shows this sidebar and used it last (the
+# click): with several terminals on a session, tmux would pick one itself.
 side_act() {
+  local c
+  c="$(side_client)"
   case "$1" in
     -) echo ignore ;;
-    new) echo "execute-silent($SELF side-new)" ;;
-    pane:%*) echo "execute-silent($SELF goto-pane ${1#pane:})" ;;
-    *) echo "execute-silent($SELF open $1)+reload-sync($SELF side-lines)" ;;
+    # In the background: the popup stays open while the agent is chosen, the
+    # sidebar must not wait for it
+    new) echo "execute-silent($SELF side-new $c >/dev/null 2>&1 </dev/null &)" ;;
+    pane:%*) echo "execute-silent(HERDR_CLIENT=$c $SELF goto-pane ${1#pane:})" ;;
+    *) echo "execute-silent(HERDR_CLIENT=$c $SELF open $1)+reload-sync($SELF side-lines)" ;;
   esac
 }
 
+# The tmux client of this sidebar (TMUX_PANE): among the ones that show its
+# window, the one active last
+side_client() {
+  local win
+  win="$(tmux display -p -t "${TMUX_PANE:-}" '#{window_id}' 2>/dev/null)" || return 0
+  tmux list-clients -F '#{client_activity} #{client_name} #{window_id}' 2>/dev/null \
+    | awk -v w="$win" '$3 == w' | sort -rn | head -1 | cut -d' ' -f2
+}
+
 # The new agent window, from the sidebar: in the folder of the pane beside.
+# The popup of a new agent, on client $1 (see side_client), in the folder of
+# the pane beside the sidebar (the one active before it)
 side_new() {
-  local p dir client
-  p="$(tmux display -p -t "$(tmux display -p '#{window_id}')" '#{pane_id}')"
-  [[ "$(tmux display -p -t "$p" '#{pane_start_command}')" == *"$SELF sidebar"* ]] \
-    && p="$(tmux display -p -t '{last}' '#{pane_id}' 2>/dev/null || echo "$p")"
-  dir="$(tmux display -p -t "$p" '#{pane_current_path}')"
-  client="$(tmux list-clients -t "$(tmux display -p '#{session_id}')" -F '#{client_name}' | head -1)"
+  local client="${1:-}" win p dir
+  win="$(tmux display -p -t "${TMUX_PANE:-}" '#{window_id}')"
+  p="$(tmux list-panes -t "$win" -F '#{pane_last} #{pane_id} #{pane_start_command}' \
+    | grep -v -- "$SELF sidebar" | sort -rn | head -1 | cut -d' ' -f2)" || true
+  dir="$(tmux display -p -t "${p:-$win}" '#{pane_current_path}')"
+  [ -n "$client" ] || client="$(side_client)"
   tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% -d "$dir" \
     -T "#[align=centre] New agent " "$SELF new"
 }
@@ -1261,10 +1286,10 @@ case "${1:-}" in
   side-act) side_act "${2:-}" ;;
   side-pos) side_pos ;;
   focus) [ -n "${2:-}" ] || { echo "usage: herdr focus <terminal>" >&2; exit 2; }; need_hc; focus "$2" ;;
-  side-new) side_new ;;
+  side-new) side_new "${2:-}" ;;
   goto-pane)
     [[ "${2:-}" =~ ^%[0-9]+$ ]] || exit 2
-    tmux switch-client -t "$(tmux display -p -t "$2" '#{session_id}')" \; select-window -t "$2" \; select-pane -t "$2"
+    tmux switch-client ${HERDR_CLIENT:+-c "$HERDR_CLIENT"} -t "$(tmux display -p -t "$2" '#{session_id}')" \; select-window -t "$2" \; select-pane -t "$2"
     ;;
   app-names) shift; app_names "$@" ;;
   here) shift; [ $# -gt 0 ] || { echo "usage: herdr here <program> [args]" >&2; exit 2; }; here "$@" ;;
