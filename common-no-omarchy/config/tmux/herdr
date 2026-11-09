@@ -548,15 +548,19 @@ age() {
 # The lines of the sidebar: id (address, new, or - for a heading), then what
 # fzf shows. Grouped by status, the ones that need you first.
 side_lines() {
-  local cols rk addr app name mach ms state open key
+  local cols rk addr app name mach ms state open key mark fw
   # The width of the sidebar pane itself
   # (or SIDE_COLS: the palette, a popup)
   cols="${SIDE_COLS:-$(tmux display -p -t "${TMUX_PANE:-}" '#{pane_width}' 2>/dev/null || true)}"
   [[ "$cols" =~ ^[0-9]+$ ]] || cols="${FZF_COLUMNS:-$SIDE_W}"
   local cur="" n w glyph here
   here="$(hostname)"
-  [ -n "$HC" ] || { printf -- '-\t\033[2m herdr-core not available\033[0m\n'; return 0; }
-  printf 'new\t \033[1;32m+\033[0m New agent\n'
+  # The window of this sidebar: its agent is marked ▸ (not in the palette)
+  SIDE_WIN=""
+  [ -z "${SIDE_COLS:-}" ] && [ -n "${TMUX_PANE:-}" ] \
+    && SIDE_WIN="$(tmux display -p -t "$TMUX_PANE" '#{window_id}' 2>/dev/null || true)"
+  # The first line is the header of fzf (--header-lines=1)
+  [ -n "$HC" ] || { printf -- '-\t \033[1mAgents\033[0m\n-\t\033[2m herdr-core not available\033[0m\n'; return 0; }
   local -A count=() needs=()
   local rows
   # One group per machine, this one first; in each, the agents that need you
@@ -576,6 +580,21 @@ side_lines() {
       done | sort -t $'\t' -k1,1 -k2,2n -k8,8nr)"
   local panes
   panes="$(tmux_agents)"
+  # Header: the number of agents in each state, the ones that need you first
+  local -A st=()
+  local hdr=" \033[1mAgents\033[0m"
+  if [ -n "$rows" ]; then
+    while IFS=$'\t' read -r key rk mach state _; do
+      st[${state:-other}]=$(( ${st[${state:-other}]:-0} + 1 ))
+    done <<<"$rows"
+  fi
+  [ -n "${st[blocked]:-}" ] && hdr+=" \033[1;31m⚠${st[blocked]}\033[0m"
+  [ -n "${st[error]:-}" ] && hdr+=" \033[31m✗${st[error]}\033[0m"
+  [ -n "${st[working]:-}" ] && hdr+=" \033[34m●${st[working]}\033[0m"
+  [ -n "${st[done]:-}" ] && hdr+=" \033[33m✓${st[done]}\033[0m"
+  [ -n "${st[idle]:-}" ] && hdr+=" \033[2m○${st[idle]}\033[0m"
+  printf -- '-\t%b\n' "$hdr"
+  printf 'new\t \033[1;32m+\033[0m New agent\n'
   [ -n "$rows$panes" ] || { printf -- '-\t\n-\t\033[2m No agent\033[0m\n'; return 0; }
   side_panes "$panes" "$cols"
   [ -n "$rows" ] || return 0
@@ -595,13 +614,20 @@ side_lines() {
       done) glyph='\033[33m✓' ;; working) glyph='\033[34m●' ;;
       idle) glyph='\033[2m○' ;; *) glyph=' ' ;;
     esac
-    open=""; [ -n "$(find_window "$addr")" ] && open='\033[1m'
+    open=""; mark=" "
+    fw="$(find_window "$addr")"
+    if [ -n "$fw" ]; then
+      open='\033[1m'
+      if [ -n "$SIDE_WIN" ] && [ "$(tmux display -p -t "$fw" '#{window_id}')" = "$SIDE_WIN" ]; then
+        mark='\033[1;36m▸\033[0m'
+      fi
+    fi
     # icon, name, then age and status on the right
     w=$(( cols - 11 ))
     [ "$w" -lt 4 ] && w=4
     n="$name"; [ "${#n}" -gt "$w" ] && n="${n:0:$((w - 1))}…"
-    printf '%s\t %s %b%-*s\033[0m \033[2m%3s\033[0m %b\033[0m\n' \
-      "$addr" "$(icon "$app")" "$open" "$w" "$n" "$(age "$ms")" "$glyph"
+    printf '%s\t%b%s %b%-*s\033[0m \033[2m%3s\033[0m %b\033[0m\n' \
+      "$addr" "$mark" "$(icon "$app")" "$open" "$w" "$n" "$(age "$ms")" "$glyph"
   done <<<"$rows"
 }
 
@@ -642,14 +668,18 @@ tmux_agents() {
 
 # Their group in the sidebar, first: a click goes to the pane.
 side_panes() {
-  local panes="$1" cols="$2" id cmd path win n w
+  local panes="$1" cols="$2" id cmd path win n w mark
   [ -n "$panes" ] || return 0
   printf -- '-\t\n-\t \033[1mtmux\033[0m \033[2m%s\033[0m\n' "$(grep -c . <<<"$panes")"
   w=$(( cols - 11 ))
   [ "$w" -lt 4 ] && w=4
   while IFS=$'\t' read -r id cmd path win; do
     n="$(basename "$path")"; [ "${#n}" -gt "$w" ] && n="${n:0:$((w - 1))}…"
-    printf 'pane:%s\t %s %-*s \033[2m%3s\033[0m  \n' "$id" "$(icon "$cmd")" "$w" "$n" "$win" 
+    mark=" "
+    if [ -n "${SIDE_WIN:-}" ] && [ "$(tmux display -p -t "$id" '#{window_id}')" = "$SIDE_WIN" ]; then
+      mark='\033[1;36m▸\033[0m'
+    fi
+    printf 'pane:%s\t%b%s %-*s \033[2m%3s\033[0m  \n' "$id" "$mark" "$(icon "$cmd")" "$w" "$n" "$win"
   done <<<"$panes"
 }
 
@@ -661,7 +691,7 @@ sidebar() {
     SHELL=/bin/bash fzf --ansi --no-sort --track --id-nth=1 \
       --delimiter=$'\t' --with-nth=2 --listen --no-input \
       --layout=reverse --info=hidden --no-scrollbar --border=none \
-      --pointer=" " --gutter=" " --header=" Agents" --header-first \
+      --pointer=" " --gutter=" " --header-lines=1 --header-first \
       --color='bg+:236,gutter:-1,header:bold' \
       --bind "start:reload-sync($SELF side-lines)+execute-silent($SELF tick \$FZF_PORT side-lines </dev/null >/dev/null 2>&1 &)" \
       --bind "resize:reload-sync($SELF side-lines)" \
@@ -669,7 +699,7 @@ sidebar() {
       --bind "double-click:transform:$SELF side-act {1}" \
       --bind "left-click:transform:$SELF side-act {1}" \
       --bind "ctrl-x:execute-silent([ {1} = new ] || [ {1} = - ] || [[ {1} == pane:* ]] || $SELF close {1})+reload-sync($SELF side-lines)" \
-      --bind 'esc:ignore' \
+      --bind 'esc:execute-silent(tmux select-pane -l)' \
       < /dev/null && rc=0 || rc=$?
     side_log "sidebar ${TMUX_PANE:-}: fzf ended (rc $rc), started again"
     sleep 0.5
@@ -916,7 +946,7 @@ watch() {
   echo $$ > "$lock.pid"
   export TMUX_SOCK="$sock"
   tm() { tmux -S "$TMUX_SOCK" "$@"; }
-  local -A prev=() now=() kind=()
+  local -A prev=() now=() kind=() was=()
   local line type t k addr agent where status first=1
   while tm has-session 2>/dev/null; do
     while IFS= read -r line; do
@@ -926,6 +956,11 @@ watch() {
       [ -n "$k" ] && kind[$t]="$k"
       now=()
       while IFS=$'\t' read -r addr agent where status; do
+        # On the desktop too: blocked, done or failed, once per change
+        if [ -z "$first" ] && [ "${was[$addr]:-}" != "$status" ]; then
+          desktop_notify "$agent" "$where" "$status" "${kind[$addr]:-}"
+        fi
+        was[$addr]="$status"
         [ "$status" = blocked ] || continue
         now[$addr]=1
         [ -n "$first" ] || [ -n "${prev[$addr]:-}" ] && continue
@@ -950,6 +985,21 @@ notify() {
     [ -n "$win" ] && [ "$cwin" = "$win" ] && continue
     tm display-message -c "$client" -d 10000 "$msg" 2>/dev/null || true
   done < <(tm list-clients -F '#{client_name} #{window_id}' 2>/dev/null)
+}
+
+# A desktop notification (notify-send) for agent $1 in $2, now $3: not
+# when herdr-app runs (it has its own), nor when notify-send is missing.
+desktop_notify() {
+  local agent="$1" where="$2" status="$3" k="$4" body urgency=normal
+  case "$status" in
+    blocked) body="needs you${k:+ ($k)}"; urgency=critical ;;
+    done) body="finished" ;;
+    error) body="ended with an error" ;;
+    *) return 0 ;;
+  esac
+  command -v notify-send >/dev/null 2>&1 || return 0
+  pgrep -x herdr-app >/dev/null 2>&1 && return 0
+  notify-send -a Herdr -u "$urgency" "$agent · $where" "$body" 2>/dev/null || true
 }
 
 watch_stop() {
