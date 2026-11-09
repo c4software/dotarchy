@@ -156,18 +156,12 @@ cp "$SCRIPT_DIR/../common-no-omarchy/config/opencode/plugins/llm-proxy.ts" ~/.co
 # Herdr : Activate zsh in herdr configuration
 [ -f ~/.config/herdr/config.toml ] && sed -i '/^\[terminal\]/a default_shell = "zsh"' ~/.config/herdr/config.toml
 
-# Tmux Enable ZSH
-echo 'set-option -g default-shell /bin/zsh' >>~/.config/tmux/tmux.conf
-
-# Tmux : Ctrl+T sans prefix ouvre un onglet dans le dossier du panneau courant
-grep -q 'bind -n C-t new-window' ~/.config/tmux/tmux.conf \
-  || echo 'bind -n C-t new-window -c "#{pane_current_path}"' >>~/.config/tmux/tmux.conf
-
-# Tmux : boutons + et agents de la barre de statut, menu des agents Herdr
-# (herdr.conf et son script, sourcés à la fin de la config d'Omarchy)
-cp "$SCRIPT_DIR/../common-no-omarchy/config/tmux/herdr.conf" "$SCRIPT_DIR/../common-no-omarchy/config/tmux/herdr" ~/.config/tmux/
-grep -q 'source-file -q ~/.config/tmux/herdr.conf' ~/.config/tmux/tmux.conf \
-  || echo 'source-file -q ~/.config/tmux/herdr.conf' >>~/.config/tmux/tmux.conf
+# Tmux : la config de dotarchy remplace celle d'Omarchy (zsh, Ctrl+T, boutons
+# + et agents de la barre, barre latérale et palette des agents Herdr)
+mkdir -p ~/.config/tmux
+cp "$SCRIPT_DIR/../common-no-omarchy/config/tmux/tmux.conf" \
+  "$SCRIPT_DIR/../common-no-omarchy/config/tmux/herdr.conf" \
+  "$SCRIPT_DIR/../common-no-omarchy/config/tmux/herdr" ~/.config/tmux/
 
 # Enable some keyboard stuff (nuphy, apple keyboard key swapping)
 (
