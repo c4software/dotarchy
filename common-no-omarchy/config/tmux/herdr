@@ -26,18 +26,19 @@
 #                         too: a space for its folder, a tab for it. The agents offered are
 #                         the ones installed among HERDR_AGENTS (the tmux
 #                         option @herdr_agents): claude codex pi omp opencode
-#   herdr watch [socket]  follows herdr-core and, when an agent asks for an
-#                         action (status blocked), shows a message on every
-#                         tmux client and the count in @herdr_blocked (the ⚠
-#                         of the agents button); one per tmux server, started
-#                         by herdr.conf. watch restart: after an update
+#   herdr watch [socket]  follows the events of herdr-core: keeps the cache of
+#                         the sidebars and the ones on screen up to date, shows
+#                         a message on every tmux client and on the desktop when
+#                         an agent needs you, the count in @herdr_blocked (the ⚠
+#                         of the agents button), its windows in red; one per
+#                         tmux server, started by herdr.conf or by a sidebar.
+#                         watch restart: after an update
 #   herdr menu [client]   the tmux menu of the agents, one line each: picking a
 #                         line opens the agent in a window of its own, picking
 #                         it again closes that window
 #   herdr prepare [mouse] the same menu as a tmux command, in the option
-#                         @herdr_menu, for herdr.conf (prefix + Alt+a, formerly the
-#                         agents button); with mouse, it opens under the status line
-#                         on the right, where the button is
+#                         @herdr_menu, for herdr.conf (prefix + Alt+a); with
+#                         mouse, it opens under the status line, on the right
 #   herdr toggle <t>      open or close the window of terminal <t> (t7)
 #   herdr open|close <t>  open (or go to) the window of terminal <t>, close it
 #   herdr list            the live terminals, and whether a window is open
@@ -296,8 +297,8 @@ popup() {
     < /dev/null
 }
 
-# Refreshes a list every 2 seconds through the fzf API, until fzf ends:
-# $2 is the command of this script that prints it (lines, side-lines).
+# Refreshes the list of the popup every 2 seconds through the fzf API, until
+# fzf ends: $2 is the command of this script that prints it (lines).
 tick() {
   local port="$1" what="${2:-lines}" extra=""
   [[ "$port" =~ ^[0-9]+$ ]] || exit 0
@@ -482,7 +483,7 @@ ls -A --group-directories-first --color=always -1 . 2>/dev/null'
   fi
 }
 
-# A folder picked by walking the tree (instead of typing it), on machine $1,
+# A folder picked by walking the tree, on machine $1,
 # from $3: enter goes in, .. up, . or ctrl-o takes it, ctrl-h goes home;
 # typing filters the folders of the one shown. Git repositories show their
 # branch, hidden folders are dim, the right side shows what the folder holds.
@@ -617,12 +618,12 @@ adopt() {
 
 # The state of the agents for the sidebars: herdr watch writes it to a cache
 # at each event of herdr-core (the file of its tmux server), the sidebars and
-# the palette read it instead of asking herdr-core every time. Without a
+# the palette read it. Without a
 # watch running (none, or another machine), they ask herdr-core.
 side_cache() {
   local sock="${1:-${TMUX_SOCK:-${TMUX:-}}}"
   sock="${sock%%,*}"
-  # (the path of the socket, / as _: no md5sum to start, it has the uid)
+  # (the path of the socket, / as _: it has the uid)
   printf '%s/herdr-side%s.json' "${XDG_RUNTIME_DIR:-/tmp}" "${sock//\//_}"
 }
 
@@ -661,7 +662,8 @@ side_watch_ensure() {
 # with a shell; its label still names the agent, its title is the one of the
 # shell. A jq function, for side_lines and ghosts_clean.
 # Only one of the agents (AGENTS), named by the label herdr.agent (start and
-# here set it) or, for the older ones, at the end of the label where: a
+# here set it) or, for agents started without it, at the end of the label
+# where: a
 # shell labelled by something else is never one.
 printf -v GHOST_AGENTS '"%s",' $AGENTS
 GHOST_JQ='def ghost:
@@ -991,7 +993,6 @@ side_client() {
     | awk -v w="$win" '$3 == w' | sort -rn | head -1 | cut -d' ' -f2
 }
 
-# The new agent window, from the sidebar: in the folder of the pane beside.
 # The popup of a new agent, on client $1 (see side_client), in the folder of
 # the pane beside the sidebar (the one active before it)
 # $1: project or folder (see new_agent)
@@ -1006,10 +1007,10 @@ side_new() {
     -T "#[align=centre] New ${mode:+$mode }agent " "$SELF new $mode"
 }
 
-# The sidebar is one pane per window, on its right, the full height: none
-# moves from a window to another. Each one is made when its window is shown
-# (hooks of herdr.conf: herdr sidebar ensure) while @herdr_side_on says that
-# it is wanted, and only the ones on screen refresh (see tick).
+# The sidebar is one pane per window, on its right, the full height. Each one
+# is made when its window is shown (hooks of herdr.conf: herdr sidebar
+# ensure) while @herdr_side_on says that it is wanted; herdr watch keeps the
+# ones on screen up to date.
 
 # The sidebar panes of window $1, or of every window
 side_in() {
@@ -1418,7 +1419,7 @@ copy_t() {
   tmux display-message "Copied: $1"
 }
 
-# --- Palette (Ctrl+Shift+P) -----------------------------------------------
+# --- Palette (Ctrl+K) -------------------------------------------------------
 
 # The windows of every session, then the agents (like the sidebar), in a
 # popup with a search: enter goes there. The current window is not in it.
