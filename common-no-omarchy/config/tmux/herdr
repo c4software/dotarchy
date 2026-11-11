@@ -771,11 +771,15 @@ side_lines() {
         if [[ "$addr" == */* ]]; then mach="${addr%%/*}" key="1$mach"; else mach="$here" key="0"; fi
         printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$key" "$(rank "$state")" "$mach" "$state" "$addr" "$app" "$name" "$ms"
       done | sort -t $'\t' -k1,1 -k2,2n -k8,8nr || true)"
+  # Options: only the agents of this machine
+  if [ -n "$(tmux show -gqv @herdr_side_local 2>/dev/null)" ] && [ -n "$rows" ]; then
+    rows="$(awk -F '\t' -v h="$here" '$3 == h' <<<"$rows")"
+  fi
   local panes
   panes="$(tmux_agents)"
   # Header: the number of agents in each state, the ones that need you first
   local -A st=()
-  local hdr=" \033[1mAgents\033[0m"
+  local hdr=" \033[1mAgents\033[0m \033[2m⚙\033[0m"
   if [ -n "$rows" ]; then
     while IFS=$'\t' read -r key rk mach state _; do
       st[${state:-other}]=$(( ${st[${state:-other}]:-0} + 1 ))
@@ -903,6 +907,10 @@ sidebar() {
       --bind "double-click:transform:$SELF side-act {1}" \
       --bind "left-click:transform:$SELF side-act {1}" \
       --bind "ctrl-x:execute-silent($SELF side-x {1})+reload-sync($SELF side-lines)" \
+      --bind "right-click:transform:$SELF side-menu {1}" \
+      --bind "space:transform:$SELF side-menu {1}" \
+      --bind "click-header:transform:$SELF side-menu options" \
+      --bind "o:transform:$SELF side-menu options" \
       --bind 'esc:execute-silent(tmux select-pane -l)' \
       < /dev/null && rc=0 || rc=$?
     side_log "sidebar ${TMUX_PANE:-}: fzf ended (rc $rc), started again"
@@ -1190,6 +1198,144 @@ side_unsplit() {
   return 0
 }
 
+# --- Floating menus of the sidebar ----------------------------------------
+
+# fzf action for right-click or space on line $1 of the sidebar (or for
+# "options": a click on the header, o): a small popup over the sidebar, on
+# the client of the sidebar, in the background (it stays while you choose).
+side_menu() {
+  local id="${1:-}" c
+  case "$id" in -|new*|"") echo ignore; return 0 ;; esac
+  c="$(side_client)"
+  echo "execute-silent($SELF side-popup $(printf '%q' "$id") $c >/dev/null 2>&1 </dev/null &)"
+}
+
+side_popup() {
+  local id="$1" client="${2:-}" title h
+  case "$id" in
+    options) title=" Options "; h=12 ;;
+    ghost:*) title=" Ghost "; h=6 ;;
+    pane:*) title=" tmux pane "; h=7 ;;
+    *) title=" $id "; h=12 ;;
+  esac
+  tmux display-popup ${client:+-c "$client"} -E -w 44 -h "$h" -x R -y C \
+    -T "#[align=centre]$title" "HERDR_CLIENT=$client $SELF menu-ui $(printf '%q' "$id")"
+}
+
+# Inside the popup: the actions of line $1, chosen with fzf (mouse or keys)
+menu_ui() {
+  local id="$1" t act msg win p
+  [ "$id" = options ] && { options_ui; return 0; }
+  local -a items=()
+  case "$id" in
+    ghost:*)
+      t="${id#ghost:}"
+      items=($'open\tOpen its shell' $'forget\tRemove it') ;;
+    pane:%*)
+      t="${id#pane:}"
+      items=($'goto\tGo to the pane' $'int\tInterrupt (ctrl+c)' $'kill\tClose the pane') ;;
+    *)
+      t="$id"
+      items=($'open\tOpen' $'split\tOpen in a split, beside' $'close\tClose its window'
+             $'int\tInterrupt (ctrl+c)' $'send\tSend a message…' $'rename\tRename its window…'
+             $'copy\tCopy its address' $'forget\tRemove the agent') ;;
+  esac
+  act="$(printf '%s\n' "${items[@]}" | fzf --delimiter=$'\t' --with-nth=2 --layout=reverse \
+    --no-input --info=hidden --no-scrollbar --pointer='▌' --gutter=' ' \
+    --bind 'left-click:accept' --bind 'q:abort' | cut -f1)" || return 0
+  case "$act" in
+    open) open_t "$t" ;;
+    goto) "$SELF" goto-pane "$t" ;;
+    split)
+      # Beside the pane of the client's window that was used last (not the
+      # sidebar)
+      win="$(tmux list-clients -F '#{client_name} #{window_id}' | awk -v c="${HERDR_CLIENT:-}" '$1 == c { print $2 }')"
+      [ -n "$win" ] || return 0
+      p="$(tmux list-panes -t "$win" -F '#{pane_active}#{pane_last} #{pane_id} #{pane_start_command}' \
+        | grep -v -- "$SELF sidebar" | sort -rn | head -1 | awk '{ print $2 }')"
+      [ -n "$p" ] || return 0
+      p="$(tmux split-window -h -t "$p" -P -F '#{pane_id}' "$HC attach $t")"
+      tmux set -p -t "$p" @hc "$t" ;;
+    close) close_t "$t" ;;
+    int)
+      if [[ "$id" == pane:* ]]; then tmux send-keys -t "$t" C-c
+      else "$HC" interrupt "$t" >/dev/null 2>&1 || true; fi ;;
+    send)
+      read -r -e -p "Message: " msg || return 0
+      if [ -n "$msg" ]; then "$HC" send "$t" "$msg" >/dev/null 2>&1 || true; fi ;;
+    rename)
+      win="$(find_window "$t")"
+      [ -n "$win" ] || { read -rsn1 -p "No window open for $t (a key)" || true; return 0; }
+      read -r -e -i "$(tmux display -p -t "$win" '#{window_name}')" -p "Name: " msg || return 0
+      if [ -n "$msg" ]; then tmux rename-window -t "$win" -- "$msg"; fi ;;
+    copy)
+      tmux set-buffer -- "$t"
+      if command -v wl-copy >/dev/null 2>&1; then printf '%s' "$t" | wl-copy 2>/dev/null || true; fi
+      tmux display-message "Copied: $t" ;;
+    kill)
+      read -rsn1 -p "Close pane $t? (y/N) " msg || return 0
+      if [ "$msg" = y ]; then tmux kill-pane -t "$t"; fi ;;
+    forget)
+      read -rsn1 -p "Remove $t, its program ends? (y/N) " msg || return 0
+      if [ "$msg" = y ]; then forget "$t"; fi ;;
+  esac
+  return 0
+}
+
+# The options: tmux options, kept in ~/.config/tmux/herdr-options.conf (which
+# herdr.conf sources), so they stay after tmux restarts. fzf in a loop,
+# enter changes the line.
+OPTS_FILE="$HOME/.config/tmux/herdr-options.conf"
+
+opt_set() {
+  local k="$1" v="$2" f="$OPTS_FILE"
+  if [ -n "$v" ]; then tmux set -g "$k" "$v"; else tmux set -gu "$k"; fi
+  touch "$f"
+  grep -v "^set -g $k " "$f" > "$f.tmp" 2>/dev/null || true
+  if [ -n "$v" ]; then printf 'set -g %s %s\n' "$k" "$v" >> "$f.tmp"; fi
+  mv "$f.tmp" "$f"
+}
+
+onoff() { if [ -n "${1:-}" ]; then printf '\033[32mon\033[0m'; else printf '\033[2moff\033[0m'; fi; }
+is_set() { [ -n "$(tmux show -gqv "$1" 2>/dev/null)" ] && echo 1 || true; }
+not_set() { [ -z "$(tmux show -gqv "$1" 2>/dev/null)" ] && echo 1 || true; }
+
+options_ui() {
+  local sel v n ttl w pos=1
+  while :; do
+    ttl="$(tmux show -gqv @herdr_ghost_ttl)"; ttl="${ttl:-24}"
+    n="$(ghosts_clean --dry-run 2>/dev/null | grep -c . || true)"
+    sel="$( {
+      printf 'width\t Width of the sidebars  \033[1m%s\033[0m\n' "$(side_width)"
+      printf 'notify\t Desktop notifications  %b\n' "$(onoff "$(not_set @herdr_notify_off)")"
+      printf 'done\t   also when done         %b\n' "$(onoff "$(is_set @herdr_notify_done)")"
+      printf 'local\t Only this machine      %b\n' "$(onoff "$(is_set @herdr_side_local)")"
+      printf 'ttl\t Ghosts removed after   \033[1m%s\033[0m\n' "$( [ "$ttl" = 0 ] && echo never || echo "$ttl h")"
+      printf 'clean\t Remove old ghosts now  \033[2m%s\033[0m\n' "$n"
+    } | fzf --ansi --delimiter=$'\t' --with-nth=2 --layout=reverse --no-input --info=hidden \
+        --no-scrollbar --pointer='▌' --gutter=' ' --no-sort \
+        --header=$'\033[2menter: change · esc: close\033[0m' --bind 'left-click:accept' \
+        --bind "load:pos($pos)" | cut -f1)" || return 0
+    # The cursor stays on the line changed
+    case "$sel" in width) pos=1 ;; notify) pos=2 ;; done) pos=3 ;; local) pos=4 ;; ttl) pos=5 ;; clean) pos=6 ;; esac
+    case "$sel" in
+      width)
+        read -r -e -i "$(side_width)" -p "Width (columns): " v || continue
+        [[ "$v" =~ ^[0-9]+$ ]] && [ "$v" -ge 10 ] || continue
+        opt_set @herdr_side_w "$v"
+        for w in $(tmux list-clients -F '#{window_id}' | sort -u); do side_window_resized "$w"; done ;;
+      notify) opt_set @herdr_notify_off "$(not_set @herdr_notify_off)" ;;
+      done) opt_set @herdr_notify_done "$(not_set @herdr_notify_done)" ;;
+      local) opt_set @herdr_side_local "$(not_set @herdr_side_local)" ;;
+      ttl)
+        case "$ttl" in 12) v=24 ;; 24) v=48 ;; 48) v=168 ;; 168) v=0 ;; *) v=12 ;; esac
+        opt_set @herdr_ghost_ttl "$v" ;;
+      # (never: nothing, a ttl of 0 would remove every ghost)
+      clean) if [ "$ttl" != 0 ]; then HERDR_GHOST_TTL="$ttl" ghosts_clean >/dev/null 2>&1 || true; fi ;;
+    esac
+  done
+}
+
 # --- Palette (Ctrl+Shift+P) -----------------------------------------------
 
 # The windows of every session, then the agents (like the sidebar), in a
@@ -1345,6 +1491,7 @@ desktop_notify() {
     *) return 0 ;;
   esac
   command -v notify-send >/dev/null 2>&1 || return 0
+  [ -n "$(tm show -gqv @herdr_notify_off 2>/dev/null)" ] && return 0
   pgrep -x herdr-app >/dev/null 2>&1 && return 0
   # In the background (notify-send waits for the click), without the lock
   # of watch (fd 9)
@@ -1456,6 +1603,9 @@ case "${1:-}" in
   side-act) side_act "${2:-}" ;;
   side-pos) side_pos ;;
   side-x) side_x "${2:-}" ;;
+  side-menu) side_menu "${2:-}" ;;
+  side-popup) side_popup "${2:-}" "${3:-}" ;;
+  menu-ui) need_hc; menu_ui "${2:-}" ;;
   ghosts-clean) need_hc; ghosts_clean "${2:-}" ;;
   revive) need_hc; [ -n "${2:-}" ] || exit 2; revive "$2" ;;
   forget) need_hc; [ -n "${2:-}" ] || exit 2; forget "$2" ;;
