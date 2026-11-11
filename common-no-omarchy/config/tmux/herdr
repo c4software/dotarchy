@@ -75,7 +75,7 @@ need_hc() {
 
 # Live terminals of herdr-core, one per line: address, agent, where, status.
 terminals() {
-  "$HC" ls | jq -r '.terminals[]
+  timeout 5 "$HC" ls | jq -r '.terminals[]
     # No empty field (read joins the tabs around one)
     | [.address, (.agent // "shell"),
        (.where // .cwd // "?" | if . == "" then "?" else . end),
@@ -301,56 +301,12 @@ popup() {
 tick() {
   local port="$1" what="${2:-lines}" extra=""
   [[ "$port" =~ ^[0-9]+$ ]] || exit 0
-  [ "$what" = side-lines ] && { side_tick "$port"; exit 0; }
   [ "$what" = lines ] && extra="+refresh-preview"
   while sleep 2; do
     curl -fsS -m 2 -XPOST "localhost:$port" -d "reload-sync($SELF $what)$extra" >/dev/null 2>&1 || exit 0
   done
 }
 
-# The tick of a sidebar ($1: the port of its fzf). herdr watch reloads it at
-# each change of the agents; this keeps it right in between, with one tmux
-# call a turn: every 2 s on screen, 10 s off screen. It ends when another
-# fzf took the pane (its port changed) or the pane is gone.
-#  - the machine slept (a turn much longer than asked): the sidebar starts
-#    again (it can come back from it stuck: no answer, odd characters)
-#  - on screen: out of copy mode, the mouse of fzf back, the width of every
-#    sidebar (@herdr_side_w); a reload every 30 s (the ages, the panes of
-#    tmux), every turn when no watch runs (side_data then asks herdr-core)
-side_tick() {
-  local port="$1" p="${TMUX_PANE:-}" iv=2 last=$EPOCHSECONDS reloaded=$EPOCHSECONDS
-  local mp vis mode any tty w sw watched=1 wcheck=0
-  [ -n "$p" ] || exit 0
-  tmux set -p -t "$p" @herdr_side_port "$port"
-  while sleep "$iv"; do
-    read -r mp vis mode any w sw tty < <(tmux display -p -t "$p" \
-      '#{@herdr_side_port} #{&&:#{window_active},#{session_attached}} #{pane_in_mode} #{mouse_any_flag} #{pane_width} #{@herdr_side_w} #{pane_tty}' 2>/dev/null) || exit 0
-    [ "$mp" = "$port" ] || exit 0
-    if [ $(( EPOCHSECONDS - last )) -gt $(( iv + 28 )) ]; then
-      side_log "tick: woke up after $(( EPOCHSECONDS - last )) s, sidebar $p started again"
-      tmux respawn-pane -k -t "$p" "$SELF sidebar"
-      exit 0
-    fi
-    last=$EPOCHSECONDS
-    if [ "$vis" != 1 ]; then iv=10; continue; fi
-    iv=2
-    [ "$mode" = 1 ] && tmux send-keys -t "$p" -X cancel 2>/dev/null
-    [ "$any" = 0 ] && [ -w "$tty" ] && printf '\033[?1000h\033[?1002h\033[?1006h' > "$tty"
-    [[ "$sw" =~ ^[0-9]+$ ]] && [ "$sw" -ge 10 ] || sw=$SIDE_W
-    if [ "$w" != "$sw" ]; then
-      side_fitting
-      tmux resize-pane -t "$p" -x "$sw" 2>/dev/null || true
-    fi
-    # Is a watch running? (asked every 30 s only)
-    if [ $(( EPOCHSECONDS - wcheck )) -ge 30 ]; then
-      wcheck=$EPOCHSECONDS
-      if side_watched; then watched=1; else watched=""; fi
-    fi
-    [ -z "$watched" ] || [ $(( EPOCHSECONDS - reloaded )) -ge 30 ] || continue
-    reloaded=$EPOCHSECONDS
-    curl -fsS -m 2 -XPOST "localhost:$port" -d "reload-sync($SELF side-lines)" >/dev/null 2>&1 || true
-  done
-}
 
 # --- New agent ------------------------------------------------------------
 
@@ -676,12 +632,29 @@ side_data() {
   if [ -s "$f" ] && side_watched; then cat "$f"; else full; fi
 }
 
-# A herdr watch runs for this tmux server (its cache is kept up to date)
+# A herdr watch runs for this tmux server (its cache is kept up to date):
+# its lock is held (a pid can be taken again by another program)
 side_watched() {
-  local sock="${TMUX_SOCK:-${TMUX:-}}" pid
+  local sock="${TMUX_SOCK:-${TMUX:-}}" f
   sock="${sock%%,*}"
-  read -r pid < "$WATCH_LOCK-${sock//\//_}.pid" 2>/dev/null || return 1
-  [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null
+  f="$WATCH_LOCK-${sock//\//_}"
+  [ -e "$f" ] || return 1
+  ! flock -n "$f" true 2>/dev/null
+}
+
+# The sidebars depend on herdr watch (the cache, their upkeep): when none
+# runs, they start it, through tmux (not as their child: it would end with
+# the pane). Its lock keeps one when several start it at once; one try every
+# 10 s at most, none without herdr-core.
+side_watch_ensure() {
+  local t
+  [ -n "$HC" ] || return 0
+  side_watched && return 0
+  t="$(tmux show -gqv @herdr_watch_try 2>/dev/null)"
+  [ $(( EPOCHSECONDS - ${t:-0} )) -ge 10 ] || return 0
+  tmux set -g @herdr_watch_try "$EPOCHSECONDS" 2>/dev/null || true
+  side_log "watch: none running, started"
+  tmux run-shell -b "$SELF watch '#{socket_path}'" 2>/dev/null || true
 }
 
 # A ghost: an agent lost (a reboot, herdr-core stopped) that keep replaced
@@ -938,13 +911,14 @@ sidebar() {
   ( ghosts_clean ) </dev/null >/dev/null 2>&1 &
   printf '\033]2;Agents\033\\'
   while :; do
+    side_watch_ensure
     start=$SECONDS
     SHELL=/bin/bash fzf --ansi --no-sort --track --id-nth=1 \
       --delimiter=$'\t' --with-nth=2 --listen --no-input \
       --layout=reverse --info=hidden --no-scrollbar --border=none \
       --pointer=" " --gutter=" " --header-lines=1 --header-first \
       --color='bg+:236,gutter:-1,header:bold' \
-      --bind "start:reload-sync($SELF side-lines)+execute-silent($SELF tick \$FZF_PORT side-lines </dev/null >/dev/null 2>&1 &)" \
+      --bind "start:reload-sync($SELF side-lines)+execute-silent(tmux set -p -t \$TMUX_PANE @herdr_side_port \$FZF_PORT)" \
       --bind "resize:reload-sync($SELF side-lines)" \
       --bind "load:transform:$SELF side-pos" \
       --bind "enter:transform:$SELF side-act {1}" \
@@ -1101,6 +1075,7 @@ side_key() {
 side_ensure() {
   local win="${1:-}" first="" id port
   [ -n "$win" ] || return 0
+  side_watch_ensure
   [ -n "$(tmux show -gqv @herdr_side_on)" ] || return 0
   for id in $(side_in "$win"); do
     if [ -z "$first" ]; then first="$id"; continue; fi
@@ -1533,14 +1508,41 @@ watch() {
   tm() { tmux -S "$TMUX_SOCK" "$@"; }
   local -A prev=() now=() kind=() was=()
   local line meth type t k addr agent where status first=1 dirty="" flushed=0 rc nblk=""
+  local maint=0 aged=$SECONDS turn=$SECONDS heard=$SECONDS
   while tm has-session 2>/dev/null; do
-    # One line per event; every second without one (read -t), the sidebars
-    # get the changes of the second before (at most one refresh a second)
+    # One line per event, or every second without one (read -t): the
+    # sidebars get the changes at most once every 5 seconds; every 2 seconds
+    # they are kept right (side_maint)
     while :; do
-      if IFS= read -r -t 1 line; then :; else
+      if IFS= read -r -t 1 line; then rc=0; heard=$SECONDS; else
         rc=$?
         [ "$rc" -gt 128 ] || break
-        if [ -n "$dirty" ]; then dirty=""; flushed=$SECONDS; side_flush; fi
+      fi
+      # A turn of this loop much longer than a second: the machine slept, the
+      # sidebars start again (they can come back from it stuck), and the
+      # events too (over ssh, a stream can be dead without its end)
+      if [ $(( SECONDS - turn )) -gt 30 ]; then
+        side_log "watch: woke up after $(( SECONDS - turn )) s, sidebars and events started again"
+        side_wake
+        events_restart
+        break
+      fi
+      turn=$SECONDS
+      # Nothing for 45 s, not even a heartbeat (every 15 s): the stream is
+      # dead, follow herdr-core again
+      if [ $(( SECONDS - heard )) -gt 45 ]; then
+        side_log "watch: no event for 45 s, events started again"
+        events_restart
+        break
+      fi
+      if [ $(( SECONDS - maint )) -ge 2 ]; then
+        maint=$SECONDS
+        # every minute, a reload of the ones on screen (the ages are in
+        # minutes)
+        if [ $(( SECONDS - aged )) -ge 60 ]; then aged=$SECONDS; side_maint reload; else side_maint; fi
+      fi
+      if [ "$rc" != 0 ]; then
+        if [ -n "$dirty" ] && [ $(( SECONDS - flushed )) -ge 5 ]; then dirty=""; flushed=$SECONDS; side_flush; fi
         continue
       fi
       tm has-session 2>/dev/null || return 0
@@ -1552,7 +1554,7 @@ watch() {
         continue
       fi
       dirty=1
-      if [ $(( SECONDS - flushed )) -ge 1 ]; then dirty=""; flushed=$SECONDS; side_flush; fi
+      if [ $(( SECONDS - flushed )) -ge 5 ]; then dirty=""; flushed=$SECONDS; side_flush; fi
       [ "$k" != - ] && [ "$t" != - ] && kind[$t]="$k"
       now=()
       while IFS=$'\t' read -r addr agent where status; do
@@ -1590,9 +1592,13 @@ watch() {
       done < <(tm list-windows -a -F '#{window_id} #{@herdr_blk}' 2>/dev/null)
     done < <("$HC" events --json 2>/dev/null 9>&-)
     # herdr-core restarted or unreachable: no cache until it answers again,
-    # then follow it again
+    # then follow it again in 5 s; the sidebars kept right meanwhile
     rm -f "$(side_cache "$TMUX_SOCK")"
-    sleep 5 9>&-
+    for _ in 1 2 3 4 5; do
+      sleep 1 9>&-
+      side_maint
+    done
+    heard=$SECONDS; turn=$SECONDS
   done
 }
 
@@ -1605,6 +1611,47 @@ notify() {
     [ -n "$win" ] && [ "$cwin" = "$win" ] && continue
     tm display-message -c "$client" -d 10000 "$msg" 2>/dev/null || true
   done < <(tm list-clients -F '#{client_name} #{window_id}' 2>/dev/null)
+}
+
+# From watch, every 2 s: the sidebars on screen kept right, all in one tmux
+# call: out of copy mode, the mouse of fzf back (a drag puts tmux in copy
+# mode, and no click reaches fzf any more), the width of every sidebar
+# (@herdr_side_w). $1 = reload: their list too (the ages, the panes of tmux;
+# every minute).
+side_maint() {
+  local id vis mode any w sw tty port cmd
+  while IFS=$'\t' read -r id vis mode any w sw tty port cmd; do
+    [[ "$cmd" == *"$SELF sidebar"* ]] && [ "$vis" = 1 ] || continue
+    [ "$mode" = 1 ] && tm send-keys -t "$id" -X cancel 2>/dev/null
+    [ "$any" = 0 ] && [ -w "$tty" ] && printf '\033[?1000h\033[?1002h\033[?1006h' > "$tty"
+    [[ "$sw" =~ ^[0-9]+$ ]] && [ "$sw" -ge 10 ] || sw=$SIDE_W
+    if [ "$w" != "$sw" ]; then
+      tm set -g @herdr_side_fitting "$EPOCHSECONDS" 2>/dev/null || true
+      tm resize-pane -t "$id" -x "$sw" 2>/dev/null || true
+    fi
+    if [ "${1:-}" = reload ] && [[ "$port" =~ ^[0-9]+$ ]]; then
+      curl -fsS -m 2 -XPOST "localhost:$port" -d "reload-sync($SELF side-lines)" >/dev/null 2>&1 9>&- &
+    fi
+  done < <(tm list-panes -a -F '#{pane_id}	#{&&:#{window_active},#{session_attached}}	#{pane_in_mode}	#{mouse_any_flag}	#{pane_width}	#{@herdr_side_w}	#{pane_tty}	#{@herdr_side_port}	#{pane_start_command}' 2>/dev/null)
+  return 0
+}
+
+# From watch: its herdr-core events end (the loop that reads them follows
+# herdr-core again)
+events_restart() {
+  local p
+  for p in $(pgrep -P "$BASHPID" -f 'events --json' 2>/dev/null); do kill "$p" 2>/dev/null || true; done
+  return 0
+}
+
+# From watch, after a sleep: every sidebar starts again, same pane
+side_wake() {
+  local id cmd
+  while IFS=$'\t' read -r id cmd; do
+    [[ "$cmd" == *"$SELF sidebar"* ]] || continue
+    tm respawn-pane -k -t "$id" "$SELF sidebar" 2>/dev/null || true
+  done < <(tm list-panes -a -F '#{pane_id}	#{pane_start_command}' 2>/dev/null)
+  return 0
 }
 
 # From watch: the state of the agents to the cache (side_cache), then the
