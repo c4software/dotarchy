@@ -1201,8 +1201,9 @@ side_unsplit() {
 # --- Floating menus of the sidebar ----------------------------------------
 
 # fzf action for right-click or space on line $1 of the sidebar (or for
-# "options": a click on the header, o): a small popup over the sidebar, on
-# the client of the sidebar, in the background (it stays while you choose).
+# "options": a click on the header, o): a small popup in the middle of the
+# screen of the sidebar's client, in the background (it stays while you
+# choose).
 side_menu() {
   local id="${1:-}" c
   case "$id" in -|new*|"") echo ignore; return 0 ;; esac
@@ -1218,7 +1219,7 @@ side_popup() {
     pane:*) title=" tmux pane "; h=7 ;;
     *) title=" $id "; h=12 ;;
   esac
-  tmux display-popup ${client:+-c "$client"} -E -w 44 -h "$h" -x R -y C \
+  tmux display-popup ${client:+-c "$client"} -E -w 48 -h "$h" -x C -y C \
     -T "#[align=centre]$title" "HERDR_CLIENT=$client $SELF menu-ui $(printf '%q' "$id")"
 }
 
