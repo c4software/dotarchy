@@ -753,7 +753,7 @@ side_lines() {
   [ -n "${st[working]:-}" ] && hdr+=" \033[34m●${st[working]}\033[0m"
   [ -n "${st[done]:-}" ] && hdr+=" \033[33m✓${st[done]}\033[0m"
   [ -n "${st[idle]:-}" ] && hdr+=" \033[2m○${st[idle]}\033[0m"
-  [ -n "${st[ghost]:-}" ] && hdr+=" \033[2m󰊠${st[ghost]}\033[0m"
+  [ -n "${st[ghost]:-}" ] && hdr+=" \033[2m◌${st[ghost]}\033[0m"
   [ -n "$hc_ok" ] || hdr+=" \033[2;31mherdr-core not answering\033[0m"
   printf -- '-\t%b\n' "$hdr"
   printf 'new-proj\t \033[1;32m+\033[0m New project agent\n'
@@ -775,7 +775,7 @@ side_lines() {
     case "$state" in
       blocked) glyph='\033[1;31m⚠' ;; error) glyph='\033[31m✗' ;;
       done) glyph='\033[33m✓' ;; working) glyph='\033[34m●' ;;
-      idle) glyph='\033[2m○' ;; ghost) glyph='\033[2m󰊠' ;; *) glyph=' ' ;;
+      idle) glyph='\033[2m○' ;; ghost) glyph='\033[2m◌' ;; *) glyph=' ' ;;
     esac
     open=""; mark=" "; id="$addr"
     fw="$(find_window "$addr")"
