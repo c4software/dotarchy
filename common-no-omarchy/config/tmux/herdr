@@ -155,8 +155,11 @@ forget() {
 
 # ctrl-x in the sidebar: a ghost is removed, an agent loses its window
 side_x() {
+  local c t
   case "${1:-}" in
-    ghost:*) forget "${1#ghost:}" ;;
+    ghost:*)
+      t="${1#ghost:}"; check_addr "$t"; c="$(side_client)"
+      tmux confirm-before -b ${c:+-t "$c"} -p "Remove ghost $t? (y/n)" "run-shell -b '$SELF forget $t'" ;;
     new*|-|pane:*|"") ;;
     *) close_t "$1" ;;
   esac
@@ -298,49 +301,54 @@ popup() {
 tick() {
   local port="$1" what="${2:-lines}" extra=""
   [[ "$port" =~ ^[0-9]+$ ]] || exit 0
+  [ "$what" = side-lines ] && { side_tick "$port"; exit 0; }
   [ "$what" = lines ] && extra="+refresh-preview"
-  local last now fails=0 n=0
-  last="$(date +%s)"
-  [ "$what" = side-lines ] && [ -n "${TMUX_PANE:-}" ] && tmux set -p -t "$TMUX_PANE" @herdr_side_port "$port"
   while sleep 2; do
-    now="$(date +%s)"
-    # Another fzf in this pane since (it started again): this tick ends
-    if [ "$what" = side-lines ] && [ -n "${TMUX_PANE:-}" ] \
-      && [ "$(tmux show -pqv -t "$TMUX_PANE" @herdr_side_port 2>/dev/null)" != "$port" ]; then
+    curl -fsS -m 2 -XPOST "localhost:$port" -d "reload-sync($SELF $what)$extra" >/dev/null 2>&1 || exit 0
+  done
+}
+
+# The tick of a sidebar ($1: the port of its fzf). herdr watch reloads it at
+# each change of the agents; this keeps it right in between, with one tmux
+# call a turn: every 2 s on screen, 10 s off screen. It ends when another
+# fzf took the pane (its port changed) or the pane is gone.
+#  - the machine slept (a turn much longer than asked): the sidebar starts
+#    again (it can come back from it stuck: no answer, odd characters)
+#  - on screen: out of copy mode, the mouse of fzf back, the width of every
+#    sidebar (@herdr_side_w); a reload every 30 s (the ages, the panes of
+#    tmux), every turn when no watch runs (side_data then asks herdr-core)
+side_tick() {
+  local port="$1" p="${TMUX_PANE:-}" iv=2 last=$EPOCHSECONDS reloaded=$EPOCHSECONDS
+  local mp vis mode any tty w sw watched=1 wcheck=0
+  [ -n "$p" ] || exit 0
+  tmux set -p -t "$p" @herdr_side_port "$port"
+  while sleep "$iv"; do
+    read -r mp vis mode any w sw tty < <(tmux display -p -t "$p" \
+      '#{@herdr_side_port} #{&&:#{window_active},#{session_attached}} #{pane_in_mode} #{mouse_any_flag} #{pane_width} #{@herdr_side_w} #{pane_tty}' 2>/dev/null) || exit 0
+    [ "$mp" = "$port" ] || exit 0
+    if [ $(( EPOCHSECONDS - last )) -gt $(( iv + 28 )) ]; then
+      side_log "tick: woke up after $(( EPOCHSECONDS - last )) s, sidebar $p started again"
+      tmux respawn-pane -k -t "$p" "$SELF sidebar"
       exit 0
     fi
-    # Two seconds that lasted much longer: the machine slept. The sidebar can
-    # come back from it stuck (no answer, odd characters): it starts again,
-    # same pane, which ends this tick too (fzf starts a new one).
-    if [ "$what" = side-lines ] && [ $(( now - last )) -gt 30 ] && [ -n "${TMUX_PANE:-}" ]; then
-      side_log "tick: woke up after $(( now - last )) s, sidebar $TMUX_PANE started again"
-      tmux respawn-pane -k -t "$TMUX_PANE" "$SELF sidebar"
-      exit 0
+    last=$EPOCHSECONDS
+    if [ "$vis" != 1 ]; then iv=10; continue; fi
+    iv=2
+    [ "$mode" = 1 ] && tmux send-keys -t "$p" -X cancel 2>/dev/null
+    [ "$any" = 0 ] && [ -w "$tty" ] && printf '\033[?1000h\033[?1002h\033[?1006h' > "$tty"
+    [[ "$sw" =~ ^[0-9]+$ ]] && [ "$sw" -ge 10 ] || sw=$SIDE_W
+    if [ "$w" != "$sw" ]; then
+      side_fitting
+      tmux resize-pane -t "$p" -x "$sw" 2>/dev/null || true
     fi
-    last="$now"
-    if [ "$what" = side-lines ] && [ -n "${TMUX_PANE:-}" ]; then
-      # A sidebar off screen does not ask herdr-core: it is refreshed when its
-      # window is shown again (herdr sidebar ensure)
-      [ "$(tmux display -p -t "$TMUX_PANE" '#{&&:#{window_active},#{session_attached}}' 2>/dev/null)" = 1 ] || continue
+    # Is a watch running? (asked every 30 s only)
+    if [ $(( EPOCHSECONDS - wcheck )) -ge 30 ]; then
+      wcheck=$EPOCHSECONDS
+      if side_watched; then watched=1; else watched=""; fi
     fi
-    # A sidebar: herdr watch reloads it at each change of the agents; here
-    # every 30 seconds only (the ages, the panes of tmux), and when no watch
-    # runs (side_data then asks herdr-core)
-    if [ "$what" = side-lines ]; then
-      n=$(( n + 1 ))
-      side_heal
-      [ $(( n % 15 )) = 0 ] || ! side_watched || continue
-    fi
-    # fzf gone (its port closed): this tick ends. One slow answer is not
-    # enough, after a wake-up herdr-core can take a few seconds.
-    if curl -fsS -m 2 -XPOST "localhost:$port" \
-      -d "reload-sync($SELF $what)$extra" >/dev/null 2>&1; then
-      fails=0
-    else
-      fails=$(( fails + 1 ))
-      [ "$fails" -ge 3 ] && exit 0
-      continue
-    fi
+    [ -z "$watched" ] || [ $(( EPOCHSECONDS - reloaded )) -ge 30 ] || continue
+    reloaded=$EPOCHSECONDS
+    curl -fsS -m 2 -XPOST "localhost:$port" -d "reload-sync($SELF side-lines)" >/dev/null 2>&1 || true
   done
 }
 
@@ -412,7 +420,7 @@ start() {
   app_labels "$m" "$dir"
   out="$("$HC" run --bg --json --keep "${on[@]}" --cwd "$dir" \
     --label "herdr.space=$SPACE" --label "herdr.tab=$TAB" \
-    --label "where=$( [ "$dir" = "$HOME" ] && echo '~' || basename "$dir") / $a" \
+    --label "where=$( [ "$dir" = "$HOME" ] && echo '~' || basename "$dir") / $a" --label "herdr.agent=$a" \
     ${1:+-- "$@"} 2>&1)" || true
   # A herdr-core updated while it ran keeps its old holder and starts
   # nothing ("holder build ... differs"): a restart fixes it, done here
@@ -427,7 +435,7 @@ start() {
     sleep 1
     out="$("$HC" run --bg --json --keep --cwd "$dir" \
       --label "herdr.space=$SPACE" --label "herdr.tab=$TAB" \
-      --label "where=$(basename "$dir") / $a" ${1:+-- "$@"} 2>&1)" || true
+      --label "where=$(basename "$dir") / $a" --label "herdr.agent=$a" ${1:+-- "$@"} 2>&1)" || true
   fi
   printf '%s\n' "$out"
   # In its own session: the popup that started it may close first
@@ -620,7 +628,7 @@ here() {
   where="$(basename "$PWD")"; [ "$PWD" = "$HOME" ] && where="~"
   out="$("$HC" run --bg --json --keep --rm --no-parent --cwd "$PWD" \
     --label "herdr.space=$SPACE" --label "herdr.tab=$TAB" \
-    --label "where=$where / $a" -- "$@" 2>/dev/null)" || true
+    --label "where=$where / $a" --label "herdr.agent=$a" -- "$@" 2>/dev/null)" || true
   t="$(jq -r '.address // empty' <<<"$out" 2>/dev/null || true)"
   [ -n "$t" ] || exec "$@"
   if [ -n "$APP_JSON" ]; then
@@ -658,7 +666,8 @@ adopt() {
 side_cache() {
   local sock="${1:-${TMUX_SOCK:-${TMUX:-}}}"
   sock="${sock%%,*}"
-  printf '%s/herdr-side-%s-%s.json' "${XDG_RUNTIME_DIR:-/tmp}" "$(id -u)" "$(printf '%s' "$sock" | md5sum | cut -c1-8)"
+  # (the path of the socket, / as _: no md5sum to start, it has the uid)
+  printf '%s/herdr-side%s.json' "${XDG_RUNTIME_DIR:-/tmp}" "${sock//\//_}"
 }
 
 side_data() {
@@ -671,22 +680,29 @@ side_data() {
 side_watched() {
   local sock="${TMUX_SOCK:-${TMUX:-}}" pid
   sock="${sock%%,*}"
-  pid="$(cat "$WATCH_LOCK-$(printf '%s' "$sock" | md5sum | cut -c1-8).pid" 2>/dev/null)" || return 1
+  read -r pid < "$WATCH_LOCK-${sock//\//_}.pid" 2>/dev/null || return 1
   [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null
 }
 
 # A ghost: an agent lost (a reboot, herdr-core stopped) that keep replaced
 # with a shell; its label still names the agent, its title is the one of the
 # shell. A jq function, for side_lines and ghosts_clean.
+# Only one of the agents (AGENTS), named by the label herdr.agent (start and
+# here set it) or, for the older ones, at the end of the label where: a
+# shell labelled by something else is never one.
+printf -v GHOST_AGENTS '"%s",' $AGENTS
 GHOST_JQ='def ghost:
-  ((.labels.where // "") | split(" / ") | last // "") as $wa
+  (.labels["herdr.agent"] // ((.labels.where // "") | split(" / ") | last) // "") as $wa
   | ((.argv[0] // "") | split("/") | last) as $a0
-  | ["bash", "zsh", "sh", "fish", "dash", "shell"] as $shells
+  | ["bash", "zsh", "sh", "fish", "dash"] as $shells
+  | '"[${GHOST_AGENTS%,}]"' as $agents
   | (.status == null) and ($shells | index($a0)) != null
-    and $wa != "" and ($shells | index($wa)) == null;'
+    and ($agents | index($wa)) != null;'
 
-# Ghosts with nothing for more than @herdr_ghost_ttl hours (24 when unset, 0:
-# never) go, once when a sidebar starts (not again within 10 minutes: a
+# Ghosts for more than @herdr_ghost_ttl hours (24 when unset, 0: never) go,
+# counted from the first time this finds them one (label herdr.ghost_since;
+# not from their last activity: after a weekend, a reboot would remove them
+# all at once). Once when a sidebar starts (not again within 10 minutes: a
 # sidebar per window, they start together on prefix + a). Not one whose
 # shell runs something (vim, an agent started again by hand), nor one whose
 # window a client shows. Each one is written in herdr-sidebar.log.
@@ -703,20 +719,33 @@ ghosts_clean() {
     tmux set -g @herdr_ghost_clean "$(date +%s)" 2>/dev/null || true
   fi
   shown=" $(tmux list-clients -F '#{window_id}' 2>/dev/null | tr '\n' ' ') "
-  full | jq -r --argjson ttl "$ttl" --argjson now "$(date +%s)000" "$GHOST_JQ"'
-      select(.state == "live" and ghost)
-      | select(($now - (.status_ms // .created_ms // $now)) >= $ttl * 3600000)
-      # its shell runs nothing: the program in front is the shell itself
-      | select(((.foreground.argv[0] // "") | split("/") | last)
-               == ((.argv[0] // "") | split("/") | last))
-      | .address' 2>/dev/null \
-    | while read -r t; do
+  local now since
+  now="$(date +%s)"
+  full | jq -r "$GHOST_JQ"'
+      select(.state == "live")
+      | (.labels["herdr.ghost_since"] // "") as $s
+      | if ghost then
+          # its shell runs nothing: the program in front is the shell itself
+          select(((.foreground.argv[0] // "") | split("/") | last)
+                 == ((.argv[0] // "") | split("/") | last))
+          | "\(.address) \(if $s == "" then "new" else $s end)"
+        elif $s != "" then "\(.address) back"
+        else empty end' 2>/dev/null \
+    | while read -r t since; do
+        # First seen a ghost: its time, nothing else yet. An agent again:
+        # the label goes (a ghost again later starts from zero)
+        if [ "$since" = new ] || [ "$since" = back ]; then
+          [ -n "$dry" ] && continue
+          "$HC" label "$t" "herdr.ghost_since=$( [ "$since" = new ] && echo "$now" || true)" >/dev/null 2>&1 || true
+          continue
+        fi
+        [[ "$since" =~ ^[0-9]+$ ]] && [ $(( now - since )) -ge $(( ttl * 3600 )) ] || continue
         win="$(find_window "$t")"
         if [ -n "$win" ] && [[ "$shown" == *" $(tmux display -p -t "$win" '#{window_id}') "* ]]; then
           continue
         fi
         if [ -n "$dry" ]; then echo "$t"; continue; fi
-        side_log "ghosts: $t removed, nothing for more than $ttl h"
+        side_log "ghosts: $t removed, a ghost for more than $ttl h"
         forget "$t"
       done || true
   return 0
@@ -758,7 +787,12 @@ age() {
 # The lines of the sidebar: id (address, new, or - for a heading), then what
 # fzf shows. Grouped by status, the ones that need you first.
 side_lines() {
-  local cols rk addr app name mach ms state open key mark fw id
+  local cols rk addr app name mach ms state open key mark fw id hc w0
+  # The window of each agent that has one (@hc), in one call
+  local -A hcwin=()
+  while read -r hc w0; do
+    [ -n "$hc" ] && [ -z "${hcwin[$hc]:-}" ] && hcwin[$hc]="$w0"
+  done < <(tmux list-panes -a -F '#{@hc} #{window_id}' 2>/dev/null | awk 'NF == 2')
   # The width of the sidebar pane itself
   # (or SIDE_COLS: the palette, a popup)
   cols="${SIDE_COLS:-$(tmux display -p -t "${TMUX_PANE:-}" '#{pane_width}' 2>/dev/null || true)}"
@@ -846,18 +880,16 @@ side_lines() {
       idle) glyph='\033[2m○' ;; ghost) glyph='\033[2m󰊠 ' ;; *) glyph=' ' ;;
     esac
     open=""; mark=" "; id="$addr"
-    fw="$(find_window "$addr")"
+    fw="${hcwin[$addr]:-}"
     if [ -n "$fw" ]; then
       open='\033[1m'
-      if [ -n "$SIDE_WIN" ] && [ "$(tmux display -p -t "$fw" '#{window_id}')" = "$SIDE_WIN" ]; then
-        mark='\033[1;36m▸\033[0m'
-      fi
+      if [ -n "$SIDE_WIN" ] && [ "$fw" = "$SIDE_WIN" ]; then mark='\033[1;36m▸\033[0m'; fi
     fi
     # icon, name, then age and status on the right
     w=$(( cols - 11 ))
     [ "$w" -lt 4 ] && w=4
     n="$name"; [ "${#n}" -gt "$w" ] && n="${n:0:$((w - 1))}…"
-    # A ghost: dim, enter starts its agent again, ctrl-x removes it
+    # A ghost: dim, enter opens its shell, ctrl-x removes it (asks first)
     # (󰊠 is drawn on two columns where tmux and fzf count one: the space
     # after it takes its second half)
     [ "$state" = ghost ] && { id="ghost:$addr"; open='\033[2m'; }
@@ -866,25 +898,6 @@ side_lines() {
   done <<<"$rows"
 }
 
-# The sidebar takes the mouse back: out of copy mode, and with the mouse
-# reporting of fzf on again when the terminal lost it (a drag on it then puts
-# tmux in copy mode, and no click reaches fzf any more).
-# Its width too: the one of @herdr_side_w, the same in every window (set
-# when you resize a sidebar, see side_resized).
-side_heal() {
-  local p="${TMUX_PANE:-}" mode any tty w
-  [ -n "$p" ] || return 0
-  read -r mode any tty w < <(tmux display -p -t "$p" '#{pane_in_mode} #{mouse_any_flag} #{pane_tty} #{pane_width}' 2>/dev/null) || return 0
-  [ "$mode" = 1 ] && tmux send-keys -t "$p" -X cancel 2>/dev/null
-  [ "$any" = 0 ] && [ -w "$tty" ] && printf '\033[?1000h\033[?1002h\033[?1006h' > "$tty"
-  # The same width in every window: tmux gives the sidebar the columns a
-  # closed pane or a larger window leaves, it gives them back
-  if [ "${w:-0}" != "$(side_width)" ]; then
-    side_fitting
-    tmux resize-pane -t "$p" -x "$(side_width)" 2>/dev/null || true
-  fi
-  return 0
-}
 
 side_width() {
   local w
@@ -975,6 +988,7 @@ side_pos() {
 # click): with several terminals on a session, tmux would pick one itself.
 side_act() {
   local c
+  side_id_ok "${1:-}" || { echo ignore; return 0; }
   c="$(side_client)"
   case "$1" in
     -) echo ignore ;;
@@ -986,6 +1000,12 @@ side_act() {
     ghost:*) echo "execute-silent(HERDR_CLIENT=$c $SELF revive ${1#ghost:})+reload-sync($SELF side-lines)" ;;
     *) echo "execute-silent(HERDR_CLIENT=$c $SELF open $1)+reload-sync($SELF side-lines)" ;;
   esac
+}
+
+# A line id of the sidebar, before it goes in a command: an address of
+# herdr-core (machine/t7), a pane, a ghost, or one of the fixed ones
+side_id_ok() {
+  [[ "${1:-}" =~ ^(ghost:|pane:%)?[A-Za-z0-9_/-]+$ ]] || [ "${1:-}" = options ]
 }
 
 # The tmux client of this sidebar (TMUX_PANE): among the ones that show its
@@ -1033,7 +1053,7 @@ side_in() {
 # a lock both see no sidebar and both make one. One at a time, per server.
 side_lock() {
   local sock="${TMUX:-}"; sock="${sock%%,*}"
-  exec 8>"${XDG_RUNTIME_DIR:-/tmp}/herdr-tmux-side-$(id -u)-$(printf '%s' "$sock" | md5sum | cut -c1-8)"
+  exec 8>"${XDG_RUNTIME_DIR:-/tmp}/herdr-tmux-side${sock//\//_}"
   flock -w 5 8 || true
 }
 
@@ -1133,7 +1153,7 @@ side_resized() {
   w="$(tmux display -p -t "$p" '#{pane_width}' 2>/dev/null)" || return 0
   [[ "$w" =~ ^[0-9]+$ ]] && [ "$w" -ge 10 ] || return 0
   [ "$w" = "$(side_width)" ] && return 0
-  tmux set -g @herdr_side_w "$w"
+  opt_set @herdr_side_w "$w"
   side_log "resized: sidebars now $w columns wide"
   return 0
 }
@@ -1236,8 +1256,10 @@ side_unsplit() {
 side_menu() {
   local id="${1:-}" c
   case "$id" in -|new*|"") echo ignore; return 0 ;; esac
+  side_id_ok "$id" || { echo ignore; return 0; }
   c="$(side_client)"
-  echo "execute-silent($SELF side-popup $(printf '%q' "$id") $c 0 ${TMUX_PANE:-} >/dev/null 2>&1 </dev/null &)"
+  # (- for no client: the arguments after it keep their place)
+  echo "execute-silent($SELF side-popup $id ${c:--} 0 ${TMUX_PANE:--} >/dev/null 2>&1 </dev/null &)"
 }
 
 # The menu of line $1 on client $2 ($3: the item chosen first, for the
@@ -1245,6 +1267,9 @@ side_menu() {
 # sidebar $4 (the header for the options), or else in the middle
 side_popup() {
   local id="$1" c="${2:-}" first="${3:-0}" sp="${4:-}" t win title
+  [ "$c" = - ] && c=""
+  [ "$sp" = - ] && sp=""
+  side_id_ok "$id" || return 0
   local -a it=()
   local run="run-shell -b"
   case "$id" in
@@ -1255,7 +1280,7 @@ side_popup() {
       title=" Agents options "
       it=(
         "Width of the sidebars: $(side_width)…" w
-          "command-prompt -I $(side_width) -p 'Width (columns):' { run-shell -b \"$SELF opt width '%%%'\" }"
+          "command-prompt -l -I $(side_width) -p 'Width (columns):' { run-shell -b \"$SELF opt width '%%%'\" }"
         ""
         "$(box "$(not_set @herdr_notify_off)") Desktop notifications" n
           "run-shell \"$SELF opt notify\" ; $run \"$SELF side-popup options $c 2 $sp\""
@@ -1296,7 +1321,7 @@ side_popup() {
         "Send a message…" m
           "command-prompt -p 'Message:' { set-buffer -b herdr_msg -- \"%%%\" ; run-shell -b \"$SELF msg $t\" }"
         "$(dim_if "$win")Rename its window…" r
-          "command-prompt -I '$(tmux display -p -t "${win:-}" '#{window_name}' 2>/dev/null | sed "s/'//g")' -p 'Name:' { rename-window -t ${win:-} -- \"%%%\" }"
+          "command-prompt -l -I '$(tmux display -p -t "${win:-}" '#{window_name}' 2>/dev/null | sed "s/'//g")' -p 'Name:' { rename-window -t ${win:-} -- \"%%%\" }"
         "Copy its address" y "$run \"$SELF copy $t\""
         ""
         "Remove the agent" d "confirm-before -p 'Remove $t, its program ends? (y/n)' { run-shell -b \"$SELF forget $t\" }"
@@ -1481,7 +1506,7 @@ palette() {
 
 # --- Notifications --------------------------------------------------------
 
-WATCH_LOCK="${XDG_RUNTIME_DIR:-/tmp}/herdr-tmux-watch-$(id -u)"
+WATCH_LOCK="${XDG_RUNTIME_DIR:-/tmp}/herdr-tmux-watch-$UID"
 
 # Follows herdr-core events. On each change it reads the blocked terminals,
 # puts their number in @herdr_blocked and shows a message on every tmux
@@ -1500,14 +1525,14 @@ watch() {
     tmux -S "$sock" run-shell -b "$SELF watch '$sock'"
     return 0
   fi
-  local lock="$WATCH_LOCK-$(printf '%s' "$sock" | md5sum | cut -c1-8)"
+  local lock="$WATCH_LOCK-${sock//\//_}"
   exec 9>"$lock"
   flock -n 9 || return 0
   echo $$ > "$lock.pid"
   export TMUX_SOCK="$sock"
   tm() { tmux -S "$TMUX_SOCK" "$@"; }
   local -A prev=() now=() kind=() was=()
-  local line type t k addr agent where status first=1 dirty="" flushed=0 rc
+  local line meth type t k addr agent where status first=1 dirty="" flushed=0 rc nblk=""
   while tm has-session 2>/dev/null; do
     # One line per event; every second without one (read -t), the sidebars
     # get the changes of the second before (at most one refresh a second)
@@ -1519,8 +1544,13 @@ watch() {
         continue
       fi
       tm has-session 2>/dev/null || return 0
-      IFS=$'\t' read -r type t k < <(jq -r '[.params.type // "snapshot", .params.terminal // "-", .params.data.status.kind // "-"] | map(if . == "" then "-" else . end) | @tsv' <<<"$line" 2>/dev/null) || continue
-      [ "$type" = heartbeat ] && continue
+      IFS=$'\t' read -r meth type t k < <(jq -r '[.method // "-", .params.type // "snapshot", .params.terminal // "-", .params.data.status.kind // "-"] | map(if . == "" then "-" else . end) | @tsv' <<<"$line" 2>/dev/null) || continue
+      # A heartbeat (every 15 s or so): no change, only the cache made again
+      # now and then (an agent on another machine, a missed event)
+      if [ "$meth" = heartbeat ]; then
+        if [ $(( SECONDS - flushed )) -ge 30 ]; then flushed=$SECONDS; side_flush; fi
+        continue
+      fi
       dirty=1
       if [ $(( SECONDS - flushed )) -ge 1 ]; then dirty=""; flushed=$SECONDS; side_flush; fi
       [ "$k" != - ] && [ "$t" != - ] && kind[$t]="$k"
@@ -1539,7 +1569,12 @@ watch() {
       first=""
       prev=()
       for addr in "${!now[@]}"; do prev[$addr]=1; done
-      if [ "${#now[@]}" -gt 0 ]; then tm set -g @herdr_blocked "${#now[@]}"; else tm set -gu @herdr_blocked; fi
+      # (tmux only when the number changes)
+      if [ "${#now[@]}" != "$nblk" ]; then
+        nblk="${#now[@]}"
+        if [ "$nblk" -gt 0 ]; then tm set -g @herdr_blocked "$nblk"; else tm set -gu @herdr_blocked; fi
+        tm refresh-client -S 2>/dev/null || true
+      fi
       # The windows that show a blocked agent: @herdr_blk, red in the list
       # of windows (window-status-format of herdr.conf)
       local -A blk=()
@@ -1553,9 +1588,11 @@ watch() {
           tm set -wu -t "$w" @herdr_blk 2>/dev/null || true
         fi
       done < <(tm list-windows -a -F '#{window_id} #{@herdr_blk}' 2>/dev/null)
-      tm refresh-client -S 2>/dev/null || true
     done < <("$HC" events --json 2>/dev/null 9>&-)
-    sleep 5 9>&-   # herdr-core restarted or unreachable: follow it again
+    # herdr-core restarted or unreachable: no cache until it answers again,
+    # then follow it again
+    rm -f "$(side_cache "$TMUX_SOCK")"
+    sleep 5 9>&-
   done
 }
 
@@ -1575,7 +1612,8 @@ notify() {
 side_flush() {
   local f data id cmd vis port
   f="$(side_cache "$TMUX_SOCK")"
-  data="$(full 2>/dev/null)" || return 0
+  # herdr-core not answering: no cache, the sidebars ask it and say so
+  data="$(full 2>/dev/null)" || { rm -f "$f"; return 0; }
   printf '%s\n' "$data" > "$f.tmp" && mv "$f.tmp" "$f"
   while read -r id vis port cmd; do
     [[ "$cmd" == *"$SELF sidebar"* ]] && [ "$vis" = 1 ] && [[ "$port" =~ ^[0-9]+$ ]] || continue
@@ -1602,7 +1640,8 @@ desktop_notify() {
   # In the background (notify-send waits for the click), without the lock
   # of watch (fd 9)
   (
-    act="$(notify-send -a Herdr -u "$urgency" -A default=Open "$agent · $where" "$body" 2>/dev/null)" || exit 0
+    # (not waiting for ever: a notification left open keeps this process)
+    act="$(timeout 600 notify-send -a Herdr -u "$urgency" -A default=Open "$agent · $where" "$body" 2>/dev/null)" || exit 0
     [ "$act" = default ] && exec "$SELF" focus "$addr"
   ) 9>&- </dev/null >/dev/null 2>&1 &
   return 0
