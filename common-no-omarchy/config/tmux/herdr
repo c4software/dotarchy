@@ -138,6 +138,40 @@ open_t() {
   tmux set-option -w -t "$win" @hc "$t"
 }
 
+# A ghost (see side_lines): its agent starts again in its shell, in its
+# folder (claude and codex: the picker of the conversation to take back),
+# and its window opens.
+revive() {
+  local t="$1" a cmd
+  check_addr "$t"
+  a="$(full | jq -r --arg t "$t" 'select(.address == $t) | (.labels.where // "" | split(" / ") | last)' | head -1 || true)"
+  case "$a" in
+    claude*) cmd="claude --resume" ;;
+    codex*) cmd="codex resume" ;;
+    "") return 0 ;;
+    *) cmd="$a" ;;
+  esac
+  "$HC" send "$t" "$cmd" >/dev/null 2>&1 || true
+  open_t "$t"
+}
+
+# A ghost removed: its program ends (the terminal goes, --rm), its window too
+forget() {
+  check_addr "$1"
+  close_t "$1" || true
+  "$HC" kill "$1" >/dev/null 2>&1 || true
+  "$HC" rm "$1" >/dev/null 2>&1 || true
+}
+
+# ctrl-x in the sidebar: a ghost is removed, an agent loses its window
+side_x() {
+  case "${1:-}" in
+    ghost:*) forget "${1#ghost:}" ;;
+    new*|-|pane:*|"") ;;
+    *) close_t "$1" ;;
+  esac
+}
+
 # Only a window opened by herdr open: a pane of herdr here is yours.
 close_t() {
   local win
@@ -221,7 +255,7 @@ prepare() {
 rank() {
   case "$1" in
     blocked) echo 0 ;; error) echo 1 ;; done) echo 2 ;; working) echo 3 ;;
-    idle) echo 4 ;; *) echo 5 ;;
+    idle) echo 4 ;; ghost) echo 6 ;; *) echo 5 ;;
   esac
 }
 
@@ -656,7 +690,7 @@ age() {
 # The lines of the sidebar: id (address, new, or - for a heading), then what
 # fzf shows. Grouped by status, the ones that need you first.
 side_lines() {
-  local cols rk addr app name mach ms state open key mark fw
+  local cols rk addr app name mach ms state open key mark fw id
   # The width of the sidebar pane itself
   # (or SIDE_COLS: the palette, a popup)
   cols="${SIDE_COLS:-$(tmux display -p -t "${TMUX_PANE:-}" '#{pane_width}' 2>/dev/null || true)}"
@@ -679,13 +713,21 @@ side_lines() {
   data="$(full 2>/dev/null)" || { hc_ok=""; data=""; }
   rows="$(printf '%s\n' "$data" | jq -r '
       select(.state == "live")
-      | [ (.status.state // ""),
+      # A ghost: an agent lost (a reboot), that keep replaced with a shell;
+      # its label still names the agent, its title is the one of the shell
+      | (.labels.where // "") as $w
+      | ($w | split(" / ") | last // "") as $wa
+      | ((.argv[0] // "") | split("/") | last) as $a0
+      | ["bash", "zsh", "sh", "fish", "dash", "shell"] as $shells
+      | ((.status == null) and ($shells | index($a0)) != null
+         and $wa != "" and ($shells | index($wa)) == null) as $ghost
+      | [ (if $ghost then "ghost" else (.status.state // "") end),
           .address,
-          (.status.app // .foreground.name // .argv[0] // "shell"),
+          (if $ghost then $wa else (.status.app // .foreground.name // .argv[0] // "shell") end),
           # The title of the conversation, or else the folder
           # without the activity glyph agents put first (✳, ⠂…)
-          (if (.title // "") != "" then (.title | sub("^[^\\p{L}\\p{N}]+"; ""))
-           else ((.labels.where // "" | split(" / ") | first) // "") end),
+          (if (.title // "") != "" and ($ghost | not) then (.title | sub("^[^\\p{L}\\p{N}]+"; ""))
+           else ($w | split(" / ") | first // "") end),
           (.cwd // ""),
           (.status_ms // .created_ms // 0) ]
       # No empty field: read joins the tabs around one (a status null)
@@ -711,6 +753,7 @@ side_lines() {
   [ -n "${st[working]:-}" ] && hdr+=" \033[34m●${st[working]}\033[0m"
   [ -n "${st[done]:-}" ] && hdr+=" \033[33m✓${st[done]}\033[0m"
   [ -n "${st[idle]:-}" ] && hdr+=" \033[2m○${st[idle]}\033[0m"
+  [ -n "${st[ghost]:-}" ] && hdr+=" \033[2m󰊠${st[ghost]}\033[0m"
   [ -n "$hc_ok" ] || hdr+=" \033[2;31mherdr-core not answering\033[0m"
   printf -- '-\t%b\n' "$hdr"
   printf 'new-proj\t \033[1;32m+\033[0m New project agent\n'
@@ -732,9 +775,9 @@ side_lines() {
     case "$state" in
       blocked) glyph='\033[1;31m⚠' ;; error) glyph='\033[31m✗' ;;
       done) glyph='\033[33m✓' ;; working) glyph='\033[34m●' ;;
-      idle) glyph='\033[2m○' ;; *) glyph=' ' ;;
+      idle) glyph='\033[2m○' ;; ghost) glyph='\033[2m󰊠' ;; *) glyph=' ' ;;
     esac
-    open=""; mark=" "
+    open=""; mark=" "; id="$addr"
     fw="$(find_window "$addr")"
     if [ -n "$fw" ]; then
       open='\033[1m'
@@ -746,8 +789,10 @@ side_lines() {
     w=$(( cols - 11 ))
     [ "$w" -lt 4 ] && w=4
     n="$name"; [ "${#n}" -gt "$w" ] && n="${n:0:$((w - 1))}…"
+    # A ghost: dim, enter starts its agent again, ctrl-x removes it
+    [ "$state" = ghost ] && { id="ghost:$addr"; open='\033[2m'; }
     printf '%s\t%b%s %b%s\033[0m \033[2m%3s\033[0m %b\033[0m\n' \
-      "$addr" "$mark" "$(icon "$app")" "$open" "$(pad "$n" "$w")" "$(age "$ms")" "$glyph"
+      "$id" "$mark" "$(icon "$app")" "$open" "$(pad "$n" "$w")" "$(age "$ms")" "$glyph"
   done <<<"$rows"
 }
 
@@ -820,7 +865,7 @@ sidebar() {
       --bind "enter:transform:$SELF side-act {1}" \
       --bind "double-click:transform:$SELF side-act {1}" \
       --bind "left-click:transform:$SELF side-act {1}" \
-      --bind "ctrl-x:execute-silent([[ {1} == new* ]] || [ {1} = - ] || [[ {1} == pane:* ]] || $SELF close {1})+reload-sync($SELF side-lines)" \
+      --bind "ctrl-x:execute-silent($SELF side-x {1})+reload-sync($SELF side-lines)" \
       --bind 'esc:execute-silent(tmux select-pane -l)' \
       < /dev/null && rc=0 || rc=$?
     side_log "sidebar ${TMUX_PANE:-}: fzf ended (rc $rc), started again"
@@ -864,6 +909,7 @@ side_act() {
     new-proj) echo "execute-silent($SELF side-new project $c >/dev/null 2>&1 </dev/null &)" ;;
     new-dir) echo "execute-silent($SELF side-new folder $c >/dev/null 2>&1 </dev/null &)" ;;
     pane:%*) echo "execute-silent(HERDR_CLIENT=$c $SELF goto-pane ${1#pane:})" ;;
+    ghost:*) echo "execute-silent(HERDR_CLIENT=$c $SELF revive ${1#ghost:})+reload-sync($SELF side-lines)" ;;
     *) echo "execute-silent(HERDR_CLIENT=$c $SELF open $1)+reload-sync($SELF side-lines)" ;;
   esac
 }
@@ -1162,6 +1208,7 @@ palette() {
              tmux switch-client -t "$(tmux display -p -t "$id" '#{session_id}')" \; select-window -t "$id" \; select-pane -t "$id" ;;
     new-proj) need_hc; new_agent project ;;
     new-dir) need_hc; new_agent folder ;;
+    ghost:*) need_hc; revive "${id#ghost:}" ;;
     -|"") ;;
     *) open_t "$id" ;;
   esac
@@ -1218,6 +1265,19 @@ watch() {
       prev=()
       for addr in "${!now[@]}"; do prev[$addr]=1; done
       if [ "${#now[@]}" -gt 0 ]; then tm set -g @herdr_blocked "${#now[@]}"; else tm set -gu @herdr_blocked; fi
+      # The windows that show a blocked agent: @herdr_blk, red in the list
+      # of windows (window-status-format of herdr.conf)
+      local -A blk=()
+      while read -r w hc; do
+        [ -n "$hc" ] && [ -n "${now[$hc]:-}" ] && blk[$w]=1
+      done < <(tm list-panes -a -F '#{window_id} #{@hc}' 2>/dev/null)
+      while read -r w f; do
+        if [ -n "${blk[$w]:-}" ]; then
+          [ "$f" = 1 ] || tm set -w -t "$w" @herdr_blk 1 2>/dev/null || true
+        elif [ "$f" = 1 ]; then
+          tm set -wu -t "$w" @herdr_blk 2>/dev/null || true
+        fi
+      done < <(tm list-windows -a -F '#{window_id} #{@herdr_blk}' 2>/dev/null)
       tm refresh-client -S 2>/dev/null || true
     done < <("$HC" events --json 2>/dev/null 9>&-)
     sleep 5 9>&-   # herdr-core restarted or unreachable: follow it again
@@ -1358,6 +1418,9 @@ case "${1:-}" in
   side-lines) side_lines ;;
   side-act) side_act "${2:-}" ;;
   side-pos) side_pos ;;
+  side-x) side_x "${2:-}" ;;
+  revive) need_hc; [ -n "${2:-}" ] || exit 2; revive "$2" ;;
+  forget) need_hc; [ -n "${2:-}" ] || exit 2; forget "$2" ;;
   dir-preview) dir_preview "${2:-}" "${3:-}" "${4:-.}" ;;
   focus) [ -n "${2:-}" ] || { echo "usage: herdr focus <terminal>" >&2; exit 2; }; need_hc; focus "$2" ;;
   side-new) side_new "${2:-}" "${3:-}" ;;
