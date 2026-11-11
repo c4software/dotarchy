@@ -299,7 +299,7 @@ tick() {
   local port="$1" what="${2:-lines}" extra=""
   [[ "$port" =~ ^[0-9]+$ ]] || exit 0
   [ "$what" = lines ] && extra="+refresh-preview"
-  local last now fails=0
+  local last now fails=0 n=0
   last="$(date +%s)"
   [ "$what" = side-lines ] && [ -n "${TMUX_PANE:-}" ] && tmux set -p -t "$TMUX_PANE" @herdr_side_port "$port"
   while sleep 2; do
@@ -323,6 +323,14 @@ tick() {
       # window is shown again (herdr sidebar ensure)
       [ "$(tmux display -p -t "$TMUX_PANE" '#{&&:#{window_active},#{session_attached}}' 2>/dev/null)" = 1 ] || continue
     fi
+    # A sidebar: herdr watch reloads it at each change of the agents; here
+    # every 30 seconds only (the ages, the panes of tmux), and when no watch
+    # runs (side_data then asks herdr-core)
+    if [ "$what" = side-lines ]; then
+      n=$(( n + 1 ))
+      side_heal
+      [ $(( n % 15 )) = 0 ] || ! side_watched || continue
+    fi
     # fzf gone (its port closed): this tick ends. One slow answer is not
     # enough, after a wake-up herdr-core can take a few seconds.
     if curl -fsS -m 2 -XPOST "localhost:$port" \
@@ -333,7 +341,6 @@ tick() {
       [ "$fails" -ge 3 ] && exit 0
       continue
     fi
-    [ "$what" = side-lines ] && side_heal
   done
 }
 
@@ -644,6 +651,30 @@ adopt() {
   echo "$t: in herdr-app now"
 }
 
+# The state of the agents for the sidebars: herdr watch writes it to a cache
+# at each event of herdr-core (the file of its tmux server), the sidebars and
+# the palette read it instead of asking herdr-core every time. Without a
+# watch running (none, or another machine), they ask herdr-core.
+side_cache() {
+  local sock="${1:-${TMUX_SOCK:-${TMUX:-}}}"
+  sock="${sock%%,*}"
+  printf '%s/herdr-side-%s-%s.json' "${XDG_RUNTIME_DIR:-/tmp}" "$(id -u)" "$(printf '%s' "$sock" | md5sum | cut -c1-8)"
+}
+
+side_data() {
+  local f
+  f="$(side_cache)"
+  if [ -s "$f" ] && side_watched; then cat "$f"; else full; fi
+}
+
+# A herdr watch runs for this tmux server (its cache is kept up to date)
+side_watched() {
+  local sock="${TMUX_SOCK:-${TMUX:-}}" pid
+  sock="${sock%%,*}"
+  pid="$(cat "$WATCH_LOCK-$(printf '%s' "$sock" | md5sum | cut -c1-8).pid" 2>/dev/null)" || return 1
+  [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null
+}
+
 # A ghost: an agent lost (a reboot, herdr-core stopped) that keep replaced
 # with a shell; its label still names the agent, its title is the one of the
 # shell. A jq function, for side_lines and ghosts_clean.
@@ -747,7 +778,7 @@ side_lines() {
   # herdr-core down or slow (timeout): an empty list, said in the header,
   # not a sidebar left blank (set -e would end here)
   local data hc_ok=1
-  data="$(full 2>/dev/null)" || { hc_ok=""; data=""; }
+  data="$(side_data 2>/dev/null)" || { hc_ok=""; data=""; }
   rows="$(printf '%s\n' "$data" | jq -r '
       '"$GHOST_JQ"'
       select(.state == "live")
@@ -1476,12 +1507,22 @@ watch() {
   export TMUX_SOCK="$sock"
   tm() { tmux -S "$TMUX_SOCK" "$@"; }
   local -A prev=() now=() kind=() was=()
-  local line type t k addr agent where status first=1
+  local line type t k addr agent where status first=1 dirty="" flushed=0 rc
   while tm has-session 2>/dev/null; do
-    while IFS= read -r line; do
+    # One line per event; every second without one (read -t), the sidebars
+    # get the changes of the second before (at most one refresh a second)
+    while :; do
+      if IFS= read -r -t 1 line; then :; else
+        rc=$?
+        [ "$rc" -gt 128 ] || break
+        if [ -n "$dirty" ]; then dirty=""; flushed=$SECONDS; side_flush; fi
+        continue
+      fi
       tm has-session 2>/dev/null || return 0
       IFS=$'\t' read -r type t k < <(jq -r '[.params.type // "snapshot", .params.terminal // "-", .params.data.status.kind // "-"] | map(if . == "" then "-" else . end) | @tsv' <<<"$line" 2>/dev/null) || continue
       [ "$type" = heartbeat ] && continue
+      dirty=1
+      if [ $(( SECONDS - flushed )) -ge 1 ]; then dirty=""; flushed=$SECONDS; side_flush; fi
       [ "$k" != - ] && [ "$t" != - ] && kind[$t]="$k"
       now=()
       while IFS=$'\t' read -r addr agent where status; do
@@ -1527,6 +1568,20 @@ notify() {
     [ -n "$win" ] && [ "$cwin" = "$win" ] && continue
     tm display-message -c "$client" -d 10000 "$msg" 2>/dev/null || true
   done < <(tm list-clients -F '#{client_name} #{window_id}' 2>/dev/null)
+}
+
+# From watch: the state of the agents to the cache (side_cache), then the
+# sidebars on screen reload it (through the fzf API, in the background).
+side_flush() {
+  local f data id cmd vis port
+  f="$(side_cache "$TMUX_SOCK")"
+  data="$(full 2>/dev/null)" || return 0
+  printf '%s\n' "$data" > "$f.tmp" && mv "$f.tmp" "$f"
+  while read -r id vis port cmd; do
+    [[ "$cmd" == *"$SELF sidebar"* ]] && [ "$vis" = 1 ] && [[ "$port" =~ ^[0-9]+$ ]] || continue
+    curl -fsS -m 2 -XPOST "localhost:$port" -d "reload-sync($SELF side-lines)" >/dev/null 2>&1 9>&- &
+  done < <(tm list-panes -a -F '#{pane_id} #{&&:#{window_active},#{session_attached}} #{@herdr_side_port} #{pane_start_command}' 2>/dev/null)
+  return 0
 }
 
 # A desktop notification (notify-send) for agent $2 (terminal $1) in $3,
