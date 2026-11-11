@@ -1847,6 +1847,10 @@ list() {
   done < <(terminals)
 }
 
+# All in one function, ended on the line that calls it: bash reads a script
+# as it runs it, and a long run (herdr here, for the life of an agent) would
+# go on in the middle of a line of the script updated meanwhile.
+main() {
 case "${1:-}" in
   "")
     need_hc
@@ -1905,3 +1909,5 @@ case "${1:-}" in
   -h|--help) sed -n '2,/^set -euo/p' "$0" | sed '$d; s/^# \?//' ;;
   *) echo "unknown command: $1 (popup, sidebar, new, here, adopt, menu, prepare, toggle, open, close, list, count, watch)" >&2; exit 2 ;;
 esac
+}
+main "$@"; exit
