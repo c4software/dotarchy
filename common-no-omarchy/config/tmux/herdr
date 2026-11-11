@@ -909,7 +909,6 @@ sidebar() {
       --bind "ctrl-x:execute-silent($SELF side-x {1})+reload-sync($SELF side-lines)" \
       --bind "right-click:transform:$SELF side-menu {1}" \
       --bind "click-header:transform:$SELF side-menu options" \
-      --bind "o:transform:$SELF side-menu options" \
       --bind 'esc:execute-silent(tmux select-pane -l)' \
       < /dev/null && rc=0 || rc=$?
     side_log "sidebar ${TMUX_PANE:-}: fzf ended (rc $rc), started again"
@@ -1200,7 +1199,7 @@ side_unsplit() {
 # --- Menus of the sidebar --------------------------------------------------
 
 # fzf action for right-click on line $1 of the sidebar (or for
-# "options": a click on the header, o): a tmux menu (display-menu, the
+# "options": a click on the header): a tmux menu (display-menu, the
 # style of tmux, the mouse works in it) in the middle of the screen of the
 # sidebar's client. In the background, the sidebar does not wait for it.
 side_menu() {
