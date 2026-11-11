@@ -138,21 +138,11 @@ open_t() {
   tmux set-option -w -t "$win" @hc "$t"
 }
 
-# A ghost (see side_lines): its agent starts again in its shell, in its
-# folder (claude and codex: the picker of the conversation to take back),
-# and its window opens.
+# A ghost (see side_lines): its window opens on its shell, in the folder of
+# the agent; start it again there by hand if you want it back.
 revive() {
-  local t="$1" a cmd
-  check_addr "$t"
-  a="$(full | jq -r --arg t "$t" 'select(.address == $t) | (.labels.where // "" | split(" / ") | last)' | head -1 || true)"
-  case "$a" in
-    claude*) cmd="claude --resume" ;;
-    codex*) cmd="codex resume" ;;
-    "") return 0 ;;
-    *) cmd="$a" ;;
-  esac
-  "$HC" send "$t" "$cmd" >/dev/null 2>&1 || true
-  open_t "$t"
+  check_addr "$1"
+  open_t "$1"
 }
 
 # A ghost removed: its program ends (the terminal goes, --rm), its window too
@@ -753,7 +743,7 @@ side_lines() {
   [ -n "${st[working]:-}" ] && hdr+=" \033[34m●${st[working]}\033[0m"
   [ -n "${st[done]:-}" ] && hdr+=" \033[33m✓${st[done]}\033[0m"
   [ -n "${st[idle]:-}" ] && hdr+=" \033[2m○${st[idle]}\033[0m"
-  [ -n "${st[ghost]:-}" ] && hdr+=" \033[2m◌${st[ghost]}\033[0m"
+  [ -n "${st[ghost]:-}" ] && hdr+=" \033[2m󰊠 ${st[ghost]}\033[0m"
   [ -n "$hc_ok" ] || hdr+=" \033[2;31mherdr-core not answering\033[0m"
   printf -- '-\t%b\n' "$hdr"
   printf 'new-proj\t \033[1;32m+\033[0m New project agent\n'
@@ -775,7 +765,7 @@ side_lines() {
     case "$state" in
       blocked) glyph='\033[1;31m⚠' ;; error) glyph='\033[31m✗' ;;
       done) glyph='\033[33m✓' ;; working) glyph='\033[34m●' ;;
-      idle) glyph='\033[2m○' ;; ghost) glyph='\033[2m◌' ;; *) glyph=' ' ;;
+      idle) glyph='\033[2m○' ;; ghost) glyph='\033[2m󰊠 ' ;; *) glyph=' ' ;;
     esac
     open=""; mark=" "; id="$addr"
     fw="$(find_window "$addr")"
@@ -790,6 +780,8 @@ side_lines() {
     [ "$w" -lt 4 ] && w=4
     n="$name"; [ "${#n}" -gt "$w" ] && n="${n:0:$((w - 1))}…"
     # A ghost: dim, enter starts its agent again, ctrl-x removes it
+    # (󰊠 is drawn on two columns where tmux and fzf count one: the space
+    # after it takes its second half)
     [ "$state" = ghost ] && { id="ghost:$addr"; open='\033[2m'; }
     printf '%s\t%b%s %b%s\033[0m \033[2m%3s\033[0m %b\033[0m\n' \
       "$id" "$mark" "$(icon "$app")" "$open" "$(pad "$n" "$w")" "$(age "$ms")" "$glyph"
