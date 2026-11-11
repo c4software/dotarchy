@@ -644,6 +644,53 @@ adopt() {
   echo "$t: in herdr-app now"
 }
 
+# A ghost: an agent lost (a reboot, herdr-core stopped) that keep replaced
+# with a shell; its label still names the agent, its title is the one of the
+# shell. A jq function, for side_lines and ghosts_clean.
+GHOST_JQ='def ghost:
+  ((.labels.where // "") | split(" / ") | last // "") as $wa
+  | ((.argv[0] // "") | split("/") | last) as $a0
+  | ["bash", "zsh", "sh", "fish", "dash", "shell"] as $shells
+  | (.status == null) and ($shells | index($a0)) != null
+    and $wa != "" and ($shells | index($wa)) == null;'
+
+# Ghosts with nothing for more than @herdr_ghost_ttl hours (24 when unset, 0:
+# never) go, once when a sidebar starts (not again within 10 minutes: a
+# sidebar per window, they start together on prefix + a). Not one whose
+# shell runs something (vim, an agent started again by hand), nor one whose
+# window a client shows. Each one is written in herdr-sidebar.log.
+# $1 = --dry-run: print the ones that would go, remove nothing.
+ghosts_clean() {
+  local dry="" ttl t win shown
+  [ "${1:-}" = --dry-run ] && dry=1
+  ttl="${HERDR_GHOST_TTL:-$(tmux show -gqv @herdr_ghost_ttl 2>/dev/null)}"
+  [[ "$ttl" =~ ^[0-9]+$ ]] || ttl=24
+  [ "$ttl" -gt 0 ] || [ -n "${HERDR_GHOST_TTL:-}" ] || return 0
+  t="$(tmux show -gqv @herdr_ghost_clean 2>/dev/null)"
+  if [ -z "$dry" ]; then
+    [ -z "${HERDR_GHOST_TTL:-}" ] && [ $(( $(date +%s) - ${t:-0} )) -lt 600 ] && return 0
+    tmux set -g @herdr_ghost_clean "$(date +%s)" 2>/dev/null || true
+  fi
+  shown=" $(tmux list-clients -F '#{window_id}' 2>/dev/null | tr '\n' ' ') "
+  full | jq -r --argjson ttl "$ttl" --argjson now "$(date +%s)000" "$GHOST_JQ"'
+      select(.state == "live" and ghost)
+      | select(($now - (.status_ms // .created_ms // $now)) >= $ttl * 3600000)
+      # its shell runs nothing: the program in front is the shell itself
+      | select(((.foreground.argv[0] // "") | split("/") | last)
+               == ((.argv[0] // "") | split("/") | last))
+      | .address' 2>/dev/null \
+    | while read -r t; do
+        win="$(find_window "$t")"
+        if [ -n "$win" ] && [[ "$shown" == *" $(tmux display -p -t "$win" '#{window_id}') "* ]]; then
+          continue
+        fi
+        if [ -n "$dry" ]; then echo "$t"; continue; fi
+        side_log "ghosts: $t removed, nothing for more than $ttl h"
+        forget "$t"
+      done || true
+  return 0
+}
+
 # --- Sidebar --------------------------------------------------------------
 
 SIDE_W=25
@@ -702,15 +749,11 @@ side_lines() {
   local data hc_ok=1
   data="$(full 2>/dev/null)" || { hc_ok=""; data=""; }
   rows="$(printf '%s\n' "$data" | jq -r '
+      '"$GHOST_JQ"'
       select(.state == "live")
-      # A ghost: an agent lost (a reboot), that keep replaced with a shell;
-      # its label still names the agent, its title is the one of the shell
       | (.labels.where // "") as $w
       | ($w | split(" / ") | last // "") as $wa
-      | ((.argv[0] // "") | split("/") | last) as $a0
-      | ["bash", "zsh", "sh", "fish", "dash", "shell"] as $shells
-      | ((.status == null) and ($shells | index($a0)) != null
-         and $wa != "" and ($shells | index($wa)) == null) as $ghost
+      | ghost as $ghost
       | [ (if $ghost then "ghost" else (.status.state // "") end),
           .address,
           (if $ghost then $wa else (.status.app // .foreground.name // .argv[0] // "shell") end),
@@ -843,6 +886,8 @@ side_panes() {
 # What runs in the sidebar pane: the list, again when fzf ends.
 sidebar() {
   local rc start quick=0
+  # The old ghosts go first, in the background (see ghosts_clean)
+  ( ghosts_clean ) </dev/null >/dev/null 2>&1 &
   printf '\033]2;Agents\033\\'
   while :; do
     start=$SECONDS
@@ -1411,6 +1456,7 @@ case "${1:-}" in
   side-act) side_act "${2:-}" ;;
   side-pos) side_pos ;;
   side-x) side_x "${2:-}" ;;
+  ghosts-clean) need_hc; ghosts_clean "${2:-}" ;;
   revive) need_hc; [ -n "${2:-}" ] || exit 2; revive "$2" ;;
   forget) need_hc; [ -n "${2:-}" ] || exit 2; forget "$2" ;;
   dir-preview) dir_preview "${2:-}" "${3:-}" "${4:-.}" ;;
