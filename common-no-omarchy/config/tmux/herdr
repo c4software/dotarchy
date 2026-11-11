@@ -1207,13 +1207,14 @@ side_menu() {
   local id="${1:-}" c
   case "$id" in -|new*|"") echo ignore; return 0 ;; esac
   c="$(side_client)"
-  echo "execute-silent($SELF side-popup $(printf '%q' "$id") $c >/dev/null 2>&1 </dev/null &)"
+  echo "execute-silent($SELF side-popup $(printf '%q' "$id") $c 0 ${TMUX_PANE:-} >/dev/null 2>&1 </dev/null &)"
 }
 
 # The menu of line $1 on client $2 ($3: the item chosen first, for the
-# options menu shown again after a change)
+# options menu shown again after a change), anchored on that line of
+# sidebar $4 (the header for the options), or else in the middle
 side_popup() {
-  local id="$1" c="${2:-}" first="${3:-0}" t win title
+  local id="$1" c="${2:-}" first="${3:-0}" sp="${4:-}" t win title
   local -a it=()
   local run="run-shell -b"
   case "$id" in
@@ -1227,14 +1228,14 @@ side_popup() {
           "command-prompt -I $(side_width) -p 'Width (columns):' { run-shell -b \"$SELF opt width '%%%'\" }"
         ""
         "$(box "$(not_set @herdr_notify_off)") Desktop notifications" n
-          "run-shell \"$SELF opt notify\" ; $run \"$SELF side-popup options $c 2\""
+          "run-shell \"$SELF opt notify\" ; $run \"$SELF side-popup options $c 2 $sp\""
         "$(box "$(is_set @herdr_notify_done)")   also when an agent is done" d
-          "run-shell \"$SELF opt done\" ; $run \"$SELF side-popup options $c 3\""
+          "run-shell \"$SELF opt done\" ; $run \"$SELF side-popup options $c 3 $sp\""
         "$(box "$(is_set @herdr_side_local)") Only the agents of this machine" l
-          "run-shell \"$SELF opt local\" ; $run \"$SELF side-popup options $c 4\""
+          "run-shell \"$SELF opt local\" ; $run \"$SELF side-popup options $c 4 $sp\""
         ""
         "Ghosts removed after: $( [ "$ttl" = 0 ] && echo never || echo "$ttl h")" g
-          "run-shell \"$SELF opt ttl\" ; $run \"$SELF side-popup options $c 6\""
+          "run-shell \"$SELF opt ttl\" ; $run \"$SELF side-popup options $c 6 $sp\""
         "$(dim_if "$( [ "$n" != 0 ] && echo 1 || true)")Remove old ghosts now ($n)" c
           "$run \"$SELF opt clean\""
       ) ;;
@@ -1271,7 +1272,47 @@ side_popup() {
         "Remove the agent" d "confirm-before -p 'Remove $t, its program ends? (y/n)' { run-shell -b \"$SELF forget $t\" }"
       ) ;;
   esac
-  tmux display-menu -M ${c:+-c "$c"} -C "$first" -x C -y C -T "#[align=centre]$title" "${it[@]}"
+  # -O: a click opens it, another chooses (no need to hold the button)
+  tmux display-menu -M -O ${c:+-c "$c"} -C "$first" $(menu_pos "$id" "$c" "$sp" "${it[@]}") \
+    -T "#[align=centre]$title" "${it[@]}"
+}
+
+# -x and -y of a menu (items $4...) that starts on the line of item $1 in
+# sidebar $3, seen by client $2: the left of the sidebar, its top on that
+# line (the header for the options). tmux takes -y as the bottom line of
+# the menu. When it cannot (no sidebar), the middle of the screen.
+menu_pos() {
+  local id="$1" c="$2" sp="$3" port pos top left st lines=0 w=0 n sy sx y x
+  shift 3
+  [ -n "$sp" ] && [ -n "$c" ] || { echo "-x C -y C"; return 0; }
+  read -r top left < <(tmux display -p -t "$sp" '#{pane_top} #{pane_left}' 2>/dev/null) || { echo "-x C -y C"; return 0; }
+  read -r sx sy < <(tmux list-clients -F '#{client_name} #{client_width} #{client_height}' | awk -v c="$c" '$1 == c { print $2, $3 }')
+  [ -n "${sy:-}" ] || { echo "-x C -y C"; return 0; }
+  # The status line on top moves the panes down
+  st=0
+  [ "$(tmux show -gv status-position)" = top ] && [ "$(tmux show -gv status)" != off ] && st=1
+  if [ "$id" = options ]; then
+    pos=-1
+  else
+    port="$(tmux show -pqv -t "$sp" @herdr_side_port 2>/dev/null)"
+    pos="$(curl -s -m 1 "localhost:$port" 2>/dev/null | jq -r '.position // empty' 2>/dev/null)" || true
+    [[ "$pos" =~ ^[0-9]+$ ]] || { echo "-x C -y C"; return 0; }
+  fi
+  # Its size: a line per item or separator, the borders; the longest name
+  while [ $# -gt 0 ]; do
+    lines=$(( lines + 1 ))
+    if [ -z "$1" ]; then shift; continue; fi
+    n="${1#-}"; [ "${#n}" -gt "$w" ] && w="${#n}"
+    shift 3 2>/dev/null || shift $#
+  done
+  # line of the item: status, top of the pane, the header line, then pos
+  y=$(( st + top + 1 + pos + lines + 1 ))
+  [ "$y" -ge "$sy" ] && y=$(( sy - 1 ))
+  # (name, key, spaces, borders; tmux does not show a menu that does not fit)
+  x=$(( left + 2 )); w=$(( w + 11 ))
+  [ $(( x + w )) -gt "$sx" ] && x=$(( sx - w ))
+  [ "$x" -lt 0 ] && x=0
+  echo "-x $x -y $y"
 }
 
 # "-" (an item tmux shows dim and does not choose) when $1 is empty
@@ -1615,7 +1656,7 @@ case "${1:-}" in
   side-pos) side_pos ;;
   side-x) side_x "${2:-}" ;;
   side-menu) side_menu "${2:-}" ;;
-  side-popup) side_popup "${2:-}" "${3:-}" "${4:-0}" ;;
+  side-popup) side_popup "${2:-}" "${3:-}" "${4:-0}" "${5:-}" ;;
   opt) opt "${2:-}" "${3:-}" ;;
   split) need_hc; [ -n "${2:-}" ] || exit 2; split_t "$2" ;;
   msg) need_hc; [ -n "${2:-}" ] || exit 2; msg_t "$2" ;;
