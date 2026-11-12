@@ -19,6 +19,9 @@
 #                         attached to the pane (the zsh functions of fns/herdr)
 #   herdr adopt <t>       show terminal <t>, started without Herdr, in
 #                         herdr-app too (a space for its folder, a tab)
+#   herdr shell [machine] a shell on another machine of herdr-core (pick it
+#                         and the folder, or its home), in a tmux window; it
+#                         lives there (exit ends it)
 #   herdr new             start an agent: which one and on which machine (this
 #                         one or one of herdr-core), its folder (with the
 #                         project picker of p there, or ctrl-o: the current
@@ -120,7 +123,7 @@ open_t() {
   # Named like the sidebar shows it: agent·space, @machine when not here
   # (claude·llm-proxy@dev-box)
   name="$(full | jq -r --arg t "$t" 'select(.address == $t and .state == "live")
-    | [ (.status.app // .foreground.name // .argv[0] // "shell" | sub("-code$"; "")),
+    | [ (.status.app // .foreground.name // .argv[0] // "shell" | split("/") | last | sub("-code$"; "")),
         ((.labels.where // "" | split(" / ") | first) // ""),
         (.cwd // "") ] | map(if . == "" then "-" else . end) | @tsv' | head -1 || true)"
   [ -n "$name" ] || { tmux display-message "No live Herdr terminal $t"; exit 0; }
@@ -376,10 +379,12 @@ app_names() {
 start() {
   local m="$1" dir="$2" a="$3" out
   shift 3
-  local -a on=()
+  local -a on=() keep=(--keep)
   [ -n "$m" ] && on=(--on "$m")
+  # A shell: exit removes it (no ghost of it)
+  [ "$a" = shell ] && keep=(--rm --no-parent)
   app_labels "$m" "$dir"
-  out="$("$HC" run --bg --json --keep "${on[@]}" --cwd "$dir" \
+  out="$("$HC" run --bg --json "${keep[@]}" "${on[@]}" --cwd "$dir" \
     --label "herdr.space=$SPACE" --label "herdr.tab=$TAB" \
     --label "where=$( [ "$dir" = "$HOME" ] && echo '~' || basename "$dir") / $a" --label "herdr.agent=$a" \
     ${1:+-- "$@"} 2>&1)" || true
@@ -394,7 +399,7 @@ start() {
     env $(env | sed -n 's/^\(CLAUDE[A-Z_]*\|CLAUDECODE\|AI_AGENT[A-Z_]*\)=.*/-u \1/p') \
       "$HC" server restart >/dev/null 2>&1 || true
     sleep 1
-    out="$("$HC" run --bg --json --keep --cwd "$dir" \
+    out="$("$HC" run --bg --json "${keep[@]}" --cwd "$dir" \
       --label "herdr.space=$SPACE" --label "herdr.tab=$TAB" \
       --label "where=$(basename "$dir") / $a" --label "herdr.agent=$a" ${1:+-- "$@"} 2>&1)" || true
   fi
@@ -570,6 +575,44 @@ new_agent() {
     echo; echo "Not started: ${err:-$out}"
     jq -r '.error.hint // empty' <<<"$out" 2>/dev/null || true
     read -rsn1 -p "(a key to close)" || true
+    return 0
+  fi
+  open_t "$addr"
+}
+
+# The machines of herdr-core connected now, one per line
+connected_machines() {
+  "$HC" machine ls --json 2>/dev/null | jq -r '.machines[] | select(.state == "connected") | .name' 2>/dev/null || true
+}
+
+# herdr shell [machine]: a shell in a terminal of herdr-core on another
+# machine, opened in a tmux window. It lives there: a closed window, a sleep
+# or a lost network leave it running (the sidebar has it), exit ends it.
+# With a machine: in its home. Without: pick the machine (when there are
+# several), then the folder, in this terminal (a popup).
+remote_shell() {
+  local m="${1:-}" home dir out addr err ms
+  if [ -z "$m" ]; then
+    ms="$(connected_machines)"
+    [ -n "$ms" ] || { echo; echo " No other machine connected (Settings: + Add a machine)"; read -rsn1 || true; return 0; }
+    if [ "$(grep -c . <<<"$ms")" = 1 ]; then m="$ms"; else
+      m="$(fzf --layout=reverse --info=hidden --gutter=' ' --prompt='shell on › ' \
+        --header='enter: then the folder · esc: cancel' <<<"$ms")" || return 0
+    fi
+  fi
+  [[ "$m" =~ ^[A-Za-z0-9_.-]+$ ]] || return 2
+  home="$("$HC" exec --on "$m" 'printf %s "$HOME"' 2>/dev/null)" || home=""
+  [ -n "$home" ] || { tmux display-message "No answer from $m"; return 0; }
+  dir="$home"
+  if [ -z "${1:-}" ]; then
+    dir="$(browse_folder "$m" "$home" "$home")" || return 0
+    [ -n "$dir" ] || return 0
+  fi
+  out="$(start "$m" "$dir" shell)"
+  addr="$(jq -r '.address // empty' <<<"$out" 2>/dev/null | head -1 || true)"
+  if [ -z "$addr" ]; then
+    err="$(jq -r '.error.message // empty' <<<"$out" 2>/dev/null || true)"
+    tmux display-message "Shell on $m not started: ${err:-$out}"
     return 0
   fi
   open_t "$addr"
@@ -863,6 +906,7 @@ side_lines_raw() {
   printf -- '-\t%b\n' "$hdr"
   printf 'new-proj\t \033[1;32m+\033[0m New project agent\n'
   printf 'new-dir\t \033[1;32m+\033[0m New folder agent\n'
+  printf 'new-shell\t \033[1;32m+\033[0m New remote shell\n'
   [ -n "${SIDE_COLS:-}" ] || printf 'settings\t \033[2m⚙\033[0m Settings\n'
   # A machine not connected shows, with no agent too
   local down=""
@@ -1190,6 +1234,7 @@ side_act() {
     # sidebar must not wait for it
     new-proj) echo "execute-silent($SELF side-new project $c >/dev/null 2>&1 </dev/null &)" ;;
     new-dir) echo "execute-silent($SELF side-new folder $c >/dev/null 2>&1 </dev/null &)" ;;
+    new-shell) echo "execute-silent($SELF side-new shell $c >/dev/null 2>&1 </dev/null &)" ;;
     # (the line ⚙ Settings, or ← Back in the settings)
     settings) echo "execute-silent($SELF side-view)+reload-sync($SELF side-lines)+first" ;;
     pane:%*) echo "execute-silent(HERDR_CLIENT=$c $SELF goto-pane ${1#pane:})" ;;
@@ -1227,6 +1272,11 @@ side_new() {
     | grep -v -- "$SELF sidebar" | sort -rn | head -1 | cut -d' ' -f2)" || true
   dir="$(tmux display -p -t "${p:-$win}" '#{pane_current_path}')"
   [ -n "$client" ] || client="$(side_client)"
+  if [ "$mode" = shell ]; then
+    tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% \
+      -T "#[align=centre] New remote shell " "$SELF shell"
+    return 0
+  fi
   tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% -d "$dir" \
     -T "#[align=centre] New ${mode:+$mode }agent " "$SELF new $mode"
 }
@@ -1502,7 +1552,7 @@ side_unsplit() {
 # it) on that line. In the background, the sidebar does not wait for it.
 side_menu() {
   local id="${1:-}" c
-  case "$id" in -|new*|madd|settings|o:*|"") echo ignore; return 0 ;; esac
+  case "$id" in -|new*|madd|settings|o:*|shell:*|"") echo ignore; return 0 ;; esac
   side_id_ok "$id" || { echo ignore; return 0; }
   c="$(side_client)"
   # (- for no client: the arguments after it keep their place)
@@ -1526,6 +1576,9 @@ side_popup() {
       hv="$(side_data 2>/dev/null | jq -r 'select(.hello) | .hello.version' 2>/dev/null)" || true
       title=" $m: ${st:-?}${ver:+, hc $ver} "
       it=(
+        "$(dim_if "$( [ "${st:-}" = connected ] && echo 1 || true)")Open a shell there" s
+          "$run \"HERDR_CLIENT=$c $SELF shell $m\""
+        ""
         "$(dim_if "$( [ "${st:-}" != connected ] && echo 1 || true)")Log in again…" l
           "display-popup -E -w 80% -h 60% -T '#[align=centre] Log in: $m ' \"$SELF machine-run login $m\""
         "$(dim_if "$( [ "${st:-}" = connected ] && [ -n "$hv" ] && [ "${ver:-}" != "$hv" ] && echo 1 || true)")Update hc there${hv:+ (to $hv)}" u
@@ -1693,7 +1746,7 @@ copy_t() {
 # The windows of every session, then the agents (like the sidebar), in a
 # popup with a search: enter goes there. The current window is not in it.
 palette_lines() {
-  local cur cols id sess idx hc
+  local cur cols id sess idx hc m
   local -A agent_win=() where=()
   cur="$(tmux display -p '#{window_id}')"
   # The windows that show an agent: the agent line stands for them (with
@@ -1728,6 +1781,11 @@ palette_lines() {
           printf '%s\t%s\n' "$id" "$line"
         fi
       done || true
+  # A shell straight in the home of each other machine
+  side_data 2>/dev/null | jq -r 'select(.machines) | .machines[] | select(.state == "connected") | .name' 2>/dev/null \
+    | while read -r m; do
+        printf 'shell:%s\t \033[2m›\033[0m Shell on %s\n' "$m" "$m"
+      done || true
 }
 
 palette() {
@@ -1743,6 +1801,8 @@ palette() {
              tmux switch-client -t "$(tmux display -p -t "$id" '#{session_id}')" \; select-window -t "$id" \; select-pane -t "$id" ;;
     new-proj) need_hc; new_agent project ;;
     new-dir) need_hc; new_agent folder ;;
+    new-shell) need_hc; remote_shell ;;
+    shell:*) need_hc; remote_shell "${id#shell:}" ;;
     ghost:*) need_hc; revive "${id#ghost:}" ;;
     -|"") ;;
     *) open_t "$id" ;;
@@ -2101,6 +2161,7 @@ case "${1:-}" in
   here) shift; [ $# -gt 0 ] || { echo "usage: herdr here <program> [args]" >&2; exit 2; }; here "$@" ;;
   adopt) need_hc; [ -n "${2:-}" ] || { echo "usage: herdr adopt <terminal>" >&2; exit 2; }; adopt "$2" ;;
   new) need_hc; new_agent "${2:-}" ;;
+  shell) need_hc; remote_shell "${2:-}" ;;
   has) has ;;
   lines) lines ;;
   tick) tick "${2:-}" "${3:-}" ;;
