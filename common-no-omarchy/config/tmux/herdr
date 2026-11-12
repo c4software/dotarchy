@@ -906,7 +906,6 @@ side_lines_raw() {
   printf -- '-\t%b\n' "$hdr"
   printf 'new-proj\t \033[1;32m+\033[0m New project agent\n'
   printf 'new-dir\t \033[1;32m+\033[0m New folder agent\n'
-  printf 'new-shell\t \033[1;32m+\033[0m New remote shell\n'
   [ -n "${SIDE_COLS:-}" ] || printf 'settings\t \033[2m⚙\033[0m Settings\n'
   # A machine not connected shows, with no agent too
   local down=""
@@ -1234,7 +1233,6 @@ side_act() {
     # sidebar must not wait for it
     new-proj) echo "execute-silent($SELF side-new project $c >/dev/null 2>&1 </dev/null &)" ;;
     new-dir) echo "execute-silent($SELF side-new folder $c >/dev/null 2>&1 </dev/null &)" ;;
-    new-shell) echo "execute-silent($SELF side-new shell $c >/dev/null 2>&1 </dev/null &)" ;;
     # (the line ⚙ Settings, or ← Back in the settings)
     settings) echo "execute-silent($SELF side-view)+reload-sync($SELF side-lines)+first" ;;
     pane:%*) echo "execute-silent(HERDR_CLIENT=$c $SELF goto-pane ${1#pane:})" ;;
@@ -1272,11 +1270,6 @@ side_new() {
     | grep -v -- "$SELF sidebar" | sort -rn | head -1 | cut -d' ' -f2)" || true
   dir="$(tmux display -p -t "${p:-$win}" '#{pane_current_path}')"
   [ -n "$client" ] || client="$(side_client)"
-  if [ "$mode" = shell ]; then
-    tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% \
-      -T "#[align=centre] New remote shell " "$SELF shell"
-    return 0
-  fi
   tmux display-popup ${client:+-c "$client"} -E -w 90% -h 80% -d "$dir" \
     -T "#[align=centre] New ${mode:+$mode }agent " "$SELF new $mode"
 }
@@ -1801,7 +1794,6 @@ palette() {
              tmux switch-client -t "$(tmux display -p -t "$id" '#{session_id}')" \; select-window -t "$id" \; select-pane -t "$id" ;;
     new-proj) need_hc; new_agent project ;;
     new-dir) need_hc; new_agent folder ;;
-    new-shell) need_hc; remote_shell ;;
     shell:*) need_hc; remote_shell "${id#shell:}" ;;
     ghost:*) need_hc; revive "${id#ghost:}" ;;
     -|"") ;;
