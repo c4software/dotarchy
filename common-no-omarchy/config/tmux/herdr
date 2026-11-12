@@ -165,7 +165,7 @@ side_x() {
     ghost:*)
       t="${1#ghost:}"; check_addr "$t"; c="$(side_client)"
       tmux confirm-before -b ${c:+-t "$c"} -p "Remove ghost $t? (y/n)" "run-shell -b '$SELF forget $t'" ;;
-    new*|-|pane:*|m:*|o:*|madd|"") ;;
+    new*|-|pane:*|m:*|o:*|madd|settings|"") ;;
     *) close_t "$1" ;;
   esac
 }
@@ -863,6 +863,7 @@ side_lines_raw() {
   printf -- '-\t%b\n' "$hdr"
   printf 'new-proj\t \033[1;32m+\033[0m New project agent\n'
   printf 'new-dir\t \033[1;32m+\033[0m New folder agent\n'
+  [ -n "${SIDE_COLS:-}" ] || printf 'settings\t \033[2m⚙\033[0m Settings\n'
   # A machine not connected shows, with no agent too
   local down=""
   if [ -z "$(tmux show -gqv @herdr_side_local 2>/dev/null)" ]; then
@@ -938,7 +939,8 @@ settings_lines() {
   read -r here hv < <(printf '%s\n' "$data" | jq -r 'select(.hello) | "\(.hello.name) \(.hello.version)"' 2>/dev/null) || true
   [ -n "${here:-}" ] || here="$(uname -n)"
   w=$(( cols - 16 )); [ "$w" -lt 6 ] && w=6
-  printf -- '-\t \033[1m← Settings\033[0m\n'
+  printf -- '-\t \033[1m⚙ Settings\033[0m\n'
+  printf 'settings\t \033[2m←\033[0m Back to the agents\n'
   printf -- '-\t \033[1mMachines\033[0m\n'
   printf -- '-\t \033[32m●\033[0m %s \033[2mhere %s\033[0m\n' "$(pad "$here" "$w")" "${hv:-}"
   while IFS=$'\t' read -r name state ver; do
@@ -1188,6 +1190,8 @@ side_act() {
     # sidebar must not wait for it
     new-proj) echo "execute-silent($SELF side-new project $c >/dev/null 2>&1 </dev/null &)" ;;
     new-dir) echo "execute-silent($SELF side-new folder $c >/dev/null 2>&1 </dev/null &)" ;;
+    # (the line ⚙ Settings, or ← Back in the settings)
+    settings) echo "execute-silent($SELF side-view)+reload-sync($SELF side-lines)+first" ;;
     pane:%*) echo "execute-silent(HERDR_CLIENT=$c $SELF goto-pane ${1#pane:})" ;;
     m:*) side_menu "$1" ;;
     madd) echo "execute-silent(tmux display-popup ${c:+-c $c} -E -w 80% -h 60% -T '#[align=centre] Add a machine ' '$SELF machine-add' >/dev/null 2>&1 </dev/null &)" ;;
@@ -1498,7 +1502,7 @@ side_unsplit() {
 # it) on that line. In the background, the sidebar does not wait for it.
 side_menu() {
   local id="${1:-}" c
-  case "$id" in -|new*|madd|o:*|"") echo ignore; return 0 ;; esac
+  case "$id" in -|new*|madd|settings|o:*|"") echo ignore; return 0 ;; esac
   side_id_ok "$id" || { echo ignore; return 0; }
   c="$(side_client)"
   # (- for no client: the arguments after it keep their place)
