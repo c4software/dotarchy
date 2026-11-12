@@ -89,8 +89,12 @@ terminals() {
 full() {
   printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"hello","params":{}}' \
     '{"jsonrpc":"2.0","id":2,"method":"terminal.list","params":{}}' \
+    '{"jsonrpc":"2.0","id":3,"method":"machine.list","params":{}}' \
     | timeout 5 "$HC" connect 2>/dev/null \
-    | jq -c 'select(.id == 2) | .result.terminals[]'
+    | jq -c 'if .id == 2 then .result.terminals[]
+      elif .id == 1 then {hello: {name: .result.core.name, version: .result.version}}
+      elif .id == 3 then {machines: (.result.machines // [])}
+      else empty end'
 }
 
 # The tmux pane that shows terminal $1, tagged with the option @hc: of its
@@ -161,7 +165,7 @@ side_x() {
     ghost:*)
       t="${1#ghost:}"; check_addr "$t"; c="$(side_client)"
       tmux confirm-before -b ${c:+-t "$c"} -p "Remove ghost $t? (y/n)" "run-shell -b '$SELF forget $t'" ;;
-    new*|-|pane:*|"") ;;
+    new*|-|pane:*|m:*|o:*|madd|"") ;;
     *) close_t "$1" ;;
   esac
 }
@@ -765,7 +769,15 @@ age() {
 
 # The lines of the sidebar: id (address, new, or - for a heading), then what
 # fzf shows. Grouped by status, the ones that need you first.
+# Written at once: fzf keeps its old header line when the first line of a
+# reload comes before the others.
 side_lines() {
+  local out
+  out="$(side_lines_raw)"
+  printf '%s\n' "$out"
+}
+
+side_lines_raw() {
   local cols rk addr app name mach ms state open key mark fw id hc w0
   # The window of each agent that has one (@hc), in one call
   local -A hcwin=()
@@ -784,6 +796,11 @@ side_lines() {
     && SIDE_WIN="$(tmux display -p -t "$TMUX_PANE" '#{window_id}' 2>/dev/null || true)"
   # The first line is the header of fzf (--header-lines=1)
   [ -n "$HC" ] || { printf -- '-\t \033[1mAgents\033[0m\n-\t\033[2m herdr-core not available\033[0m\n'; return 0; }
+  if [ -z "${SIDE_COLS:-}" ] && [ -n "${TMUX_PANE:-}" ] \
+    && [ "$(tmux show -pqv -t "$TMUX_PANE" @herdr_side_view 2>/dev/null)" = settings ]; then
+    settings_lines "$cols"
+    return 0
+  fi
   local -A count=() needs=()
   local rows
   # One group per machine, this one first; in each, the agents that need you
@@ -792,6 +809,13 @@ side_lines() {
   # not a sidebar left blank (set -e would end here)
   local data hc_ok=1
   data="$(side_data 2>/dev/null)" || { hc_ok=""; data=""; }
+  # The other machines: name, state (connected, connecting, needs_login,
+  # unreachable)
+  local -A mstate=()
+  local mn ms_
+  while IFS=$'\t' read -r mn ms_; do
+    [ -n "$mn" ] && mstate[$mn]="$ms_"
+  done < <(printf '%s\n' "$data" | jq -r 'select(.machines) | .machines[] | [.name, .state] | @tsv' 2>/dev/null)
   rows="$(printf '%s\n' "$data" | jq -r '
       '"$GHOST_JQ"'
       select(.state == "live")
@@ -839,8 +863,20 @@ side_lines() {
   printf -- '-\t%b\n' "$hdr"
   printf 'new-proj\t \033[1;32m+\033[0m New project agent\n'
   printf 'new-dir\t \033[1;32m+\033[0m New folder agent\n'
-  [ -n "$rows$panes" ] || { printf -- '-\t\n-\t\033[2m No agent\033[0m\n'; return 0; }
+  # A machine not connected shows, with no agent too
+  local down=""
+  if [ -z "$(tmux show -gqv @herdr_side_local 2>/dev/null)" ]; then
+    for mn in "${!mstate[@]}"; do
+      [ "${mstate[$mn]}" = connected ] && continue
+      grep -q "^1$mn"$'\t' <<<"$rows" || down+="$mn "
+    done
+  fi
+  [ -n "$rows$panes$down" ] || { printf -- '-\t\n-\t\033[2m No agent\033[0m\n'; return 0; }
   side_panes "$panes" "$cols"
+  for mn in $down; do
+    printf -- '-\t\n'
+    printf 'm:%s\t \033[1m%s\033[0m %b\n' "$mn" "$mn" "$(mach_dot "${mstate[$mn]}")"
+  done
   [ -n "$rows" ] || return 0
   while IFS=$'\t' read -r key rk mach state addr app name ms; do
     count[$mach]=$(( ${count[$mach]:-0} + 1 ))
@@ -849,8 +885,11 @@ side_lines() {
   while IFS=$'\t' read -r key rk mach state addr app name ms; do
     if [ "$mach" != "$cur" ]; then
       cur="$mach"
-      printf -- '-\t\n-\t \033[1m%s\033[0m \033[2m%s\033[0m' "$mach" "${count[$mach]}"
+      # The group of another machine: a click gives its menu
+      if [ "$mach" = "$here" ]; then id=-; else id="m:$mach"; fi
+      printf -- '-\t\n%s\t \033[1m%s\033[0m \033[2m%s\033[0m' "$id" "$mach" "${count[$mach]}"
       [ -z "${needs[$mach]:-}" ] || printf ' \033[1;31m⚠%s\033[0m' "${needs[$mach]}"
+      [ "$mach" = "$here" ] || printf ' %b' "$(mach_dot "${mstate[$mach]:-}")"
       printf '\n'
     fi
     case "$state" in
@@ -877,6 +916,155 @@ side_lines() {
   done <<<"$rows"
 }
 
+
+# The state of a machine of herdr-core, coloured
+mach_dot() {
+  case "${1:-}" in
+    connected) printf '\033[32m●\033[0m' ;;
+    connecting) printf '\033[33m◌ connecting\033[0m' ;;
+    needs_login) printf '\033[1;33m⚠ login\033[0m' ;;
+    unreachable) printf '\033[31m✗ unreachable\033[0m' ;;
+    "") printf '\033[2m?\033[0m' ;;
+    *) printf '\033[2m%s\033[0m' "$1" ;;
+  esac
+}
+
+# The sidebar in its settings view (a click on ⚙, its header): the machines
+# of herdr-core, then the options. A click on the header, or Esc, goes back
+# to the agents.
+settings_lines() {
+  local cols="${1:-$SIDE_W}" data here hv name state ver w n ttl
+  data="$(side_data 2>/dev/null)" || data=""
+  read -r here hv < <(printf '%s\n' "$data" | jq -r 'select(.hello) | "\(.hello.name) \(.hello.version)"' 2>/dev/null) || true
+  [ -n "${here:-}" ] || here="$(uname -n)"
+  w=$(( cols - 16 )); [ "$w" -lt 6 ] && w=6
+  printf -- '-\t \033[1m← Settings\033[0m\n'
+  printf -- '-\t \033[1mMachines\033[0m\n'
+  printf -- '-\t \033[32m●\033[0m %s \033[2mhere %s\033[0m\n' "$(pad "$here" "$w")" "${hv:-}"
+  while IFS=$'\t' read -r name state ver; do
+    [ -n "$name" ] || continue
+    n="$(mach_dot "$state")"
+    [ "$state" = connected ] && n="$n \033[2m${ver}\033[0m"
+    [ -n "$hv" ] && [ "$ver" != "$hv" ] && [ "$state" = connected ] && n="$n \033[33m↑\033[0m"
+    printf 'm:%s\t %b\n' "$name" "$(pad "$name" "$w") $n"
+  done < <(printf '%s\n' "$data" | jq -r 'select(.machines) | .machines[] | [.name, .state, (.version // "")] | @tsv' 2>/dev/null)
+  printf 'madd\t \033[1;32m+\033[0m Add a machine\n'
+  printf -- '-\t\n-\t \033[1mOptions\033[0m\n'
+  printf 'o:notify\t %s Desktop notifications\n' "$(box "$(not_set @herdr_notify_off)")"
+  printf 'o:done\t %s   also when an agent is done\n' "$(box "$(is_set @herdr_notify_done)")"
+  printf 'o:local\t %s Only this machine'"'"'s agents\n' "$(box "$(is_set @herdr_side_local)")"
+  printf 'o:width\t     Width \033[1m%s\033[0m columns\n' "$(side_width)"
+  printf 'o:height\t     Band \033[1m%s\033[0m lines \033[2m(narrow)\033[0m\n' "$(side_height)"
+  n="$(tmux show -gqv @herdr_side_narrow 2>/dev/null)"
+  printf 'o:narrow\t     Narrow under \033[1m%s\033[0m columns\n' "${n:-$SIDE_NARROW}"
+  ttl="$(tmux show -gqv @herdr_ghost_ttl 2>/dev/null)"; ttl="${ttl:-24}"
+  printf 'o:ttl\t     Ghosts removed after \033[1m%s\033[0m\n' "$( [ "$ttl" = 0 ] && echo never || echo "$ttl h")"
+  n="$(ghosts_clean --dry-run 2>/dev/null | grep -c . || true)"
+  if [ "$n" != 0 ] && [ "$ttl" != 0 ]; then
+    printf 'o:clean\t     Remove old ghosts now (%s)\n' "$n"
+  else
+    printf -- '-\t     \033[2mNo old ghost\033[0m\n'
+  fi
+}
+
+# The value of option $1 (width, height, narrow) typed in the status line
+# of client $2
+side_prompt() {
+  local k="$1" c="${2:-}" cur p
+  [ "$c" = - ] && c=""
+  case "$k" in
+    width) cur="$(side_width)" p='Width (columns):' ;;
+    height) cur="$(side_height)" p='Band height (lines):' ;;
+    narrow) cur="$(tmux show -gqv @herdr_side_narrow)"; cur="${cur:-$SIDE_NARROW}" p='Band under (columns):' ;;
+    *) return 0 ;;
+  esac
+  tmux command-prompt ${c:+-t "$c"} -l -I "$cur" -p "$p" "run-shell -b \"$SELF opt $k '%%%'\""
+}
+
+# A click on the header: agents ⇄ settings (fixed fzf actions, a reload
+# from a transform would not change the header line)
+side_view() {
+  local p="${TMUX_PANE:-}"
+  [ -n "$p" ] || return 0
+  if [ "$(tmux show -pqv -t "$p" @herdr_side_view 2>/dev/null)" = settings ]; then
+    tmux set -pu -t "$p" @herdr_side_view 2>/dev/null || true
+    tmux set -p -t "$p" @herdr_side_goto 1 2>/dev/null || true
+  else
+    tmux set -p -t "$p" @herdr_side_view settings 2>/dev/null || true
+  fi
+}
+
+# Esc: back to the agents from the settings, else back to the pane before
+side_esc() {
+  if [ "$(tmux show -pqv -t "${TMUX_PANE:-}" @herdr_side_view 2>/dev/null)" = settings ]; then
+    side_view
+  else
+    tmux select-pane -l 2>/dev/null || true
+  fi
+}
+
+# Every sidebar shown lists again (after a change of the options, of the
+# machines: the cache of the watch first, when there is one)
+side_refresh() {
+  local f id port cmd data
+  f="$(side_cache)"
+  if [ -e "$f" ] && data="$(full 2>/dev/null)"; then
+    printf '%s\n' "$data" > "$f.tmp" && mv "$f.tmp" "$f"
+  fi
+  while read -r id port cmd; do
+    [[ "$cmd" == *"$SELF sidebar"* ]] && [[ "$port" =~ ^[0-9]+$ ]] || continue
+    curl -fsS -m 2 -XPOST "localhost:$port" -d "reload-sync($SELF side-lines)" >/dev/null 2>&1 9>&- &
+  done < <(tmux list-panes -a -F '#{pane_id} #{@herdr_side_port} #{pane_start_command}' 2>/dev/null)
+  return 0
+}
+
+# --- Machines of herdr-core ------------------------------------------------
+
+# The Hosts of ~/.ssh/config (and the files it includes), no pattern
+ssh_hosts() {
+  local -a files=("$HOME/.ssh/config")
+  local f inc
+  [ -r "$HOME/.ssh/config" ] || return 0
+  while read -r inc; do
+    [[ "$inc" == /* ]] || inc="$HOME/.ssh/$inc"
+    inc="${inc/#\~/$HOME}"
+    for f in $inc; do [ -r "$f" ] && files+=("$f"); done
+  done < <(awk 'tolower($1) == "include" { for (i = 2; i <= NF; i++) print $i }' "$HOME/.ssh/config")
+  awk 'tolower($1) == "host" { for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print $i }' "${files[@]}" \
+    | awk '!seen[$0]++'
+}
+
+# herdr machine-add: in a popup, a Host of ~/.ssh/config or what you type
+# (user@host:port), then hc machine add there (it may ask to install hc)
+machine_add() {
+  local known t out
+  known="$("$HC" machine ls --json 2>/dev/null | jq -r '.machines[] | .name, .host, .target' 2>/dev/null)" || true
+  t="$(ssh_hosts | grep -vxF -f <(printf '%s\n' "$known" | grep .) 2>/dev/null \
+    | fzf --prompt 'ssh target: ' --print-query --layout=reverse --info=hidden \
+        --header 'A Host of ~/.ssh/config, or type user@host[:port] · Esc: cancel' \
+        --bind 'tab:replace-query' )" || true
+  # (the last line: the chosen Host, or else what was typed)
+  out="$(printf '%s\n' "$t" | grep . | tail -1)" || true
+  [ -n "$out" ] || return 0
+  printf '\n hc machine add %s\n\n' "$out"
+  "$HC" machine add "$out" && side_refresh
+  printf '\n Press a key'; read -rsn1 || true
+}
+
+# herdr machine-run login|update <name>: in a popup (it may ask something)
+machine_run() {
+  local what="$1" m="$2"
+  [[ "$m" =~ ^[A-Za-z0-9_.-]+$ ]] || return 2
+  printf '\n hc machine %s %s\n\n' "$what" "$m"
+  "$HC" machine "$what" "$m" && side_refresh
+  printf '\n Press a key'; read -rsn1 || true
+}
+
+machine_rm() {
+  [[ "${1:-}" =~ ^[A-Za-z0-9_.-]+$ ]] || return 2
+  "$HC" machine rm "$1" >/dev/null 2>&1 && tmux display-message "Machine $1 forgotten (its terminals go on there)"
+  side_refresh
+}
 
 side_width() {
   local w
@@ -955,8 +1143,8 @@ sidebar() {
       --bind "left-click:transform:$SELF side-act {1}" \
       --bind "ctrl-x:execute-silent($SELF side-x {1})+reload-sync($SELF side-lines)" \
       --bind "right-click:transform:$SELF side-menu {1}" \
-      --bind "click-header:transform:$SELF side-menu options" \
-      --bind 'esc:execute-silent(tmux select-pane -l)' \
+      --bind "click-header:execute-silent($SELF side-view)+reload-sync($SELF side-lines)+first" \
+      --bind "esc:execute-silent($SELF side-esc)+reload-sync($SELF side-lines)" \
       < /dev/null && rc=0 || rc=$?
     side_log "sidebar ${TMUX_PANE:-}: fzf ended (rc $rc), started again"
     # fzf that cannot start (too old for these options, pane too small): not
@@ -979,6 +1167,7 @@ side_pos() {
   local p="${TMUX_PANE:-}" n
   [ -n "$p" ] || return 0
   [ "$(tmux show -pqv -t "$p" @herdr_side_goto 2>/dev/null)" = 0 ] && return 0
+  [ "$(tmux show -pqv -t "$p" @herdr_side_view 2>/dev/null)" = settings ] && return 0
   tmux set -p -t "$p" @herdr_side_goto 0 2>/dev/null || true
   # Its place in the list: the line of ▸, less the header (--header-lines=1)
   n="$(side_lines | grep -n '▸' | head -1 | cut -d: -f1)" || true
@@ -1000,6 +1189,10 @@ side_act() {
     new-proj) echo "execute-silent($SELF side-new project $c >/dev/null 2>&1 </dev/null &)" ;;
     new-dir) echo "execute-silent($SELF side-new folder $c >/dev/null 2>&1 </dev/null &)" ;;
     pane:%*) echo "execute-silent(HERDR_CLIENT=$c $SELF goto-pane ${1#pane:})" ;;
+    m:*) side_menu "$1" ;;
+    madd) echo "execute-silent(tmux display-popup ${c:+-c $c} -E -w 80% -h 60% -T '#[align=centre] Add a machine ' '$SELF machine-add' >/dev/null 2>&1 </dev/null &)" ;;
+    o:width|o:height|o:narrow) echo "execute-silent($SELF side-prompt ${1#o:} ${c:--})" ;;
+    o:*) echo "execute-silent($SELF opt ${1#o:})+reload-sync($SELF side-lines)" ;;
     ghost:*) echo "execute-silent(HERDR_CLIENT=$c $SELF revive ${1#ghost:})+reload-sync($SELF side-lines)" ;;
     *) echo "execute-silent(HERDR_CLIENT=$c $SELF open $1)+reload-sync($SELF side-lines)" ;;
   esac
@@ -1008,7 +1201,7 @@ side_act() {
 # A line id of the sidebar, before it goes in a command: an address of
 # herdr-core (machine/t7), a pane, a ghost, or one of the fixed ones
 side_id_ok() {
-  [[ "${1:-}" =~ ^(ghost:|pane:%)?[A-Za-z0-9_/-]+$ ]] || [ "${1:-}" = options ]
+  [[ "${1:-}" =~ ^(ghost:|pane:%|m:|o:)?[A-Za-z0-9_./-]+$ ]]
 }
 
 # The tmux client of this sidebar (TMUX_PANE): among the ones that show its
@@ -1300,22 +1493,20 @@ side_unsplit() {
 
 # --- Menus of the sidebar --------------------------------------------------
 
-# fzf action for right-click on line $1 of the sidebar (or for
-# "options": a click on the header): a tmux menu (display-menu, the
-# style of tmux, the mouse works in it) in the middle of the screen of the
-# sidebar's client. In the background, the sidebar does not wait for it.
+# fzf action for right-click on line $1 of the sidebar (enter too, on a
+# machine): a tmux menu (display-menu, the style of tmux, the mouse works in
+# it) on that line. In the background, the sidebar does not wait for it.
 side_menu() {
   local id="${1:-}" c
-  case "$id" in -|new*|"") echo ignore; return 0 ;; esac
+  case "$id" in -|new*|madd|o:*|"") echo ignore; return 0 ;; esac
   side_id_ok "$id" || { echo ignore; return 0; }
   c="$(side_client)"
   # (- for no client: the arguments after it keep their place)
   echo "execute-silent($SELF side-popup $id ${c:--} 0 ${TMUX_PANE:--} >/dev/null 2>&1 </dev/null &)"
 }
 
-# The menu of line $1 on client $2 ($3: the item chosen first, for the
-# options menu shown again after a change), anchored on that line of
-# sidebar $4 (the header for the options), or else in the middle
+# The menu of line $1 on client $2 ($3: the item chosen first), anchored on
+# that line of sidebar $4, or else in the middle
 side_popup() {
   local id="$1" c="${2:-}" first="${3:-0}" sp="${4:-}" t win title
   [ "$c" = - ] && c=""
@@ -1324,26 +1515,20 @@ side_popup() {
   local -a it=()
   local run="run-shell -b"
   case "$id" in
-    options)
-      local ttl n
-      ttl="$(tmux show -gqv @herdr_ghost_ttl)"; ttl="${ttl:-24}"
-      n="$(ghosts_clean --dry-run 2>/dev/null | grep -c . || true)"
-      title=" Agents options "
+    m:*)
+      local m="${id#m:}" st ver hv
+      read -r st ver < <(side_data 2>/dev/null | jq -r --arg m "$m" \
+        'select(.machines) | .machines[] | select(.name == $m) | "\(.state) \(.version // "-")"' 2>/dev/null) || true
+      hv="$(side_data 2>/dev/null | jq -r 'select(.hello) | .hello.version' 2>/dev/null)" || true
+      title=" $m: ${st:-?}${ver:+, hc $ver} "
       it=(
-        "Width of the sidebars: $(side_width)…" w
-          "command-prompt -l -I $(side_width) -p 'Width (columns):' { run-shell -b \"$SELF opt width '%%%'\" }"
+        "$(dim_if "$( [ "${st:-}" != connected ] && echo 1 || true)")Log in again…" l
+          "display-popup -E -w 80% -h 60% -T '#[align=centre] Log in: $m ' \"$SELF machine-run login $m\""
+        "$(dim_if "$( [ "${st:-}" = connected ] && [ -n "$hv" ] && [ "${ver:-}" != "$hv" ] && echo 1 || true)")Update hc there${hv:+ (to $hv)}" u
+          "display-popup -E -w 80% -h 60% -T '#[align=centre] Update: $m ' \"$SELF machine-run update $m\""
         ""
-        "$(box "$(not_set @herdr_notify_off)") Desktop notifications" n
-          "run-shell \"$SELF opt notify\" ; $run \"$SELF side-popup options $c 2 $sp\""
-        "$(box "$(is_set @herdr_notify_done)")   also when an agent is done" d
-          "run-shell \"$SELF opt done\" ; $run \"$SELF side-popup options $c 3 $sp\""
-        "$(box "$(is_set @herdr_side_local)") Only the agents of this machine" l
-          "run-shell \"$SELF opt local\" ; $run \"$SELF side-popup options $c 4 $sp\""
-        ""
-        "Ghosts removed after: $( [ "$ttl" = 0 ] && echo never || echo "$ttl h")" g
-          "run-shell \"$SELF opt ttl\" ; $run \"$SELF side-popup options $c 6 $sp\""
-        "$(dim_if "$( [ "$n" != 0 ] && echo 1 || true)")Remove old ghosts now ($n)" c
-          "$run \"$SELF opt clean\""
+        "Remove the machine" d
+          "confirm-before -p 'Forget $m? Its terminals go on there (y/n)' { run-shell -b \"$SELF machine-rm $m\" }"
       ) ;;
     ghost:*)
       t="${id#ghost:}"; title=" Ghost $t "
@@ -1380,12 +1565,12 @@ side_popup() {
   esac
   # -O: a click opens it, another chooses (no need to hold the button)
   tmux display-menu -M -O ${c:+-c "$c"} -C "$first" $(menu_pos "$id" "$c" "$sp" "${it[@]}") \
-    -T "#[align=centre]$title" "${it[@]}"
+    -T "#[align=centre]$title" -- "${it[@]}"
 }
 
 # -x and -y of a menu (items $4...) that starts on the line of item $1 in
 # sidebar $3, seen by client $2: the left of the sidebar, its top on that
-# line (the header for the options). tmux takes -y as the bottom line of
+# line. tmux takes -y as the bottom line of
 # the menu. When it cannot (no sidebar), the middle of the screen.
 menu_pos() {
   local id="$1" c="$2" sp="$3" port pos top left st lines=0 w=0 n sy sx y x
@@ -1397,13 +1582,9 @@ menu_pos() {
   # The status line on top moves the panes down
   st=0
   [ "$(tmux show -gv status-position)" = top ] && [ "$(tmux show -gv status)" != off ] && st=1
-  if [ "$id" = options ]; then
-    pos=-1
-  else
-    port="$(tmux show -pqv -t "$sp" @herdr_side_port 2>/dev/null)"
-    pos="$(curl -s -m 1 "localhost:$port" 2>/dev/null | jq -r '.position // empty' 2>/dev/null)" || true
-    [[ "$pos" =~ ^[0-9]+$ ]] || { echo "-x C -y C"; return 0; }
-  fi
+  port="$(tmux show -pqv -t "$sp" @herdr_side_port 2>/dev/null)"
+  pos="$(curl -s -m 1 "localhost:$port" 2>/dev/null | jq -r '.position // empty' 2>/dev/null)" || true
+  [[ "$pos" =~ ^[0-9]+$ ]] || { echo "-x C -y C"; return 0; }
   # Its size: a line per item or separator, the borders; the longest name
   while [ $# -gt 0 ]; do
     lines=$(( lines + 1 ))
@@ -1441,13 +1622,21 @@ opt_set() {
   mv "$f.tmp" "$f"
 }
 
-# herdr opt <name> [value]: the lines of the options menu
+# herdr opt <name> [value]: the options of the settings view
 opt() {
   local ttl w
   case "${1:-}" in
     width)
       [[ "${2:-}" =~ ^[0-9]+$ ]] && [ "$2" -ge 10 ] || return 0
       opt_set @herdr_side_w "$2"
+      for w in $(tmux list-clients -F '#{window_id}' | sort -u); do side_window_resized "$w"; done ;;
+    height)
+      [[ "${2:-}" =~ ^[0-9]+$ ]] && [ "$2" -ge 4 ] || return 0
+      opt_set @herdr_side_h "$2"
+      for w in $(tmux list-clients -F '#{window_id}' | sort -u); do side_window_resized "$w"; done ;;
+    narrow)
+      [[ "${2:-}" =~ ^[0-9]+$ ]] || return 0
+      opt_set @herdr_side_narrow "$2"
       for w in $(tmux list-clients -F '#{window_id}' | sort -u); do side_window_resized "$w"; done ;;
     notify) opt_set @herdr_notify_off "$(not_set @herdr_notify_off)" ;;
     done) opt_set @herdr_notify_done "$(not_set @herdr_notify_done)" ;;
@@ -1461,6 +1650,7 @@ opt() {
       ttl="$(tmux show -gqv @herdr_ghost_ttl)"; ttl="${ttl:-24}"
       if [ "$ttl" != 0 ]; then HERDR_GHOST_TTL="$ttl" ghosts_clean >/dev/null 2>&1 || true; fi ;;
   esac
+  side_refresh
   return 0
 }
 
@@ -1882,6 +2072,13 @@ case "${1:-}" in
   side-x) side_x "${2:-}" ;;
   side-menu) side_menu "${2:-}" ;;
   side-popup) side_popup "${2:-}" "${3:-}" "${4:-0}" "${5:-}" ;;
+  side-view) side_view ;;
+  side-esc) side_esc ;;
+  side-prompt) side_prompt "${2:-}" "${3:-}" ;;
+  side-refresh) side_refresh ;;
+  machine-add) need_hc; machine_add ;;
+  machine-run) need_hc; case "${2:-}" in login|update) machine_run "$2" "${3:-}" ;; *) exit 2 ;; esac ;;
+  machine-rm) need_hc; machine_rm "${2:-}" ;;
   opt) opt "${2:-}" "${3:-}" ;;
   split) need_hc; [ -n "${2:-}" ] || exit 2; split_t "$2" ;;
   msg) need_hc; [ -n "${2:-}" ] || exit 2; msg_t "$2" ;;
