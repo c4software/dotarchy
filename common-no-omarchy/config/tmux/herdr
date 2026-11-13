@@ -743,8 +743,10 @@ ghosts_clean() {
   shown=" $(tmux list-clients -F '#{window_id}' 2>/dev/null | tr '\n' ' ') "
   local now since
   now="$(date +%s)"
+  # Only the ghosts of this machine (an address without machine/): the
+  # other machines clean their own, they know the windows that show them
   full | jq -r "$GHOST_JQ"'
-      select(.state == "live")
+      select(.state == "live" and ((.address // "") | contains("/") | not))
       | (.labels["herdr.ghost_since"] // "") as $s
       | if ghost then
           # its shell runs nothing: the program in front is the shell itself
