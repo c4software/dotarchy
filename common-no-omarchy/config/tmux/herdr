@@ -623,25 +623,70 @@ remote_shell() {
 # attached to this pane: the sidebar, the notifications and herdr-app see
 # it. Quiet: nothing more than the program itself shows. Ctrl+\ detaches
 # (it keeps running there); it ends, the pane is back to the shell. Without
-# herdr-core, it runs as before.
+# herdr-core, it runs as before. Outside tmux too: any terminal attaches to
+# it the same way (only the tmux pane tag @hc is skipped). Not interactive
+# (no tty, a pipe) or a one-shot mode (print, help, version): run as is.
 here() {
-  local a="$1" out t rc=0 where
-  if [ -z "${TMUX:-}" ] || [ -z "$HC" ]; then exec "$@"; fi
+  local a="$1" out t rc=0 where arg
+  [ -n "$HC" ] && [ -t 0 ] && [ -t 1 ] || exec "$@"
+  for arg in "${@:2}"; do
+    case "$arg" in
+      --) break ;;
+      -p|--print|-h|--help|-v|-V|--version) exec "$@" ;;
+    esac
+  done
+  case "$a ${2:-}" in
+    "codex exec"|"codex e"|"opencode run"|"claude mcp"|"claude config"|"claude update"|"claude doctor") exec "$@" ;;
+  esac
   [ "$a" = codex ] && set -- "$@" --no-daemon
   app_labels "" "$PWD"
   where="$(basename "$PWD")"; [ "$PWD" = "$HOME" ] && where="~"
+  # The terminal gets the environment of herdr-core, not of this shell: the
+  # one of this shell goes in a file (0600, not in argv: tokens) that
+  # env-exec loads before the program (claude-local and its ANTHROPIC_*)
+  local envf
+  envf="$(umask 077; mktemp "${XDG_RUNTIME_DIR:-/tmp}/herdr-env.XXXXXX")"
+  env_dump >"$envf"
   out="$("$HC" run --bg --json --keep --rm --no-parent --cwd "$PWD" \
     --label "herdr.space=$SPACE" --label "herdr.tab=$TAB" \
-    --label "where=$where / $a" --label "herdr.agent=$a" -- "$@" 2>/dev/null)" || true
+    --label "where=$where / $a" --label "herdr.agent=$a" \
+    -- "$SELF" env-exec "$envf" "$@" 2>/dev/null)" || true
   t="$(jq -r '.address // empty' <<<"$out" 2>/dev/null || true)"
-  [ -n "$t" ] || exec "$@"
+  [ -n "$t" ] || { rm -f "$envf"; exec "$@"; }
   if [ -n "$APP_JSON" ]; then
     setsid -f "$SELF" app-names "" "$PWD" "$a" "$TAB" "$SPACE" "$SPACE_NEW" </dev/null >/dev/null 2>&1
   fi
-  tmux set -p -t "${TMUX_PANE:-}" @hc "$t" 2>/dev/null || true
+  [ -z "${TMUX:-}" ] || tmux set -p -t "${TMUX_PANE:-}" @hc "$t" 2>/dev/null || true
   "$HC" attach "$t" 2>/dev/null || rc=$?
-  tmux set -pu -t "${TMUX_PANE:-}" @hc 2>/dev/null || true
+  [ -z "${TMUX:-}" ] || tmux set -pu -t "${TMUX_PANE:-}" @hc 2>/dev/null || true
   return "$rc"
+}
+
+# The environment of this shell, NUL separated, for env-exec: without what
+# names the terminal it runs in (herdr-core has its own) or the shell itself.
+env_dump() {
+  local kv
+  while IFS= read -r -d '' kv; do
+    case "${kv%%=*}" in
+      TERM|COLORTERM|TERM_PROGRAM|TERM_PROGRAM_VERSION|TERMINFO|WINDOWID|VTE_VERSION) ;;
+      KITTY_*|GHOSTTY_*|ALACRITTY_*|WEZTERM_*|FOOT_*|ZELLIJ*) ;;
+      COLUMNS|LINES|SHLVL|_|PWD|OLDPWD) ;;
+      *) printf '%s\0' "$kv" ;;
+    esac
+  done < <(env -0)
+}
+
+# herdr env-exec <file> <program> [args]: what here runs in herdr-core. The
+# environment of the shell that typed it replaces the one of herdr-core
+# (TMUX of the core gone outside tmux), the file goes, then the program.
+env_exec() {
+  local f="$1" kv; shift
+  unset TMUX TMUX_PANE
+  if [ -r "$f" ]; then
+    while IFS= read -r -d '' kv; do export "$kv" 2>/dev/null || true; done <"$f"
+    rm -f "$f"
+  fi
+  exec "$@"
 }
 
 # Gives terminal $1, started without Herdr, the labels of herdr-app.
@@ -2153,6 +2198,7 @@ case "${1:-}" in
     ;;
   app-names) shift; app_names "$@" ;;
   here) shift; [ $# -gt 0 ] || { echo "usage: herdr here <program> [args]" >&2; exit 2; }; here "$@" ;;
+  env-exec) shift; [ $# -gt 1 ] || exit 2; env_exec "$@" ;;
   adopt) need_hc; [ -n "${2:-}" ] || { echo "usage: herdr adopt <terminal>" >&2; exit 2; }; adopt "$2" ;;
   new) need_hc; new_agent "${2:-}" ;;
   shell) need_hc; remote_shell "${2:-}" ;;
