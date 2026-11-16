@@ -26,6 +26,9 @@ systemctl --user enable --now ssh-agent.socket
 systemctl --user mask --now localsearch-3.service
 rm -rf ~/.cache/tracker3
 
+# fcitx5 coupé : lag et répétitions de touches dès que la charge monte
+"$SCRIPT_DIR/disable-fcitx5.sh"
+
 # ~/.local/bin n'existe pas sur une fresh install Omarchy
 mkdir -p ~/.local/bin
 
