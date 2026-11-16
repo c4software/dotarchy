@@ -103,6 +103,20 @@ cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/config/keymaps.lua" ~/.conf
 # Fichiers cachés (.env, .gitignore, …) visibles par défaut dans Neo-tree et le picker Snacks
 cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/plugins/neo-tree-dotfiles.lua" "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/plugins/snacks-picker-hidden.lua" ~/.config/nvim/lua/plugins/
 
+# Les extensions llm-proxy.ts (pi / omp, opencode) vivent dans le dépôt du
+# proxy, à côté de la page qui les affiche (Configuration → Clients) : prises
+# sur sa branche master. Téléchargement impossible : le fichier en place est
+# gardé.
+LLM_PROXY_RAW=https://raw.githubusercontent.com/c4software/llm-proxy/master/proxy/llm_proxy/ui/web/static/config
+llm_proxy_ext() { # <fichier du dépôt du proxy> <destination>
+  if curl -fsSL "$LLM_PROXY_RAW/$1" -o "$2.tmp"; then
+    mv -f "$2.tmp" "$2"
+  else
+    rm -f "$2.tmp"
+    echo "⚠ $1 : téléchargement impossible, $2 inchangé" >&2
+  fi
+}
+
 # Install pi / omp : provider llm-proxy (modèles du proxy) et serveur MCP du
 # proxy (outils web : recherche, lecture de page et de PDF, recherche dans
 # une page, mémoire…). Un mcp.json par agent : pi compte son `timeout` en
@@ -111,7 +125,7 @@ for agent in pi omp; do
   dir=~/.$agent/agent
   mcp=mcp.json; [ $agent = omp ] && mcp=mcp.omp.json
   mkdir -p "$dir/extensions"
-  cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/llm-proxy.ts" "$dir/extensions/"
+  llm_proxy_ext pi-llm-proxy.ts "$dir/extensions/llm-proxy.ts"
   [ -f "$dir/mcp.json" ] || cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/$mcp" "$dir/mcp.json"
 done
 
@@ -152,9 +166,9 @@ fi
 
 # opencode (2.x) : le plugin llm-proxy — provider `llmproxy` (modèles lus sur
 # /v1/models du proxy) et serveur MCP du proxy, outils web intégrés retirés.
-# Il suit le dépôt, comme llm-proxy.ts de pi et omp.
+# Il vient du dépôt du proxy, comme llm-proxy.ts de pi et omp.
 mkdir -p ~/.config/opencode/plugins
-cp "$SCRIPT_DIR/../common-no-omarchy/config/opencode/plugins/llm-proxy.ts" ~/.config/opencode/plugins/
+llm_proxy_ext opencode-llm-proxy.ts ~/.config/opencode/plugins/llm-proxy.ts
 
 # Herdr : Activate zsh in herdr configuration
 [ -f ~/.config/herdr/config.toml ] && sed -i '/^\[terminal\]/a default_shell = "zsh"' ~/.config/herdr/config.toml
