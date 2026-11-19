@@ -161,6 +161,18 @@ forget() {
   "$HC" rm "$1" >/dev/null 2>&1 || true
 }
 
+# The line 󰊠 Remove ghosts (sidebar, Ctrl+K): asked on client $1 first
+ghosts_ask() {
+  local c="${1:-}" n
+  n="$(ghosts_all | grep -c . || true)"
+  if [ "${n:-0}" = 0 ]; then
+    tmux display-message ${c:+-c "$c"} "No ghost to remove (shown in a window, or busy)"
+    return 0
+  fi
+  tmux confirm-before -b ${c:+-t "$c"} -p "Remove $n ghost$( [ "$n" -gt 1 ] && echo s || true)? (y/n)" \
+    "run-shell -b '$SELF ghosts-clean --all'"
+}
+
 # ctrl-x in the sidebar: a ghost is removed, an agent loses its window
 side_x() {
   local c t
@@ -168,7 +180,7 @@ side_x() {
     ghost:*)
       t="${1#ghost:}"; check_addr "$t"; c="$(side_client)"
       tmux confirm-before -b ${c:+-t "$c"} -p "Remove ghost $t? (y/n)" "run-shell -b '$SELF forget $t'" ;;
-    new*|-|pane:*|m:*|o:*|madd|settings|"") ;;
+    new*|-|pane:*|m:*|o:*|madd|settings|ghosts-rm|"") ;;
     *) close_t "$1" ;;
   esac
 }
@@ -764,7 +776,12 @@ GHOST_JQ='def ghost:
   | ["bash", "zsh", "sh", "fish", "dash"] as $shells
   | '"[${GHOST_AGENTS%,}]"' as $agents
   | (.status == null) and ($shells | index($a0)) != null
-    and ($agents | index($wa)) != null;'
+    and ($agents | index($wa)) != null;
+# Its shell runs nothing: the program in front is a shell (keep starts bash,
+# which can start the login shell, zsh: not the same name)
+def idle_shell:
+  ((.foreground.argv[0] // "") | split("/") | last | ltrimstr("-")) as $f
+  | ["bash", "zsh", "sh", "fish", "dash"] | index($f) != null;'
 
 # Ghosts for more than @herdr_ghost_ttl hours (24 when unset, 0: never) go,
 # counted from the first time this finds them one (label herdr.ghost_since;
@@ -774,9 +791,21 @@ GHOST_JQ='def ghost:
 # shell runs something (vim, an agent started again by hand), nor one whose
 # window a client shows. Each one is written in herdr-sidebar.log.
 # $1 = --dry-run: print the ones that would go, remove nothing.
+# $1 = --all (the line 󰊠 Remove ghosts, asked first): every ghost now,
+# whatever its age, with the same exceptions; says how many went.
 ghosts_clean() {
-  local dry="" ttl t win shown
+  local dry="" all="" ttl t win shown
   [ "${1:-}" = --dry-run ] && dry=1
+  [ "${1:-}" = --all ] && all=1
+  if [ -n "$all" ]; then
+    local n=0
+    while read -r t; do
+      forget "$t"; side_log "ghosts: $t removed (Remove ghosts)"; n=$((n + 1))
+    done < <(ghosts_all)
+    tmux display-message "$n ghost$( [ "$n" -gt 1 ] && echo s || true) removed" 2>/dev/null || true
+    side_refresh
+    return 0
+  fi
   ttl="${HERDR_GHOST_TTL:-$(tmux show -gqv @herdr_ghost_ttl 2>/dev/null)}"
   [[ "$ttl" =~ ^[0-9]+$ ]] || ttl=24
   [ "$ttl" -gt 0 ] || [ -n "${HERDR_GHOST_TTL:-}" ] || return 0
@@ -795,8 +824,7 @@ ghosts_clean() {
       | (.labels["herdr.ghost_since"] // "") as $s
       | if ghost then
           # its shell runs nothing: the program in front is the shell itself
-          select(((.foreground.argv[0] // "") | split("/") | last)
-                 == ((.argv[0] // "") | split("/") | last))
+          select(idle_shell)
           | "\(.address) \(if $s == "" then "new" else $s end)"
         elif $s != "" then "\(.address) back"
         else empty end' 2>/dev/null \
@@ -818,6 +846,25 @@ ghosts_clean() {
         forget "$t"
       done || true
   return 0
+}
+
+# The ghosts of this machine that --all removes: not one whose shell runs
+# something, nor one whose window a client shows
+ghosts_all() {
+  local t win shown
+  shown=" $(tmux list-clients -F '#{window_id}' 2>/dev/null | tr '\n' ' ') "
+  full | jq -r "$GHOST_JQ"'
+      select(.state == "live" and ((.address // "") | contains("/") | not))
+      | select(ghost)
+      | select(idle_shell)
+      | .address' 2>/dev/null \
+    | while read -r t; do
+        win="$(find_window "$t")"
+        if [ -n "$win" ] && [[ "$shown" == *" $(tmux display -p -t "$win" '#{window_id}') "* ]]; then
+          continue
+        fi
+        echo "$t"
+      done || true
 }
 
 # --- Sidebar --------------------------------------------------------------
@@ -953,6 +1000,10 @@ side_lines_raw() {
   printf -- '-\t%b\n' "$hdr"
   printf 'new-proj\t \033[1;32m+\033[0m New project agent\n'
   printf 'new-dir\t \033[1;32m+\033[0m New folder agent\n'
+  # The ghosts of this machine (ghosts_clean --all removes only those)
+  local nghost
+  nghost="$(awk -F '\t' -v h="$here" '$3 == h && $4 == "ghost"' <<<"$rows" | grep -c . || true)"
+  [ "${nghost:-0}" = 0 ] || printf 'ghosts-rm\t \033[2m󰊠 \033[0mRemove ghosts \033[2m(%s)\033[0m\n' "$nghost"
   [ -n "${SIDE_COLS:-}" ] || printf 'settings\t \033[2m⚙\033[0m Settings\n'
   # A machine not connected shows, with no agent too
   local down=""
@@ -1282,6 +1333,7 @@ side_act() {
     new-dir) echo "execute-silent($SELF side-new folder $c >/dev/null 2>&1 </dev/null &)" ;;
     # (the line ⚙ Settings, or ← Back in the settings)
     settings) echo "execute-silent($SELF side-view)+reload-sync($SELF side-lines)+first" ;;
+    ghosts-rm) echo "execute-silent($SELF ghosts-ask $c)" ;;
     pane:%*) echo "execute-silent(HERDR_CLIENT=$c $SELF goto-pane ${1#pane:})" ;;
     m:*) side_menu "$1" ;;
     madd) echo "execute-silent(tmux display-popup ${c:+-c $c} -E -w 80% -h 60% -T '#[align=centre] Add a machine ' '$SELF machine-add' >/dev/null 2>&1 </dev/null &)" ;;
@@ -1592,7 +1644,7 @@ side_unsplit() {
 # it) on that line. In the background, the sidebar does not wait for it.
 side_menu() {
   local id="${1:-}" c
-  case "$id" in -|new*|madd|settings|o:*|shell:*|"") echo ignore; return 0 ;; esac
+  case "$id" in -|new*|madd|settings|ghosts-rm|o:*|shell:*|"") echo ignore; return 0 ;; esac
   side_id_ok "$id" || { echo ignore; return 0; }
   c="$(side_client)"
   # (- for no client: the arguments after it keep their place)
@@ -1843,6 +1895,7 @@ palette() {
     new-dir) need_hc; new_agent folder ;;
     shell:*) need_hc; remote_shell "${id#shell:}" ;;
     ghost:*) need_hc; revive "${id#ghost:}" ;;
+    ghosts-rm) need_hc; ghosts_ask ;;
     -|"") ;;
     *) open_t "$id" ;;
   esac
@@ -2187,6 +2240,7 @@ case "${1:-}" in
   msg) need_hc; [ -n "${2:-}" ] || exit 2; msg_t "$2" ;;
   copy) [ -n "${2:-}" ] || exit 2; copy_t "$2" ;;
   ghosts-clean) need_hc; ghosts_clean "${2:-}" ;;
+  ghosts-ask) need_hc; ghosts_ask "${2:-}" ;;
   revive) need_hc; [ -n "${2:-}" ] || exit 2; revive "$2" ;;
   forget) need_hc; [ -n "${2:-}" ] || exit 2; forget "$2" ;;
   dir-preview) dir_preview "${2:-}" "${3:-}" "${4:-.}" ;;
