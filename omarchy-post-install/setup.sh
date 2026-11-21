@@ -94,6 +94,10 @@ sudo pacman -Sy hunspell-fr --noconfirm
 sed -i 's/^size = 9$/size = 10/' ~/.config/alacritty/alacritty.toml
 sed -i 's/^size=9$/size=10/' ~/.config/foot/foot.ini
 
+# Ghostty : Ctrl+Shift+T va à tmux (sa palette, comme Ctrl+K), pas un nouvel onglet
+grep -q '^keybind = ctrl+shift+t=' ~/.config/ghostty/config 2>/dev/null \
+  || printf '\n# Ctrl+Shift+T to tmux (its palette, like Ctrl+K), not a new Ghostty tab\nkeybind = ctrl+shift+t=csi:116;6u\n' >> ~/.config/ghostty/config
+
 # Enable autologin
 sudo cp "$SCRIPT_DIR/configs/sddm-autologin.conf" /etc/sddm.conf.d/autologin.conf
 sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf

@@ -31,3 +31,6 @@ resize-overlay = never
 cursor-style = "block"
 cursor-style-blink = false
 shell-integration-features = no-cursor
+
+# Ctrl+Shift+T to tmux (its palette, like Ctrl+K), not a new Ghostty tab
+keybind = ctrl+shift+t=csi:116;6u

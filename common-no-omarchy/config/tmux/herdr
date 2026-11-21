@@ -124,7 +124,7 @@ open_t() {
   # (claude·llm-proxy@dev-box)
   name="$(full | jq -r --arg t "$t" 'select(.address == $t and .state == "live")
     | [ (.status.app // .foreground.name // .argv[0] // "shell" | split("/") | last | sub("-code$"; "")),
-        ((.labels.where // "" | split(" / ") | first) // ""),
+        (.labels["herdr.name"] // (.labels.where // "" | split(" / ") | first) // ""),
         (.cwd // "") ] | map(if . == "" then "-" else . end) | @tsv' | head -1 || true)"
   [ -n "$name" ] || { tmux display-message "No live Herdr terminal $t"; exit 0; }
   local app space cwd
@@ -162,15 +162,105 @@ forget() {
 }
 
 # The line 󰊠 Remove ghosts (sidebar, Ctrl+K): asked on client $1 first
+# --- Dialogs in the middle of the screen -----------------------------------
+# (not the status line on top, hard to see)
+
+# The client to show a dialog on: $1, or else the one used last
+dlg_client() {
+  local c="${1:-}"
+  [ "$c" = - ] && c=""
+  [ -n "$c" ] || c="$(tmux list-clients -F '#{client_activity} #{client_name}' 2>/dev/null | sort -rn | awk 'NR == 1 { print $2 }')"
+  printf '%s' "$c"
+}
+
+# A yes/no dialog on client $1: title $2, the yes item $3 runs tmux
+# command $4; the lines after are shown dim above the choice
+confirm_box() {
+  local c title="$2" yes="$3" cmd="$4" l
+  c="$(dlg_client "${1:-}")"
+  shift 4
+  local -a it=()
+  for l in "$@"; do it+=("-${l//#/##}" "" ""); done
+  [ "${#it[@]}" = 0 ] || it+=("")
+  it+=("$yes" y "$cmd" "Cancel" n "")
+  tmux display-menu -M -O ${c:+-c "$c"} -x C -y C -C $(( ${#it[@]} / 3 - 1 )) \
+    -T "#[align=centre] ${title//#/##} " -- "${it[@]}"
+}
+
+# herdr ask <what> <arg> [client]: a confirmation (in the middle), or a text
+# box in a popup in the middle (herdr ask-text, run in that popup)
+ask() {
+  local what="$1" a="${2:-}" c="${3:-}"
+  case "$what" in
+    forget) check_addr "$a"
+      confirm_box "$c" "Remove $a?" "Remove" "run-shell -b '$SELF forget $a'" \
+        "$(agent_name "$a")  ($a)" "Its program ends." ;;
+    machine-rm) [[ "$a" =~ ^[A-Za-z0-9_.-]+$ ]] || return 0
+      confirm_box "$c" "Forget $a?" "Forget" "run-shell -b '$SELF machine-rm $a'" \
+        "Its terminals go on there." ;;
+    kill-pane) [[ "$a" =~ ^%[0-9]+$ ]] || return 0
+      confirm_box "$c" "Close pane $a?" "Close" "kill-pane -t $a" \
+        "$(tmux display -p -t "$a" '#{pane_current_command} in #{b:pane_current_path}' 2>/dev/null)" ;;
+    rename|msg|width|height|narrow)
+      c="$(dlg_client "$c")"
+      local t
+      case "$what" in rename) t="Rename $a" ;; msg) t="Message to $a" ;; *) t="Sidebar" ;; esac
+      tmux display-popup ${c:+-c "$c"} -E -w 64 -h 6 -T "#[align=centre] ${t//#/##} " \
+        "$SELF ask-text $what ${a:--}" ;;
+  esac
+}
+
+# The text box itself (in the popup): enter does it, esc cancels
+ask_text() {
+  local what="$1" a="$2" init="" label v rc=0
+  case "$what" in
+    rename) check_addr "$a"; init="$(agent_name "$a")"; label="Name (empty: the folder)" ;;
+    msg) check_addr "$a"; label="Message, sent with enter" ;;
+    width) init="$(side_width)"; label="Width (columns)" ;;
+    height) init="$(side_height)"; label="Band height (lines)" ;;
+    narrow) init="$(tmux show -gqv @herdr_side_narrow)"; init="${init:-$SIDE_NARROW}"; label="Band under (columns)" ;;
+    *) return 0 ;;
+  esac
+  v="$(fzf --query "$init" --print-query --prompt '› ' --layout=reverse --info=hidden \
+        --no-separator --border=none --header "$label · enter: ok · esc: cancel" \
+        --bind 'enter:accept-or-print-query' </dev/null)" || rc=$?
+  [ "$rc" = 130 ] && return 0
+  v="$(head -1 <<<"$v")"
+  case "$what" in
+    rename) tmux set-buffer -b herdr_name -- "=$v"; rename_t "$a" ;;
+    msg) [ -n "$v" ] || return 0; tmux set-buffer -b herdr_msg -- "$v"; msg_t "$a" ;;
+    *) opt "$what" "$v" ;;
+  esac
+}
+
 ghosts_ask() {
-  local c="${1:-}" n
-  n="$(ghosts_all | grep -c . || true)"
-  if [ "${n:-0}" = 0 ]; then
+  local c="${1:-}" one="${2:-}" n t name more=0
+  local -a list=()
+  if [ -n "$one" ]; then
+    check_addr "$one"; list=("$one")
+  else
+    mapfile -t list < <(ghosts_all)
+  fi
+  n="${#list[@]}"
+  c="$(dlg_client "$c")"
+  if [ "$n" = 0 ]; then
     tmux display-message ${c:+-c "$c"} "No ghost to remove (shown in a window, or busy)"
     return 0
   fi
-  tmux confirm-before -b ${c:+-t "$c"} -p "Remove $n ghost$( [ "$n" -gt 1 ] && echo s || true)? (y/n)" \
-    "run-shell -b '$SELF ghosts-clean --all'"
+  # The ghosts (their folder), then the choice
+  local -A names=()
+  local -a lines=()
+  while IFS=$'\t' read -r t name; do names[$t]="$name"; done < <(side_data 2>/dev/null | jq -r \
+    'select(.address) | [.address, (.labels["herdr.name"] // (.labels.where // "" | split(" / ") | first) // "")] | @tsv' 2>/dev/null)
+  for t in "${list[@]}"; do
+    if [ "${#lines[@]}" -ge 8 ]; then more=$(( more + 1 )); continue; fi
+    name="${names[$t]:-}"
+    lines+=("󰊠  ${name:-$t}  ($t)")
+  done
+  [ "$more" = 0 ] || lines+=("    … and $more more")
+  local cmd="run-shell -b '$SELF ghosts-clean --all'"
+  [ -n "$one" ] && cmd="run-shell -b '$SELF forget $one'"
+  confirm_box "$c" "Remove $n ghost$( [ "$n" -gt 1 ] && echo s || true)?" "Remove" "$cmd" "${lines[@]}"
 }
 
 # ctrl-x in the sidebar: a ghost is removed, an agent loses its window
@@ -178,8 +268,7 @@ side_x() {
   local c t
   case "${1:-}" in
     ghost:*)
-      t="${1#ghost:}"; check_addr "$t"; c="$(side_client)"
-      tmux confirm-before -b ${c:+-t "$c"} -p "Remove ghost $t? (y/n)" "run-shell -b '$SELF forget $t'" ;;
+      t="${1#ghost:}"; check_addr "$t"; ghosts_ask "$(side_client)" "$t" ;;
     new*|-|pane:*|m:*|o:*|madd|settings|ghosts-rm|"") ;;
     *) close_t "$1" ;;
   esac
@@ -939,7 +1028,9 @@ side_lines_raw() {
     return 0
   fi
   local -A count=() needs=()
-  local rows
+  local rows bymach
+  # Grouped by state (like herdr-app), or by machine (an option)
+  bymach="$(tmux show -gqv @herdr_side_bymach 2>/dev/null)"
   # One group per machine, this one first; in each, the agents that need you
   # first, then the most recent
   # herdr-core down or slow (timeout): an empty list, said in the header,
@@ -962,20 +1053,25 @@ side_lines_raw() {
       | [ (if $ghost then "ghost" else (.status.state // "") end),
           .address,
           (if $ghost then $wa else (.status.app // .foreground.name // .argv[0] // "shell") end),
-          # The title of the conversation, or else the folder
-          # without the activity glyph agents put first (✳, ⠂…)
-          (if (.title // "") != "" and ($ghost | not) then (.title | sub("^[^\\p{L}\\p{N}]+"; ""))
-           else ($w | split(" / ") | first // "") end),
+          # Its name: the one given (Rename… in its menu), or else its
+          # space of herdr-app (the folder)
+          (.labels["herdr.name"] // ($w | split(" / ") | first) // ""),
+          # Then the title of the conversation, without the activity glyph
+          # agents put first (✳, ⠂…); not the one of a shell (user@host:~/dir)
+          (if $ghost then ""
+           else (.title // "" | sub("^([^\\p{L}\\p{N}]|π)+"; "")
+                 | if test("^[^ ]+@[^ ]+:") then "" else . end) end),
           (.cwd // ""),
           (.status_ms // .created_ms // 0) ]
       # No empty field: read joins the tabs around one (a status null)
       | map(tostring | if . == "" then "-" else . end) | @tsv' 2>/dev/null \
-    | while IFS=$'\t' read -r state addr app name cwd ms; do
+    | while IFS=$'\t' read -r state addr app name sub cwd ms; do
         [ "$cwd" = - ] && cwd=""
         { [ -n "$name" ] && [ "$name" != - ]; } || name="$(basename "${cwd:-?}")"
+        [ "$sub" = "$name" ] && sub=-
         if [[ "$addr" == */* ]]; then mach="${addr%%/*}" key="1$mach"; else mach="$here" key="0"; fi
-        printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$key" "$(rank "$state")" "$mach" "$state" "$addr" "$app" "$name" "$ms"
-      done | sort -t $'\t' -k1,1 -k2,2n -k8,8nr || true)"
+        printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$key" "$(rank "$state")" "$mach" "$state" "$addr" "$app" "$name" "$sub" "$ms"
+      done | if [ -n "$bymach" ]; then sort -t $'\t' -k1,1 -k2,2n -k9,9nr; else sort -t $'\t' -k2,2n -k9,9nr; fi || true)"
   # Options: only the agents of this machine
   if [ -n "$(tmux show -gqv @herdr_side_local 2>/dev/null)" ] && [ -n "$rows" ]; then
     rows="$(awk -F '\t' -v h="$here" '$3 == h' <<<"$rows")"
@@ -1020,12 +1116,24 @@ side_lines_raw() {
     printf 'm:%s\t \033[1m%s\033[0m %b\n' "$mn" "$mn" "$(mach_dot "${mstate[$mn]}")"
   done
   [ -n "$rows" ] || return 0
-  while IFS=$'\t' read -r key rk mach state addr app name ms; do
-    count[$mach]=$(( ${count[$mach]:-0} + 1 ))
-    [ "$state" = blocked ] && needs[$mach]=$(( ${needs[$mach]:-0} + 1 ))
-  done <<<"$rows"
-  while IFS=$'\t' read -r key rk mach state addr app name ms; do
-    if [ "$mach" != "$cur" ]; then
+  if [ -n "$bymach" ]; then
+    while IFS=$'\t' read -r key rk mach state addr app name sub ms; do
+      count[$mach]=$(( ${count[$mach]:-0} + 1 ))
+      [ "$state" = blocked ] && needs[$mach]=$(( ${needs[$mach]:-0} + 1 ))
+    done <<<"$rows"
+  fi
+  local col label sub
+  while IFS=$'\t' read -r key rk mach state addr app name sub ms; do
+    case "$state" in
+      blocked) glyph='\033[1;31m⚠' col='1;31' label='Needs you' ;;
+      error) glyph='\033[31m✗' col='31' label='Error' ;;
+      done) glyph='\033[33m✓' col='33' label='Done' ;;
+      working) glyph='\033[34m●' col='34' label='Working' ;;
+      idle) glyph='\033[2m○' col='2' label='Idle' ;;
+      ghost) glyph='\033[2m󰊠 ' col='2' label='Ghosts' ;;
+      *) glyph=' ' col='2' label='Other' ;;
+    esac
+    if [ -n "$bymach" ] && [ "$mach" != "$cur" ]; then
       cur="$mach"
       # The group of another machine: a click gives its menu
       if [ "$mach" = "$here" ]; then id=-; else id="m:$mach"; fi
@@ -1033,28 +1141,36 @@ side_lines_raw() {
       [ -z "${needs[$mach]:-}" ] || printf ' \033[1;31m⚠%s\033[0m' "${needs[$mach]}"
       [ "$mach" = "$here" ] || printf ' %b' "$(mach_dot "${mstate[$mach]:-}")"
       printf '\n'
+    elif [ -z "$bymach" ] && [ "$label" != "$cur" ]; then
+      cur="$label"
+      printf -- '-\t\n-\t \033[%sm%s\033[0m \033[2m%s\033[0m\n' "$col" "$label" "${st[${state:-other}]:-}"
     fi
-    case "$state" in
-      blocked) glyph='\033[1;31m⚠' ;; error) glyph='\033[31m✗' ;;
-      done) glyph='\033[33m✓' ;; working) glyph='\033[34m●' ;;
-      idle) glyph='\033[2m○' ;; ghost) glyph='\033[2m󰊠 ' ;; *) glyph=' ' ;;
-    esac
     open=""; mark=" "; id="$addr"
     fw="${hcwin[$addr]:-}"
     if [ -n "$fw" ]; then
       open='\033[1m'
       if [ -n "$SIDE_WIN" ] && [ "$fw" = "$SIDE_WIN" ]; then mark='\033[1;36m▸\033[0m'; fi
     fi
-    # icon, name, then age and status on the right
+    [ "$sub" = - ] && sub=""
+    # By state, an agent of another machine says which (name@machine)
+    local at=""
+    [ -z "$bymach" ] && [ "$mach" != "$here" ] && at="@$mach"
+    # icon, name · title, then age and status on the right
     w=$(( cols - 11 ))
     [ "$w" -lt 4 ] && w=4
-    n="$name"; [ "${#n}" -gt "$w" ] && n="${n:0:$((w - 1))}…"
+    n="$name"; [ "${#n}" -gt "$w" ] && { n="${n:0:$((w - 1))}…"; at=""; sub=""; }
+    [ $(( ${#n} + ${#at} )) -gt "$w" ] && at=""
+    local rest=$(( w - ${#n} - ${#at} )) s=""
+    if [ -n "$sub" ] && [ "$rest" -ge 5 ]; then
+      s=" · $sub"; [ "${#s}" -gt "$rest" ] && s="${s:0:$((rest - 1))}…"
+    fi
+    rest=$(( w - ${#n} - ${#at} - ${#s} ))
     # A ghost: dim, enter opens its shell, ctrl-x removes it (asks first)
     # (󰊠 is drawn on two columns where tmux and fzf count one: the space
     # after it takes its second half)
     [ "$state" = ghost ] && { id="ghost:$addr"; open='\033[2m'; }
-    printf '%s\t%b%s %b%s\033[0m \033[2m%3s\033[0m %b\033[0m\n' \
-      "$id" "$mark" "$(icon "$app")" "$open" "$(pad "$n" "$w")" "$(age "$ms")" "$glyph"
+    printf '%s\t%b%s %b%s\033[0m\033[2m%s%s\033[0m%*s \033[2m%3s\033[0m %b\033[0m\n' \
+      "$id" "$mark" "$(icon "$app")" "$open" "$n" "$at" "$s" "$rest" "" "$(age "$ms")" "$glyph"
   done <<<"$rows"
 }
 
@@ -1096,6 +1212,7 @@ settings_lines() {
   printf 'o:notify\t %s Desktop notifications\n' "$(box "$(not_set @herdr_notify_off)")"
   printf 'o:done\t %s   also when an agent is done\n' "$(box "$(is_set @herdr_notify_done)")"
   printf 'o:local\t %s Only this machine'"'"'s agents\n' "$(box "$(is_set @herdr_side_local)")"
+  printf 'o:bymach\t %s Group by machine \033[2m(else by state)\033[0m\n' "$(box "$(is_set @herdr_side_bymach)")"
   printf 'o:width\t     Width \033[1m%s\033[0m columns\n' "$(side_width)"
   printf 'o:height\t     Band \033[1m%s\033[0m lines \033[2m(narrow)\033[0m\n' "$(side_height)"
   n="$(tmux show -gqv @herdr_side_narrow 2>/dev/null)"
@@ -1113,15 +1230,7 @@ settings_lines() {
 # The value of option $1 (width, height, narrow) typed in the status line
 # of client $2
 side_prompt() {
-  local k="$1" c="${2:-}" cur p
-  [ "$c" = - ] && c=""
-  case "$k" in
-    width) cur="$(side_width)" p='Width (columns):' ;;
-    height) cur="$(side_height)" p='Band height (lines):' ;;
-    narrow) cur="$(tmux show -gqv @herdr_side_narrow)"; cur="${cur:-$SIDE_NARROW}" p='Band under (columns):' ;;
-    *) return 0 ;;
-  esac
-  tmux command-prompt ${c:+-t "$c"} -l -I "$cur" -p "$p" "run-shell -b \"$SELF opt $k '%%%'\""
+  case "${1:-}" in width|height|narrow) ask "$1" - "${2:-}" ;; esac
 }
 
 # A click on the header: agents ⇄ settings (fixed fzf actions, a reload
@@ -1677,14 +1786,14 @@ side_popup() {
           "display-popup -E -w 80% -h 60% -T '#[align=centre] Update: $m ' \"$SELF machine-run update $m\""
         ""
         "Remove the machine" d
-          "confirm-before -p 'Forget $m? Its terminals go on there (y/n)' { run-shell -b \"$SELF machine-rm $m\" }"
+          "run-shell -b \"$SELF ask machine-rm $m ${c:--}\""
       ) ;;
     ghost:*)
       t="${id#ghost:}"; title=" Ghost $t "
       it=(
         "Open its shell" o "$run \"HERDR_CLIENT=$c $SELF open $t\""
         ""
-        "Remove it" d "confirm-before -p 'Remove ghost $t? (y/n)' { run-shell -b \"$SELF forget $t\" }"
+        "Remove it" d "run-shell -b \"$SELF ghosts-ask ${c:--} $t\""
       ) ;;
     pane:%*)
       t="${id#pane:}"; title=" tmux pane $t "
@@ -1692,7 +1801,7 @@ side_popup() {
         "Go to the pane" o "$run \"HERDR_CLIENT=$c $SELF goto-pane $t\""
         "Interrupt (ctrl+c)" i "send-keys -t $t C-c"
         ""
-        "Close the pane" d "confirm-before -p 'Close pane $t? (y/n)' { kill-pane -t $t }"
+        "Close the pane" d "run-shell -b \"$SELF ask kill-pane $t ${c:--}\""
       ) ;;
     *)
       t="$id"; title=" $t "
@@ -1704,12 +1813,12 @@ side_popup() {
         ""
         "Interrupt (ctrl+c)" i "$run \"$HC interrupt $t\""
         "Send a message…" m
-          "command-prompt -p 'Message:' { set-buffer -b herdr_msg -- \"%%%\" ; run-shell -b \"$SELF msg $t\" }"
-        "$(dim_if "$win")Rename its window…" r
-          "command-prompt -l -I '$(tmux display -p -t "${win:-}" '#{window_name}' 2>/dev/null | sed "s/'//g")' -p 'Name:' { rename-window -t ${win:-} -- \"%%%\" }"
+          "run-shell -b \"$SELF ask msg $t ${c:--}\""
+        "Rename…" r
+          "run-shell -b \"$SELF ask rename $t ${c:--}\""
         "Copy its address" y "$run \"$SELF copy $t\""
         ""
-        "Remove the agent" d "confirm-before -p 'Remove $t, its program ends? (y/n)' { run-shell -b \"$SELF forget $t\" }"
+        "Remove the agent" d "run-shell -b \"$SELF ask forget $t ${c:--}\""
       ) ;;
   esac
   # -O: a click opens it, another chooses (no need to hold the button)
@@ -1790,6 +1899,7 @@ opt() {
     notify) opt_set @herdr_notify_off "$(not_set @herdr_notify_off)" ;;
     done) opt_set @herdr_notify_done "$(not_set @herdr_notify_done)" ;;
     local) opt_set @herdr_side_local "$(not_set @herdr_side_local)" ;;
+    bymach) opt_set @herdr_side_bymach "$(not_set @herdr_side_bymach)" ;;
     ttl)
       ttl="$(tmux show -gqv @herdr_ghost_ttl)"
       case "${ttl:-24}" in 12) w=24 ;; 24) w=48 ;; 48) w=168 ;; 168) w=0 ;; *) w=12 ;; esac
@@ -1831,6 +1941,42 @@ copy_t() {
   tmux set-buffer -- "$1"
   if command -v wl-copy >/dev/null 2>&1; then printf '%s' "$1" | wl-copy 2>/dev/null || true; fi
   tmux display-message "Copied: $1"
+}
+
+# The name the sidebar shows for agent $1: the one given, or its space
+agent_name() {
+  side_data 2>/dev/null | jq -r --arg t "$1" 'select(.address == $t)
+    | .labels["herdr.name"] // (.labels.where // "" | split(" / ") | first) // ""' 2>/dev/null | head -1 || true
+}
+
+# Agent $1 named as typed in the menu's prompt (buffer herdr_name): the
+# label herdr.name (empty: removed, the folder again), its window, its tab
+# in herdr-app
+rename_t() {
+  local t="$1" v v2 win app pre="" tab
+  check_addr "$t"
+  v="$(tmux show-buffer -b herdr_name 2>/dev/null)" || return 0
+  tmux delete-buffer -b herdr_name 2>/dev/null || true
+  # (= first: tmux keeps no empty buffer)
+  v="$(printf '%s' "${v#=}" | tr -d '\t\n' | sed 's/^ *//; s/ *$//')"
+  "$HC" label "$t" "herdr.name=$v" >/dev/null 2>&1 \
+    || { tmux display-message "Could not rename $t"; return 0; }
+  # (no name: the window shows the folder again, herdr-app the number of its tab)
+  local given="$v"
+  [ -n "$v" ] || v="$(agent_name "$t")"
+  win="$(find_window "$t")"
+  if [ -n "$win" ] && [ -n "$v" ]; then
+    app="$(tmux display -p -t "$win" '#{window_name}' 2>/dev/null)"
+    app="${app%%·*}"
+    v2="$v"; [[ "$t" == */* ]] && v2="$v@${t%%/*}"
+    tmux rename-window -t "$win" -- "${app:+$app·}${v2//#/##}" 2>/dev/null || true
+  fi
+  if command -v herdr-app >/dev/null 2>&1; then
+    tab="$(full | jq -r --arg t "$t" 'select(.address == $t) | .labels["herdr.tab"] // empty' | head -1 || true)"
+    [[ "$t" == */* ]] && pre="${t%%/*}/"
+    [ -n "$tab" ] && timeout 3 herdr-app do tab.rename --id "$pre$tab" --name "$given" >/dev/null 2>&1 || true
+  fi
+  side_refresh
 }
 
 # --- Palette (Ctrl+K) -------------------------------------------------------
@@ -2238,9 +2384,12 @@ case "${1:-}" in
   opt) opt "${2:-}" "${3:-}" ;;
   split) need_hc; [ -n "${2:-}" ] || exit 2; split_t "$2" ;;
   msg) need_hc; [ -n "${2:-}" ] || exit 2; msg_t "$2" ;;
+  ask) need_hc; [ -n "${2:-}" ] || exit 2; ask "$2" "${3:-}" "${4:-}" ;;
+  ask-text) need_hc; [ -n "${2:-}" ] || exit 2; ask_text "$2" "${3:-}" ;;
+  rename) need_hc; [ -n "${2:-}" ] || exit 2; rename_t "$2" ;;
   copy) [ -n "${2:-}" ] || exit 2; copy_t "$2" ;;
   ghosts-clean) need_hc; ghosts_clean "${2:-}" ;;
-  ghosts-ask) need_hc; ghosts_ask "${2:-}" ;;
+  ghosts-ask) need_hc; c="${2:-}"; [ "$c" = - ] && c=""; ghosts_ask "$c" "${3:-}" ;;
   revive) need_hc; [ -n "${2:-}" ] || exit 2; revive "$2" ;;
   forget) need_hc; [ -n "${2:-}" ] || exit 2; forget "$2" ;;
   dir-preview) dir_preview "${2:-}" "${3:-}" "${4:-.}" ;;
