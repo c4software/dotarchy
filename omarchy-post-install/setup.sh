@@ -133,6 +133,16 @@ for agent in pi omp; do
   [ -f "$dir/mcp.json" ] || cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/$mcp" "$dir/mcp.json"
 done
 
+# Réglages omp (modèle par défaut, sous-agents) : config.omp.yml posé s'il
+# manque ; omp écrit lui-même dans ce fichier, donc s'il existe seul le bloc
+# `task` (sous-agents, clé de premier niveau) y est ajouté quand il manque.
+omp_cfg="$SCRIPT_DIR/../common-no-omarchy/config/pi/config.omp.yml"
+if [ ! -f ~/.omp/agent/config.yml ]; then
+  cp "$omp_cfg" ~/.omp/agent/config.yml
+elif ! grep -q '^task:' ~/.omp/agent/config.yml; then
+  sed -n '/^task:/,$p' "$omp_cfg" >> ~/.omp/agent/config.yml
+fi
+
 # Codex : le provider llm-proxy et le même serveur MCP du proxy, ajoutés à
 # ~/.codex/config.toml s'ils n'y sont pas — le fichier n'est pas remplacé,
 # Codex y écrit lui-même (projets de confiance, interface). Sans provider

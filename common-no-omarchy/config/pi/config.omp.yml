@@ -1,0 +1,19 @@
+# Réglages omp (~/.omp/agent/config.yml) pour Flash-Next servi par gufo via
+# llm-proxy. omp écrit lui-même dans ce fichier (thème, setupVersion…) : le
+# post-install ne le pose que s'il manque, et ajoute sinon le bloc `task` s'il
+# n'y est pas.
+providers:
+  # Un long prompt peut attendre une place libre côté gufo avant le premier
+  # token.
+  streamFirstEventTimeoutSeconds: 900
+modelRoles:
+  default: llmproxy/silentchuck/qwen3.8-flash-next:high
+# Sous-agents : gufo sert Flash-Next en 3 sessions (GUFO_SESSIONS de
+# llmsetup) ; 2 sous-agents simultanés laissent une place au fil principal.
+# Effort medium pour les sous-agents (task, explore, scout).
+task:
+  agentModelOverrides:
+    task: llmproxy/silentchuck/qwen3.8-flash-next:medium
+    explore: llmproxy/silentchuck/qwen3.8-flash-next:medium
+    scout: llmproxy/silentchuck/qwen3.8-flash-next:medium
+  maxConcurrency: 2
