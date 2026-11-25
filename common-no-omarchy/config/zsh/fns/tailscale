@@ -1,5 +1,6 @@
 # `tailscale funnel` maison : expose un service local publiquement sur https://<machine>.$TS_DOMAIN
 # Chaîne : reverse proxy public → relais tailnet → <machine>:$TS_PRIVATE_PORT (tailscale serve)
+# Domaine public : TS_DOMAIN (~/.tsserve.env), sinon le nom MagicDNS (base_domain public + certificats).
 # Headscale ne gère pas le vrai funnel : ce wrapper intercepte `tailscale funnel`,
 # toutes les autres sous-commandes partent au vrai binaire (`command tailscale funnel` pour l'original).
 #
@@ -10,10 +11,13 @@
 #   dossier → lance automatiquement python -m http.server (listing + fichiers)
 #
 # Prérequis une fois par machine : sudo tailscale set --operator=$USER ; jq
-# Config privée (non versionnée) dans ~/.tsserve.env :
-#   TS_DOMAIN=sous.domaine.exemple
-#   TS_PRIVATE_PORT=12345
-# Sans ~/.tsserve.env : port 48174 et URL tailnet seulement (http://<machine>.<magicdns>:<port>)
+# Config privée facultative (non versionnée) dans ~/.tsserve.env :
+#   TS_DOMAIN=sous.domaine.exemple   (URL https://<machine>.$TS_DOMAIN)
+#   TS_PRIVATE_PORT=12345           (défaut 48174)
+# Domaine MagicDNS non public (.arpa, .internal, .local, .lan) : URL tailnet seulement (http://<machine>:<port>)
+# Sans TS_DOMAIN, depuis le tailnet l'URL publique mène directement à la machine (MagicDNS) : URL tailnet affichée.
+# Après un changement de base_domain : 404 de serve tant que le client garde l'ancien suffixe en cache
+#   → command tailscale set --update-check=false && command tailscale set --update-check=true
 [[ -r ~/.tsserve.env ]] && source ~/.tsserve.env
 TS_PRIVATE_PORT=${TS_PRIVATE_PORT:-48174}
 TS_HTTP_STATE=${XDG_RUNTIME_DIR:-/tmp}/tsserve-http   # "pid port dossier" du python lancé
@@ -41,10 +45,22 @@ _ts_funnel() {
   esac
 }
 
-_ts_name() { command tailscale status --json | jq -r '.Self.DNSName | split(".")[0]' }
+_ts_fqdn() { command tailscale status --json | jq -r '.Self.DNSName | rtrimstr(".")' }
+_ts_name() { local f=$(_ts_fqdn); print -n ${f%%.*} }
+_ts_tailnet_url() { print -n "http://$(_ts_fqdn):$TS_PRIVATE_PORT" }
 _ts_url() {
-  if [[ -n $TS_DOMAIN ]]; then print -n "https://$(_ts_name).$TS_DOMAIN"
-  else print -n "http://$(command tailscale status --json | jq -r '.Self.DNSName | rtrimstr(".")'):$TS_PRIVATE_PORT"; fi
+  local f=$(_ts_fqdn)
+  [[ -n $TS_DOMAIN ]] && { print -n "https://${f%%.*}.$TS_DOMAIN"; return }
+  case $f in
+    *.arpa|*.internal|*.local|*.lan) print -n "http://$f:$TS_PRIVATE_PORT" ;;
+    *) print -n "https://$f" ;;
+  esac
+}
+# "URL (tailnet : URL)" quand l'URL publique diffère de l'URL tailnet
+_ts_urls() {
+  local u=$(_ts_url) t=$(_ts_tailnet_url)
+  if [[ $u == $t ]]; then print -n "%F{cyan}$u%f"
+  else print -n "%F{cyan}$u%f %F{8}(tailnet : $t)%f"; fi
 }
 _ts_copy() { command -v wl-copy >/dev/null && print -n -- "$1" | wl-copy }
 
@@ -77,6 +93,12 @@ _ts_http_start() {
 # _ts_serve <bg|fg> <cible>
 _ts_serve() {
   local mode=$1 target=${2:?usage: tailscale funnel [--bg] <port|url|dossier|fichier>} backend url port
+  # Un partage au premier plan tourne déjà (autre terminal) : ne pas tuer son python
+  if command tailscale serve status --json 2>/dev/null \
+      | jq -e --arg p $TS_PRIVATE_PORT '[.Foreground // {} | .[] | .TCP // {} | has($p)] | any' >/dev/null; then
+    print -u2 "déjà partagé au premier plan dans un autre terminal (Ctrl+C là-bas d'abord)"
+    return 1
+  fi
   _ts_http_stop
   if [[ -d $target ]]; then
     port=$(_ts_http_start "$target") || return 1
@@ -91,13 +113,13 @@ _ts_serve() {
     if ! command tailscale serve --bg --http=$TS_PRIVATE_PORT "$backend" >/dev/null; then
       _ts_http_stop; return 1
     fi
-    print -P "%F{cyan}🌍 $url%f → $target %F{8}(tailscale serve sur :$TS_PRIVATE_PORT)%f"
+    print -P "🌍 $(_ts_urls) → $target %F{8}(tailscale serve sur :$TS_PRIVATE_PORT)%f"
     _ts_copy "$url"
     return
   fi
 
   # Premier plan : tailscale serve retire sa config tout seul à Ctrl+C, on arrête python ensuite
-  print -P "%F{cyan}🌍 $url%f → $target %F{8}(tailscale serve sur :$TS_PRIVATE_PORT, Ctrl+C pour arrêter)%f"
+  print -P "🌍 $(_ts_urls) → $target %F{8}(tailscale serve sur :$TS_PRIVATE_PORT, Ctrl+C pour arrêter)%f"
   _ts_copy "$url"
   setopt localoptions localtraps
   trap ':' INT
@@ -120,7 +142,7 @@ _ts_status() {
     read -r pid port dir < $TS_HTTP_STATE
     [[ $tgt == *:$port ]] && tgt="$dir (python :$port)"
   fi
-  if [[ -n $tgt ]]; then print "🌍 $(_ts_url) → $tgt"
+  if [[ -n $tgt ]]; then print -P "🌍 $(_ts_urls) → $tgt"
   else print -P "%F{8}🌍 $(_ts_url) (inactif)%f"; fi
 }
 

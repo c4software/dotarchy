@@ -11,22 +11,20 @@ screensaver() {
   fi
   (( ${#files} )) || { echo "No scene found in: $src"; return 1; }
 
-  # q / Esc (or Ctrl+C) quits; any other key skips the pause to the next scene
+  # q, Esc or Ctrl+C quits; any other key skips the pause to the next scene.
+  # The tty is put in -isig so Ctrl+C arrives as a \x03 byte, polled every 0.1 s:
+  # exiting from a signal trap would leave zsh blocked in the pending read.
   (
-    local stty_saved=$(stty -g) pid= last= file key
-    _ss_quit() {
-      [[ -n $pid ]] && { kill $pid 2>/dev/null; wait $pid 2>/dev/null; }
-      stty $stty_saved
-      printf '\e[0m'
-      tput cnorm
-      clear
-      exit 0
+    local stty_saved=$(stty -g) pid= last= file key quit=0 i
+    _ss_key() {
+      read -s -k1 -t 0.1 key || return 1
+      [[ $key == [qQ] || $key == $'\e' || $key == $'\x03' ]] && quit=1
+      return 0
     }
-    _ss_key() { read -s -k1 -t $1 key && [[ $key == [qQ] || $key == $'\e' ]] && _ss_quit; }
-    trap _ss_quit INT TERM
-    stty -echo -icanon
+    trap 'quit=1' INT TERM HUP
+    stty -echo -icanon -isig
     tput civis
-    while true; do
+    while (( ! quit )); do
       file=${files[RANDOM % ${#files} + 1]}
       (( ${#files} > 1 )) && [[ $file == $last ]] && continue
       last=$file
@@ -35,11 +33,18 @@ screensaver() {
         --canvas-width 0 --canvas-height 0 --reuse-canvas \
         --anchor-canvas c --anchor-text c --random-effect --no-eol </dev/null &
       pid=$!
-      while kill -0 $pid 2>/dev/null; do _ss_key 0.1; done
+      while (( ! quit )) && kill -0 $pid 2>/dev/null; do _ss_key; done
+      if (( quit )); then
+        kill $pid 2>/dev/null
+        wait $pid 2>/dev/null
+        break
+      fi
       wait $pid || break
-      pid=
-      _ss_key 3
+      for i in {1..30}; do (( quit )) && break; _ss_key && break; done
     done
-    _ss_quit
+    stty $stty_saved
+    printf '\e[0m'
+    tput cnorm
+    clear
   )
 }
