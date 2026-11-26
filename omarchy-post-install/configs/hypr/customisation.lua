@@ -92,7 +92,12 @@ o.bind("ALT + SHIFT + code:13", nil, "omarchy-menu summon capture")
 -- hl.exec_cmd pour lancer tmux à la place, uniquement pour ce cas précis.
 local stock_exec_cmd = hl.exec_cmd
 hl.exec_cmd = function(cmd, opts, ...)
-	if cmd == "omarchy-agent" and opts and type(opts.workspace) == "string" and opts.workspace:find("^special:qconsole") then
+	if
+		cmd == "omarchy-agent"
+		and opts
+		and type(opts.workspace) == "string"
+		and opts.workspace:find("^special:qconsole")
+	then
 		cmd = "omarchy-launch-terminal-tmux"
 	end
 	return stock_exec_cmd(cmd, opts, ...)
@@ -105,6 +110,3 @@ o.bind(
 	"Move window to Quake console",
 	hl.dsp.window.move({ workspace = "special:qconsole", follow = false })
 )
-
--- Redimensionner en tirant les bordures, en tiling comme en floating (comme upstream).
-hl.config({ general = { resize_on_border = true, extend_border_grab_area = 8 } })
