@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+# Met à jour le catalogue des modèles de Codex (catalogue-local.json, lu par
+# model_catalog_json de ~/.codex/config.toml) à partir de /v1/models du
+# proxy, puis l'installe dans ~/.codex.
+#
+# Les entrées déjà présentes ne sont jamais réécrites : leurs niveaux de
+# raisonnement, noms et descriptions sont choisis à la main (profils gufo).
+# Un modèle de conversation du proxy absent du catalogue y est ajouté sur le
+# modèle de la première entrée (mêmes instructions de base, sans lesquelles
+# Codex refuse le fichier), avec le contexte et les modalités annoncés par le
+# proxy, et les niveaux low / medium / high sans niveau par défaut (comme le
+# catalogue que génère la page du proxy). Une entrée que le proxy ne sert
+# plus est signalée, pas retirée (--prune la retire).
+#
+#   codex-catalogue-update            ajoute les modèles manquants, installe
+#   codex-catalogue-update --dry-run  montre ce qui changerait, n'écrit rien
+#   codex-catalogue-update --prune    retire aussi les modèles plus servis
+#
+# Le fichier versionné (DOTARCHY_DIR, ~/dotarchy par défaut) est mis à jour
+# aussi, sans commit. Codex ne lit le catalogue qu'au lancement.
+set -euo pipefail
+
+ENDPOINT="${LLM_PROXY_URL:-http://llmproxy}"
+ENDPOINT="${ENDPOINT%/}"
+KEYFILE="${LLM_PROXY_KEYFILE:-$HOME/.config/llm-proxy.key}"
+REPO_FILE="${DOTARCHY_DIR:-$HOME/dotarchy}/common-no-omarchy/config/codex/catalogue-local.json"
+INSTALLED="$HOME/.codex/catalogue-local.json"
+
+dry=0
+prune=0
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) dry=1 ;;
+    --prune) prune=1 ;;
+    -h | --help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "Option inconnue : $arg (voir --help)" >&2; exit 2 ;;
+  esac
+done
+
+# Source : le fichier versionné s'il existe, sinon celui déjà installé.
+src="$REPO_FILE"
+[[ -f "$src" ]] || src="$INSTALLED"
+[[ -f "$src" ]] || { echo "Aucun catalogue de départ ($REPO_FILE, $INSTALLED)." >&2; exit 1; }
+
+key="${LLM_PROXY_API_KEY:-}"
+[[ -n "$key" && "$key" != unused ]] || key="$(cat "$KEYFILE" 2>/dev/null || echo unused)"
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+code=$(curl -s -o "$tmp/models.json" -w '%{http_code}' --max-time 20 \
+  -H "Authorization: Bearer $key" "$ENDPOINT/v1/models" || true)
+case "$code" in
+  200) ;;
+  401) echo "Clé refusée par $ENDPOINT (401) : llm-proxy-key pour la reposer." >&2; exit 1 ;;
+  *) echo "Proxy injoignable ou réponse inattendue ($ENDPOINT : ${code:-aucune})." >&2; exit 1 ;;
+esac
+
+python3 -I - "$src" "$tmp/models.json" "$tmp/catalogue.json" "$prune" <<'PY'
+import copy, json, sys
+
+src, served_path, out, prune = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == "1"
+cat = json.load(open(src, encoding="utf-8"))
+served = json.load(open(served_path, encoding="utf-8"))["data"]
+
+# Les modèles de conversation : ni image, ni voix, ni embeddings, ni rerank.
+CHAT = {"text-generation", "image-text-to-text"}
+chat, seen = [], set()
+for m in served:
+    if m.get("type") not in CHAT or m["id"] in seen:
+        continue
+    chat.append(m)
+    # Un alias servi aussi comme id (mistral/glm-5-2 et mistral/zai-glm-5-2)
+    # ne fait pas un deuxième modèle.
+    seen.add(m["id"])
+    seen.update(m.get("aliases") or [])
+
+ids = {m["id"] for m in chat}
+models = cat["models"]
+if not models:
+    sys.exit("Catalogue de départ vide : aucune entrée à prendre pour modèle.")
+known = {e["slug"] for e in models}
+
+gone = [e["slug"] for e in models if e["slug"] not in ids]
+for s in gone:
+    print(("retiré      " if prune else "plus servi  ") + s)
+if prune:
+    models = [e for e in models if e["slug"] in ids]
+
+tpl = copy.deepcopy(cat["models"][0])
+for k in ("default_reasoning_level", "availability_nux", "upgrade"):
+    tpl.pop(k, None)
+for m in chat:
+    if m["id"] in known:
+        continue
+    backend, _, name = m["id"].partition("/")
+    e = copy.deepcopy(tpl)
+    ctx = m.get("max_context_length")
+    e.update({
+        "slug": m["id"],
+        "display_name": name or m["id"],
+        "description": f"Servi par {backend}, via llm-proxy",
+        # Sans niveau par défaut : rien n'est imposé tant qu'on n'en choisit
+        # pas un, le backend garde le sien.
+        "supported_reasoning_levels": [{"effort": x, "description": x}
+                                       for x in ("low", "medium", "high")],
+        "priority": 10 if backend == "silentchuck" else 20,
+        "input_modalities": [x for x in ("text", "image")
+                             if x in m["architecture"]["input_modalities"]] or ["text"],
+    })
+    if ctx:
+        e["context_window"] = e["max_context_window"] = ctx
+    else:
+        e.pop("context_window", None)
+        e.pop("max_context_window", None)
+    models.append(e)
+    print(f"ajouté      {m['id']}  (contexte {ctx or '?'}, {'+'.join(e['input_modalities'])})")
+
+cat["models"] = models
+with open(out, "w", encoding="utf-8") as f:
+    f.write(json.dumps(cat, indent=1, ensure_ascii=False))
+PY
+
+if cmp -s "$tmp/catalogue.json" "$src" && cmp -s "$tmp/catalogue.json" "$INSTALLED"; then
+  echo "Catalogue à jour ($(python3 -I -c 'import json,sys;print(len(json.load(open(sys.argv[1]))["models"]))' "$src") modèles)."
+  exit 0
+fi
+if ((dry)); then
+  echo "(--dry-run : rien d'écrit)"
+  exit 0
+fi
+
+if [[ -f "$REPO_FILE" ]]; then
+  cp "$tmp/catalogue.json" "$REPO_FILE"
+  echo "Écrit : $REPO_FILE (à commiter)"
+fi
+mkdir -p "$(dirname "$INSTALLED")"
+cp "$tmp/catalogue.json" "$INSTALLED"
+echo "Installé : $INSTALLED"
+
+grep -q '^model_catalog_json *= *".*catalogue-local.json"' "$HOME/.codex/config.toml" 2>/dev/null \
+  || echo "Attention : ~/.codex/config.toml ne pointe pas model_catalog_json sur $INSTALLED." >&2
+# Le TUI passe par un démon `codex app-server` gardé entre les lancements :
+# tant qu'il tourne, il garde l'ancien catalogue.
+if pgrep -f 'codex app-server' >/dev/null; then
+  echo "Codex ne lit le catalogue qu'au lancement : quitter Codex, puis pkill -f 'codex app-server'."
+else
+  echo "Pris en compte au prochain lancement de Codex."
+fi
