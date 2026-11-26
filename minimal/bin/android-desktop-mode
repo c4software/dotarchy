@@ -11,7 +11,8 @@
 # `on` makes an overlay display on the phone, forces desktop windowing on
 # external displays, then shows that display with scrcpy, the phone seeing
 # this computer's keyboard and mouse as real ones (uhid). The overlay also
-# shows, small, over the phone's own screen while it is on. Closing scrcpy's
+# shows, small, over the phone's own screen while it is on: scrcpy turns that
+# screen off (Alt+Shift+o back on, Alt+o off again). Closing scrcpy's
 # window, or Ctrl-C, puts the phone back as it was.
 #
 # The settings it changes are read first and saved, once, per device, in
@@ -85,7 +86,7 @@ case "$1" in
 on)
     size="${2:-1920x1080/160}"
     if ! command -v scrcpy > /dev/null; then
-        echo "scrcpy is missing: sudo pacman -S scrcpy" >&2
+        echo "scrcpy is missing: mise use -g \"github:Genymobile/scrcpy[filter_bins=scrcpy]@latest\"" >&2
         exit 1
     fi
     # Saved once: a second `on` must not take the forced values for the phone's own.
@@ -114,7 +115,7 @@ on)
         exit 1
     fi
     echo "Desktop display: $id ($size). Close the window or press Ctrl-C to put the phone back."
-    scrcpy -s "$serial" --display-id="$id" --keyboard=uhid --mouse=uhid || true
+    scrcpy -s "$serial" --display-id="$id" --keyboard=uhid --mouse=uhid --turn-screen-off --stay-awake || true
     ;;
 off)
     if [ ! -f "$state" ]; then

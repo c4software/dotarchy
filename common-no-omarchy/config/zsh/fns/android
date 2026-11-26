@@ -1,9 +1,10 @@
-# Pick an Android emulator with gum and launch it detached (extra args go to the emulator, e.g. android-emu -no-snapshot-load)
+# Pick an Android emulator with gum and start it through the Android CLI, which
+# returns once the device is ready (extra args go to android emulator start,
+# e.g. android-emu --cold or android-emu --headless; stop: android emulator stop <avd>)
 android-emu() {
-  local emulator="$HOME/Android/Sdk/emulator/emulator"
   local avds avd
 
-  avds="$("$emulator" -list-avds 2>/dev/null)"
+  avds="$(android emulator list 2>/dev/null)"
   if [[ -z "$avds" ]]; then
     echo "No emulator found"
     return 1
@@ -11,8 +12,7 @@ android-emu() {
 
   avd="$(echo "$avds" | gum choose --header "Launch emulator")" || return
 
-  nohup "$emulator" -avd "$avd" "$@" &> /dev/null &!
-  echo "Launching $avd"
+  android emulator start "$@" "$avd"
 }
 
 enable-java() {
