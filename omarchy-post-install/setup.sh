@@ -163,22 +163,23 @@ fi
 # Codex y écrit lui-même (projets de confiance, interface). Sans provider
 # choisi, `model_provider` et un modèle de départ sont posés en tête (clés de
 # premier niveau : avant toute table), avec le catalogue des modèles du proxy
-# (catalogue-local.json, suit le dépôt) : sans lui, Codex leur refuse tout
-# niveau de raisonnement ; il remplace le catalogue intégré (instructions de
-# base de Codex 0.164.0). /model propose les autres modèles du catalogue, qui
-# donne aussi le contexte de chacun. Sans raisonnement par défaut :
+# (llm-proxy-models.json) : sans lui, Codex leur refuse tout niveau de
+# raisonnement ; il remplace le catalogue intégré. Il se télécharge depuis la
+# page du proxy (Configuration → Clients → Codex CLI, case « catalogue », les
+# modèles voulus cochés), seule source : niveaux de chaque modèle déclarés
+# par son backend (model_efforts), contexte, instructions de base. /model
+# propose les autres modèles du catalogue. Sans raisonnement par défaut :
 # -c model_reasoning_effort=low évite que Flash-Next recopie sans fin son
 # dernier appel d'outil (gufo #388), mais coûte environ x3 en temps. Connecteurs ChatGPT coupés ([features] apps) :
 # connecté à ChatGPT, Codex en ajoute 115 outils, et gufo refuse une requête
 # de plus de 128.
 mkdir -p ~/.codex
-cp "$SCRIPT_DIR/../common-no-omarchy/config/codex/catalogue-local.json" ~/.codex/
 touch ~/.codex/config.toml
 grep -q '^\[model_providers\.llm-proxy\]' ~/.codex/config.toml \
   || cat "$SCRIPT_DIR/../common-no-omarchy/config/codex/provider-llmproxy.toml" >> ~/.codex/config.toml
 if ! grep -q '^model_provider *=' ~/.codex/config.toml; then
   printf '%s\n' 'model = "silentchuck/qwen3.8-flash-next"' 'model_provider = "llm-proxy"' \
-    "model_catalog_json = \"$HOME/.codex/catalogue-local.json\"" \
+    "model_catalog_json = \"$HOME/.codex/llm-proxy-models.json\"" \
     'model_reasoning_effort = "none"' '' | cat - ~/.codex/config.toml > ~/.codex/config.toml.new
   mv ~/.codex/config.toml.new ~/.codex/config.toml
 fi
@@ -186,6 +187,8 @@ grep -q '^\[mcp_servers\.llmproxy\]' ~/.codex/config.toml \
   || cat "$SCRIPT_DIR/../common-no-omarchy/config/codex/mcp-llmproxy.toml" >> ~/.codex/config.toml
 grep -q '^\[features\]' ~/.codex/config.toml \
   || printf '\n[features]\napps = false\n' >> ~/.codex/config.toml
+[ -f ~/.codex/llm-proxy-models.json ] \
+  || echo "Codex : télécharger le catalogue depuis la page du proxy (Configuration → Clients → Codex CLI) dans ~/.codex/llm-proxy-models.json."
 
 # Clé de compte llm-proxy (~/.config/llm-proxy.key, lue par zsh/envs) : à
 # poser maintenant ou plus tard avec llm-proxy-key.
