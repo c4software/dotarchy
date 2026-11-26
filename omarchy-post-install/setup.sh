@@ -75,6 +75,10 @@ sudo pacman -Rns --noconfirm scrcpy android-tools 2>/dev/null || true
 ln -sfn ~/Android/Sdk/platform-tools/adb ~/.local/bin/adb
 ln -sfn ~/Android/Sdk/platform-tools/fastboot ~/.local/bin/fastboot
 mise use -g android-cli@latest
+# Java et Gradle des builds Android : mise (JAVA_HOME posé par mise), plus le
+# JBR d'Android Studio ni un Gradle téléchargé à la main. 21 : la version que
+# toutes les versions de Gradle et d'AGP en usage acceptent.
+mise use -g java@temurin-21 gradle@latest
 mise use -g "github:Genymobile/scrcpy[filter_bins=scrcpy]@latest"
 mise set -g 'ADB={{env.HOME}}/Android/Sdk/platform-tools/adb'
 
