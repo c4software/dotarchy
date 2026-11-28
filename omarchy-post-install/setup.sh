@@ -1,224 +1,42 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Post-install Omarchy : lance les modules de modules/ dans l'ordre de leur numéro.
+#
+#   ./setup.sh                    tous les modules
+#   ./setup.sh apps ai-agents     seulement ceux-là (nom sans numéro ni .sh)
+#   ./setup.sh --list             liste les modules
+#
+# Un module peut aussi se lancer seul : ./modules/50-apps.sh
+# Comme avant le découpage, une commande en échec n'arrête pas la suite.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export SCRIPT_DIR
 
-sudo pacman -Sy --noconfirm wget
+name_of() { local n=${1##*/}; n=${n%.sh}; echo "${n#[0-9]*-}"; }
 
-# Copy zsh configuration to the HOME config folder
-cp -R $SCRIPT_DIR/../common-no-omarchy/config/zsh/ ~/.config/
-cp $SCRIPT_DIR/../common-no-omarchy/default/zshrc ~/.zshrc
+modules=("$SCRIPT_DIR"/modules/[0-9]*.sh)
 
-# Install zsh and zsh-completions
-sudo pacman -Sy --noconfirm zsh zsh-completions
+if [ "$1" = --list ]; then
+  for m in "${modules[@]}"; do
+    printf '%-12s %s\n' "$(name_of "$m")" "$(sed -n '2s/^# //p' "$m")"
+  done
+  exit 0
+fi
 
-# Force zsh startup (inspired by omarchy-zsh)
-cp $SCRIPT_DIR/configs/bashrc ~/.bashrc
+selected=()
+if [ $# -eq 0 ]; then
+  selected=("${modules[@]}")
+  export DOTARCHY_SETUP_ALL=1
+else
+  for want in "$@"; do
+    found=
+    for m in "${modules[@]}"; do
+      [ "$(name_of "$m")" = "$want" ] && { selected+=("$m"); found=1; }
+    done
+    [ -n "$found" ] || { echo "Module inconnu : $want (./setup.sh --list)" >&2; exit 1; }
+  done
+fi
 
-# ssh-agent : la config zsh (envs) pointe SSH_AUTH_SOCK sur $XDG_RUNTIME_DIR/ssh-agent.socket (sauf agent transmis en SSH),
-# il faut donc activer l'unite socket d'OpenSSH (sinon aucun agent, et ForwardAgent est inutile)
-systemctl --user enable --now ssh-agent.socket
-
-# LocalSearch (ex-Tracker3, tiré par nautilus) : indexeur de fichiers coupé.
-# Il indexe projets, SDK et node_modules (index de plusieurs Go dans
-# ~/.cache/tracker3) et tourne pendant les compilations. La recherche Nautilus
-# marche sans, en parcourant le disque. Réactiver :
-# systemctl --user unmask --now localsearch-3.service
-systemctl --user mask --now localsearch-3.service
-rm -rf ~/.cache/tracker3
-
-# fcitx5 coupé : lag et répétitions de touches dès que la charge monte
-"$SCRIPT_DIR/disable-fcitx5.sh"
-
-# ~/.local/bin n'existe pas sur une fresh install Omarchy
-mkdir -p ~/.local/bin
-
-# Install try.sh command
-curl -sL https://raw.githubusercontent.com/c4software/try.sh/main/try.sh -o ~/.local/bin/try
-chmod +x ~/.local/bin/try
-
-# Installation proj command
-curl -sL https://raw.githubusercontent.com/c4software/prj.sh/main/prj.sh -o ~/.local/bin/proj
-chmod +x ~/.local/bin/proj
-
-# Copy the « Mix Light / Dark » theme to the Omarych Theme folder
-cp -R $SCRIPT_DIR/../archlinux/install/tilling/config/themes/mix-light-dark ~/.config/omarchy/themes
-
-# Installation bepoDev pour l'utilisateur
-echo "Installing Bépo Dev keyboard layout (Utilisateur)..."
-mkdir -p ~/.config/xkb/symbols ~/.config/xkb/rules || true
-wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/bepoDev -O ~/.config/xkb/symbols/bepoDev || true
-wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/evdev.lst -O ~/.config/xkb/rules/evdev.lst || true
-wget https://raw.githubusercontent.com/c4software/bepo_developpeur/master/linux/evdev.xml -O ~/.config/xkb/rules/evdev.xml || true
-[ -L ~/.config/xkb/rules/base.lst ] || ln -s ~/.config/xkb/rules/evdev.lst ~/.config/xkb/rules/base.lst || true
-[ -L ~/.config/xkb/rules/base.xml ] || ln -s ~/.config/xkb/rules/evdev.xml ~/.config/xkb/rules/base.xml || true
-
-# Bépo standard hors session (TTY et login SDDM) ; bepoDev reste pour la session.
-# --no-convert : sinon chaque commande localectl écrase le réglage de l'autre.
-# Hyprland hérite de XKBVARIANT : customisation.lua le remet à vide pour bepoDev.
-sudo localectl --no-convert set-keymap fr-bepo
-sudo localectl --no-convert set-x11-keymap fr pc105 bepo terminate:ctrl_alt_bksp
-
-echo -e "\nConfiguring uhid module to fix BLE mouse issue..."
-echo -e "# Fix BLE mouse issue\nuhid" | sudo tee /etc/modules-load.d/uhid.conf
-
-# Installation plugin alt-tab
-omarchy plugin add https://github.com/c4software/hyprland-alttab --enable
-
-# Cp the bin/* contents to ~/.local/bin/
-cp $SCRIPT_DIR/bin/* ~/.local/bin/
-
-# Android : une source par outil. Le CLI android par mise ; adb et fastboot
-# sont ceux du SDK (~/Android/Sdk, celui d'Android Studio et du CLI), aucun
-# paquet pacman. scrcpy par mise, sur l'adb du SDK via ADB : sinon il prend
-# l'adb de son archive, d'une autre version que le serveur.
-sudo pacman -Rns --noconfirm scrcpy android-tools 2>/dev/null || true
-ln -sfn ~/Android/Sdk/platform-tools/adb ~/.local/bin/adb
-ln -sfn ~/Android/Sdk/platform-tools/fastboot ~/.local/bin/fastboot
-mise use -g android-cli@latest
-# Java et Gradle des builds Android : mise (JAVA_HOME posé par mise), plus le
-# JBR d'Android Studio ni un Gradle téléchargé à la main. 21 : la version que
-# toutes les versions de Gradle et d'AGP en usage acceptent.
-mise use -g java@temurin-21 gradle@latest
-mise use -g "github:Genymobile/scrcpy[filter_bins=scrcpy]@latest"
-mise set -g 'ADB={{env.HOME}}/Android/Sdk/platform-tools/adb'
-
-# Create a vim alias
-sudo ln -sf /usr/bin/nvim /usr/bin/vim
-
-# Move default configuration for hyprland
-echo "Move default configuration for Hyprland"
-cp $SCRIPT_DIR/configs/hypr/* ~/.config/hypr/
-
-# Require customisation.lua from hyprland.lua if not already present
-grep -q '^require("hypr.customisation")' ~/.config/hypr/hyprland.lua || echo 'require("hypr.customisation")' >>~/.config/hypr/hyprland.lua
-
-# Idle : screensaver après 4h, lock après 6h (remplace l'ancien hypridle.conf)
-jq '.idle.screensaver = 14400 | .idle.lock = 21600' ~/.config/omarchy/shell.json >~/.config/omarchy/shell.json.tmp && mv ~/.config/omarchy/shell.json.tmp ~/.config/omarchy/shell.json
-
-# Sur secteur, capot fermé ne suspend plus (réveil à distance possible)
-sudo cp "$SCRIPT_DIR/configs/logind-lid-remote-wake.conf" /etc/systemd/logind.conf.d/30-lid-remote-wake.conf
-sudo systemctl kill -s HUP systemd-logind
-
-# Uninstall some extra default application
-sudo pacman -Rsnc 1password-beta 1password-cli chromium --noconfirm || true
-
-# Installation de hunspell-fr
-sudo pacman -Sy hunspell-fr --noconfirm
-
-# Changement taille font dans Alacritty & Foot
-sed -i 's/^size = 9$/size = 10/' ~/.config/alacritty/alacritty.toml
-sed -i 's/^size=9$/size=10/' ~/.config/foot/foot.ini
-
-# Ghostty : Ctrl+Shift+T va à tmux (sa palette, comme Ctrl+K), pas un nouvel onglet
-grep -q '^keybind = ctrl+shift+t=' ~/.config/ghostty/config 2>/dev/null \
-  || printf '\n# Ctrl+Shift+T to tmux (its palette, like Ctrl+K), not a new Ghostty tab\nkeybind = ctrl+shift+t=csi:116;6u\n' >> ~/.config/ghostty/config
-
-# Enable autologin
-sudo cp "$SCRIPT_DIR/configs/sddm-autologin.conf" /etc/sddm.conf.d/autologin.conf
-sudo sed -i "s/USERNAME$/$USER/" /etc/sddm.conf.d/autologin.conf
-
-# Install nvim configuration
-cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/config/keymaps.lua" ~/.config/nvim/lua/config/keymaps.lua
-# Fichiers cachés (.env, .gitignore, …) visibles par défaut dans Neo-tree et le picker Snacks
-cp "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/plugins/neo-tree-dotfiles.lua" "$SCRIPT_DIR/../common-no-omarchy/config/nvim/lua/plugins/snacks-picker-hidden.lua" ~/.config/nvim/lua/plugins/
-
-# Les extensions llm-proxy.ts (pi / omp, opencode) vivent dans le dépôt du
-# proxy, à côté de la page qui les affiche (Configuration → Clients) : prises
-# sur sa branche master. Téléchargement impossible : le fichier en place est
-# gardé.
-LLM_PROXY_RAW=https://raw.githubusercontent.com/c4software/llm-proxy/master/proxy/llm_proxy/ui/web/static/config
-llm_proxy_ext() { # <fichier du dépôt du proxy> <destination>
-  if curl -fsSL "$LLM_PROXY_RAW/$1" -o "$2.tmp"; then
-    mv -f "$2.tmp" "$2"
-  else
-    rm -f "$2.tmp"
-    echo "⚠ $1 : téléchargement impossible, $2 inchangé" >&2
-  fi
-}
-
-# Install pi / omp : provider llm-proxy (modèles du proxy) et serveur MCP du
-# proxy (outils web : recherche, lecture de page et de PDF, recherche dans
-# une page, mémoire…). Un mcp.json par agent : pi compte son `timeout` en
-# secondes, omp en millisecondes. Un mcp.json déjà présent n'est pas écrasé.
-for agent in pi omp; do
-  dir=~/.$agent/agent
-  mcp=mcp.json; [ $agent = omp ] && mcp=mcp.omp.json
-  mkdir -p "$dir/extensions"
-  llm_proxy_ext pi-llm-proxy.ts "$dir/extensions/llm-proxy.ts"
-  [ -f "$dir/mcp.json" ] || cp "$SCRIPT_DIR/../common-no-omarchy/config/pi/$mcp" "$dir/mcp.json"
+for m in "${selected[@]}"; do
+  printf '\n\033[1;34m==> %s\033[0m\n' "$(name_of "$m")"
+  bash "$m" || echo "⚠ module $(name_of "$m") : code de sortie $?" >&2
 done
-
-# Réglages omp (modèle par défaut, sous-agents) : config.omp.yml posé s'il
-# manque ; omp écrit lui-même dans ce fichier, donc s'il existe seul le bloc
-# `task` (sous-agents, clé de premier niveau) y est ajouté quand il manque.
-omp_cfg="$SCRIPT_DIR/../common-no-omarchy/config/pi/config.omp.yml"
-if [ ! -f ~/.omp/agent/config.yml ]; then
-  cp "$omp_cfg" ~/.omp/agent/config.yml
-elif ! grep -q '^task:' ~/.omp/agent/config.yml; then
-  sed -n '/^task:/,$p' "$omp_cfg" >> ~/.omp/agent/config.yml
-fi
-
-# Codex : le provider llm-proxy et le même serveur MCP du proxy, ajoutés à
-# ~/.codex/config.toml s'ils n'y sont pas — le fichier n'est pas remplacé,
-# Codex y écrit lui-même (projets de confiance, interface). Sans provider
-# choisi, `model_provider` et un modèle de départ sont posés en tête (clés de
-# premier niveau : avant toute table), avec le catalogue des modèles du proxy
-# (llm-proxy-models.json) : sans lui, Codex leur refuse tout niveau de
-# raisonnement ; il remplace le catalogue intégré. Il se télécharge depuis la
-# page du proxy (Configuration → Clients → Codex CLI, case « catalogue », les
-# modèles voulus cochés), seule source : niveaux de chaque modèle déclarés
-# par son backend (model_efforts), contexte, instructions de base. /model
-# propose les autres modèles du catalogue. Sans raisonnement par défaut :
-# -c model_reasoning_effort=low évite que Flash-Next recopie sans fin son
-# dernier appel d'outil (gufo #388), mais coûte environ x3 en temps. Connecteurs ChatGPT coupés ([features] apps) :
-# connecté à ChatGPT, Codex en ajoute 115 outils, et gufo refuse une requête
-# de plus de 128.
-mkdir -p ~/.codex
-touch ~/.codex/config.toml
-grep -q '^\[model_providers\.llm-proxy\]' ~/.codex/config.toml \
-  || cat "$SCRIPT_DIR/../common-no-omarchy/config/codex/provider-llmproxy.toml" >> ~/.codex/config.toml
-if ! grep -q '^model_provider *=' ~/.codex/config.toml; then
-  printf '%s\n' 'model = "silentchuck/qwen3.8-flash-next"' 'model_provider = "llm-proxy"' \
-    "model_catalog_json = \"$HOME/.codex/llm-proxy-models.json\"" \
-    'model_reasoning_effort = "none"' '' | cat - ~/.codex/config.toml > ~/.codex/config.toml.new
-  mv ~/.codex/config.toml.new ~/.codex/config.toml
-fi
-grep -q '^\[mcp_servers\.llmproxy\]' ~/.codex/config.toml \
-  || cat "$SCRIPT_DIR/../common-no-omarchy/config/codex/mcp-llmproxy.toml" >> ~/.codex/config.toml
-grep -q '^\[features\]' ~/.codex/config.toml \
-  || printf '\n[features]\napps = false\n' >> ~/.codex/config.toml
-[ -f ~/.codex/llm-proxy-models.json ] \
-  || echo "Codex : télécharger le catalogue depuis la page du proxy (Configuration → Clients → Codex CLI) dans ~/.codex/llm-proxy-models.json."
-
-# Clé de compte llm-proxy (~/.config/llm-proxy.key, lue par zsh/envs) : à
-# poser maintenant ou plus tard avec llm-proxy-key.
-if [ ! -s ~/.config/llm-proxy.key ] && gum confirm --default=false "Poser la clé de compte llm-proxy ?"; then
-  ~/.local/bin/llm-proxy-key || true
-fi
-
-# opencode (2.x) : le plugin llm-proxy — provider `llmproxy` (modèles lus sur
-# /v1/models du proxy) et serveur MCP du proxy, outils web intégrés retirés.
-# Il vient du dépôt du proxy, comme llm-proxy.ts de pi et omp.
-mkdir -p ~/.config/opencode/plugins
-llm_proxy_ext opencode-llm-proxy.ts ~/.config/opencode/plugins/llm-proxy.ts
-
-# Herdr : Activate zsh in herdr configuration
-[ -f ~/.config/herdr/config.toml ] && sed -i '/^\[terminal\]/a default_shell = "zsh"' ~/.config/herdr/config.toml
-
-# Tmux : la config de dotarchy remplace celle d'Omarchy (zsh, Ctrl+T, boutons
-# + et agents de la barre, barre latérale et palette des agents Herdr)
-mkdir -p ~/.config/tmux
-cp "$SCRIPT_DIR/../common-no-omarchy/config/tmux/tmux.conf" \
-  "$SCRIPT_DIR/../common-no-omarchy/config/tmux/herdr.conf" \
-  "$SCRIPT_DIR/../common-no-omarchy/config/tmux/herdr" ~/.config/tmux/
-
-# Enable some keyboard stuff (nuphy, apple keyboard key swapping)
-(
-  source "$SCRIPT_DIR/keyboard.sh"
-  setup
-)
-
-# Docker rootless (à la demande) : docker sans sudo, à côté du démon root d'Omarchy
-if gum confirm --default=false "Installer Docker rootless (docker sans sudo) ?"; then
-  "$SCRIPT_DIR/docker-rootless.sh"
-fi

@@ -11,6 +11,12 @@
 
 set -euo pipefail
 
+# Lancé avec tous les modules (./setup.sh sans argument) : seulement si on le
+# demande. Lancé explicitement (./setup.sh docker ou seul) : directement.
+if [[ ${DOTARCHY_SETUP_ALL:-} == 1 ]] && ! gum confirm --default=false "Installer Docker rootless (docker sans sudo) ?"; then
+  exit 0
+fi
+
 ok()   { printf '\033[32m✓\033[0m %s\n' "$*"; }
 info() { printf '\033[34m→\033[0m %s\n' "$*"; }
 warn() { printf '\033[33m!\033[0m %s\n' "$*"; }
